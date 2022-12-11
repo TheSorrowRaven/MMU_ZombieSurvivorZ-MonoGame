@@ -56,6 +56,46 @@ namespace ZombieSurvivorZ
             return axis2;
         }
 
+        public static int GetNumberKeysDown(int min, int max)
+        {
+            for (int i = min; i <= max; i++)
+            {
+                Keys key = GetNumKey(i);
+                if (IsKeyDown(key))
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+        public static int GetNumberKeysFirstDown(int min, int max)
+        {
+            for (int i = min; i <= max; i++)
+            {
+                Keys key = GetNumKey(i);
+                if (IsKeyFirstDown(key))
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        public static Keys GetNumKey(int val) => val switch
+        {
+            0 => Keys.D0,
+            1 => Keys.D1,
+            2 => Keys.D2,
+            3 => Keys.D3,
+            4 => Keys.D4,
+            5 => Keys.D5,
+            6 => Keys.D6,
+            7 => Keys.D7,
+            8 => Keys.D8,
+            9 => Keys.D9,
+            _ => Keys.None,
+        };
+
         public static bool IsLMouseDown()
         {
             return MouseState.LeftButton == ButtonState.Pressed;

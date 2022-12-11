@@ -11,11 +11,12 @@ namespace ZombieSurvivorZ
 
         public Pistol()
         {
-            _fireTime = 0.1f;
-            _reloadTime = 2.2f;
-            _switchTime = 0.5f;
-            _clipSize = 9;
-            _canAutoFire = false;
+            FireTime = 0.2f;
+            RecoilTime = 0.05f;
+            ReloadTime = 2.2f;
+            SwitchTime = 0.5f;
+            ClipSize = 9;
+            CanAutoFire = false;
 
             AmmoInClip = 9;
             AmmoReserve = 14;
@@ -23,7 +24,13 @@ namespace ZombieSurvivorZ
 
         public override void Initialize()
         {
-            Texture = Game1.TextureBank["cursor_piece"];
+            PlayerBodyTextureHolding = Game1.GetTexture("Player/player_body_holdingpistol");
+            PlayerBodyTextureRecoiling = Game1.GetTexture("Player/player_body_firingpistol");
+
+            WeaponTexture = Game1.GetTexture("Player/player_pistol");
+            WeaponRecoilTexture = Game1.GetTexture("Player/player_recoilingpistol");
+
+            Texture = WeaponTexture;
 
             base.Initialize();
         }

@@ -14,7 +14,7 @@ namespace ZombieSurvivorZ
 
         public override void Initialize()
         {
-            Texture = Game1.TextureBank["cursor_piece"];
+            Texture = Game1.GetTexture("cursor_piece");
             Position = Game1.ScreenCenter;
             Scale = new(0.5f, 0.5f);
         }

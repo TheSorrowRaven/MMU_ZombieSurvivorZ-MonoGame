@@ -20,17 +20,12 @@ namespace ZombieSurvivorZ
         public State WeaponState { get; protected set; } = State.Holstered;
 
         //Stats
-        protected float _fireTime;
-        protected float _reloadTime;
-        protected float _switchTime;
-        protected int _clipSize;
-        protected bool _canAutoFire;
-
-        public float FireTime => _fireTime;
-        public float ReloadTime => _reloadTime;
-        public float SwitchTime => _switchTime;
-        public int ClipSize => _clipSize;
-        public bool CanAutoFire => _canAutoFire;
+        public float FireTime { get; protected set; }
+        public float RecoilTime { get; protected set; }
+        public float ReloadTime { get; protected set; }
+        public float SwitchTime { get; protected set; }
+        public int ClipSize { get; protected set; }
+        public bool CanAutoFire { get; protected set; }
 
         //Ammo
         public int AmmoReserve { get; protected set; }
@@ -38,13 +33,30 @@ namespace ZombieSurvivorZ
 
         //Time control
         private float fireTimeCount;
+        private float recoilTimeCount;
         private float reloadTimeCount;
         private float switchTimeCount;
+
+        //Graphics
+        public bool IsRecoiling { get; protected set; }
+        public Texture2D PlayerBodyTextureHolding { get; protected set; }
+        public Texture2D PlayerBodyTextureRecoiling { get; protected set; }
+        public Texture2D WeaponTexture { get; protected set; }
+        public Texture2D WeaponRecoilTexture { get; protected set; }
 
 
         public override void Initialize()
         {
-            Texture = Game1.TextureBank["cursor_piece"];
+
+        }
+
+        public virtual Texture2D GetPlayerBodyTexture()
+        {
+            if (IsRecoiling)
+            {
+                return PlayerBodyTextureRecoiling;
+            }
+            return PlayerBodyTextureHolding;
         }
 
         public virtual void HoldWeapon()
@@ -56,22 +68,23 @@ namespace ZombieSurvivorZ
         public virtual void HolsterWeapon()
         {
             WeaponState = State.Holstered;
+            Active = false;
         }
 
         public virtual void SemiFire()
         {
-            Fire();
+            TryFire();
         }
 
         public virtual void AutoFire()
         {
             if (CanAutoFire)
             {
-                Fire();
+                TryFire();
             }
         }
 
-        protected virtual void Fire()
+        protected virtual void TryFire()
         {
             if (WeaponState == State.Holstered)
             {
@@ -107,9 +120,27 @@ namespace ZombieSurvivorZ
                 return;
             }
 
+            Fire();
+        }
+
+        protected virtual void Fire()
+        {
             Console.WriteLine("Bang!!");
             AmmoInClip--;
             fireTimeCount = FireTime;
+
+            Recoil();
+        }
+
+        protected virtual void Recoil()
+        {
+            recoilTimeCount = RecoilTime;
+            IsRecoiling = true;
+        }
+
+        protected virtual void FinishRecoil()
+        {
+            IsRecoiling = false;
         }
 
         public virtual void Reload()
@@ -181,7 +212,35 @@ namespace ZombieSurvivorZ
             {
                 fireTimeCount -= Time.deltaTime;
             }
+
+            if (IsRecoiling)
+            {
+                if (recoilTimeCount > 0)
+                {
+                    //Recoiling...
+                    recoilTimeCount -= Time.deltaTime;
+                    return;
+                }
+                FinishRecoil();
+                return;
+            }
+
         }
+
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            Texture2D texture;
+            if (IsRecoiling)
+            {
+                texture = WeaponRecoilTexture;
+            }
+            else
+            {
+                texture = WeaponTexture;
+            }
+            spriteBatch.Draw(texture, Position, null, Color, Rotation, OriginPixels, Scale, SpriteEffects.None, RenderOrder);
+        }
+
 
     }
 }
