@@ -16,9 +16,10 @@ namespace ZombieSurvivorZ
             Switching,
         }
 
+        //State
         public State WeaponState { get; protected set; } = State.Holstered;
 
-        // Stats
+        //Stats
         protected float _fireTime;
         protected float _reloadTime;
         protected float _switchTime;
@@ -31,11 +32,11 @@ namespace ZombieSurvivorZ
         public int ClipSize => _clipSize;
         public bool CanAutoFire => _canAutoFire;
 
-        // Ammo
+        //Ammo
         public int AmmoReserve { get; protected set; }
         public int AmmoInClip { get; protected set; }
 
-        // Time control
+        //Time control
         private float fireTimeCount;
         private float reloadTimeCount;
         private float switchTimeCount;
