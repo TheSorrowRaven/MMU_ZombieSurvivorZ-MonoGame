@@ -1,3 +1,3 @@
 ﻿
-using var game = new ZombieSurvivorZ.Game1();
+using var game = ZombieSurvivorZ.Game1.Current;
 game.Run();

@@ -15,6 +15,12 @@ namespace ZombieSurvivorZ
             return (double)MathF.Abs(b - a) < (double)MathF.Max(1E-06f * MathF.Max(MathF.Abs(a),
                 MathF.Abs(b)), float.Epsilon * 8.0f);
         }
+
+        public static float Lerp(float from, float to, float t)
+        {
+            return from + t * (to - from);
+        }
+
     }
 
     public static class Vector2Utils

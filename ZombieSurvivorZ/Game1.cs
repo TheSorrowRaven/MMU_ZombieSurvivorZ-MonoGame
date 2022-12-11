@@ -7,14 +7,16 @@ namespace ZombieSurvivorZ
 {
     public class Game1 : Game
     {
-        public static Dictionary<string, Texture2D> TextureBank = new();
+        public static readonly Game1 Current = new();
+
+        private static readonly Dictionary<string, Texture2D> TextureBank = new();
         public static GameWindow Screen { get; private set; }
         public static Vector2 ScreenCenter => new(Screen.ClientBounds.Width / 2, Screen.ClientBounds.Height / 2);
 
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        public Game1()
+        private Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -32,14 +34,26 @@ namespace ZombieSurvivorZ
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            TextureBank.Add("player", Content.Load<Texture2D>("player"));
+            //TextureBank.Add("player", Content.Load<Texture2D>("player"));
+            //TextureBank.Add("cursor_piece", Content.Load<Texture2D>("cursor_piece"));
 
             Player player = new()
             {
                 Position = new(100, 100)
             };
-            World.AddGameObject(player);
 
+            Cursor cursor = new();
+
+        }
+
+        public static Texture2D GetTexture(string name)
+        {
+            if (!TextureBank.TryGetValue(name, out Texture2D texture))
+            {
+                texture = Current.Content.Load<Texture2D>(name);
+                TextureBank.Add(name, texture);
+            }
+            return texture;
         }
 
         protected override void Update(GameTime gameTime)

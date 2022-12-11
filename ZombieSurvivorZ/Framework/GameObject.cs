@@ -9,7 +9,7 @@ namespace ZombieSurvivorZ
         public bool Active { get; set; } = true;
         public string Name { get; set; }
         public Vector2 Position { get; set; }
-        public Vector2 Scale { get; set; }
+        public Vector2 Scale { get; set; } = Vector2.One;
 
         private Vector2 _heading = new(1, 0);
         private bool _headingDirty = true;
@@ -49,14 +49,15 @@ namespace ZombieSurvivorZ
         private bool _alive = true;
         public bool Alive => _alive;
 
-        public GameObject()
+        public GameObject() : this("New GameObject")
         {
-            Name = "New GameObject";
+
         }
 
         public GameObject(string name)
         {
             Name = name;
+            World.AddGameObject(this);
         }
 
         public abstract Rectangle Bounds();

@@ -45,6 +45,7 @@ namespace ZombieSurvivorZ
 
         // Internally, this is the origin used when drawing.
         private Vector2 originPixels;
+        public Vector2 OriginPixels => originPixels;
 
         private Rectangle bounds;
 
@@ -82,7 +83,7 @@ namespace ZombieSurvivorZ
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(Texture, Position, null, Color, Rotation, originPixels, 1.0f, SpriteEffects.None, RenderOrder);
+            spriteBatch.Draw(Texture, Position, null, Color, Rotation, OriginPixels, Scale, SpriteEffects.None, RenderOrder);
         }
     }
 }
