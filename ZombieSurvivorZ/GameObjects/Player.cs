@@ -8,38 +8,55 @@ namespace ZombieSurvivorZ
     public class Player : SpriteObject
     {
 
-        private float movementSpeed;
+        private float movementSpeed = 100;
+
+        private Weapon weapon;
 
         public override void Initialize()
         {
-            movementSpeed = 100;
-
             Texture = Game1.TextureBank["player"];
             RotationOffset = 90 * MathF.PI / 180;
             Position = Game1.ScreenCenter;
+            Pistol pistol = new();
+            SwitchToWeapon(pistol);
         }
 
         public override void Update()
         {
-            Vector2 movement = new();
-            if (Input.KeyboardState.IsKeyDown(Keys.W))
-            {
-                movement.Y -= 1;
-            }
-            if (Input.KeyboardState.IsKeyDown(Keys.S))
-            {
-                movement.Y += 1;
-            }
-            if (Input.KeyboardState.IsKeyDown(Keys.A))
-            {
-                movement.X -= 1;
-            }
-            if (Input.KeyboardState.IsKeyDown(Keys.D))
-            {
-                movement.X += 1;
-            }
+            TransformUpdate();
+            WeaponUpdate();
+        }
+
+        private void TransformUpdate()
+        {
+            Vector2 movement = Input.ConstructAxis2(Keys.S, Keys.W, Keys.D, Keys.A);
             Position += movement * movementSpeed * Time.deltaTime;
-            Heading = Input.MouseState.Position.ToVector2() - Position;
+            Heading = Input.MousePos - Position;
+        }
+
+        private void SwitchToWeapon(Weapon weapon)
+        {
+            this.weapon = weapon;
+            weapon.HoldWeapon();
+        }
+
+        private void WeaponUpdate()
+        {
+            if (weapon == null)
+            {
+                return;
+            }
+
+            if (Input.IsLMouseFirstDown())
+            {
+                weapon.SemiFire();
+            }
+            else if (Input.IsLMouseDown())
+            {
+                weapon.AutoFire();
+            }
+            
+
         }
 
     }

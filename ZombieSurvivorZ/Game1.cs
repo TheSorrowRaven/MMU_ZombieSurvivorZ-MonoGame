@@ -33,12 +33,14 @@ namespace ZombieSurvivorZ
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             TextureBank.Add("player", Content.Load<Texture2D>("player"));
+            TextureBank.Add("cursor_piece", Content.Load<Texture2D>("cursor_piece"));
 
             Player player = new()
             {
                 Position = new(100, 100)
             };
-            World.AddGameObject(player);
+
+            Cursor cursor = new();
 
         }
 
