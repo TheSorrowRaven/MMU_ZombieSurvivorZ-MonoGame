@@ -1,11 +1,16 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 
 namespace ZombieSurvivorZ
 {
     public class Game1 : Game
     {
+        public static Dictionary<string, Texture2D> TextureBank = new();
+        public static GameWindow Screen { get; private set; }
+        public static Vector2 ScreenCenter => new(Screen.ClientBounds.Width / 2, Screen.ClientBounds.Height / 2);
+
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
@@ -18,7 +23,7 @@ namespace ZombieSurvivorZ
 
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
+            Screen = Window;
 
             base.Initialize();
         }
@@ -27,15 +32,29 @@ namespace ZombieSurvivorZ
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // TODO: use this.Content to load your game content here
+            TextureBank.Add("player", Content.Load<Texture2D>("player"));
+
+            Player player = new()
+            {
+                Position = new(100, 100)
+            };
+            World.AddGameObject(player);
+
         }
 
         protected override void Update(GameTime gameTime)
         {
+            Time.time = (float)gameTime.TotalGameTime.TotalSeconds;
+            Time.deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            Time.frameCount++;
+
+            Input.Update(gameTime);
+
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
+            //Collision.Simulate();
+            World.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -44,7 +63,11 @@ namespace ZombieSurvivorZ
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
+            _spriteBatch.Begin();
+
+            World.Draw(_spriteBatch, gameTime);
+
+            _spriteBatch.End();
 
             base.Draw(gameTime);
         }
