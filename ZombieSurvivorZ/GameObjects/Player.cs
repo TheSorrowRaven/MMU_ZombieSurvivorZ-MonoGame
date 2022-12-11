@@ -12,6 +12,11 @@ namespace ZombieSurvivorZ
 
         private Weapon weapon;
 
+        public Player()
+        {
+
+        }
+
         public override void Initialize()
         {
             Texture = Game1.TextureBank["player"];

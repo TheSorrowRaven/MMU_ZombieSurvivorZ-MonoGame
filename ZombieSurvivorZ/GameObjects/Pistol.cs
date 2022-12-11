@@ -9,18 +9,21 @@ namespace ZombieSurvivorZ
     public class Pistol : Weapon
     {
 
+        public Pistol()
+        {
+            _fireTime = 0.1f;
+            _reloadTime = 2.2f;
+            _switchTime = 0.5f;
+            _clipSize = 9;
+            _canAutoFire = false;
 
+            AmmoInClip = 9;
+            AmmoReserve = 14;
+        }
 
         public override void Initialize()
         {
             Texture = Game1.TextureBank["cursor_piece"];
-            fireTime = 0.1f;
-            reloadTime = 2.2f;
-            switchTime = 0.5f;
-            clipSize = 9;
-            ammoInClip = 9;
-            ammoReserve = 14;
-            canAutoFire = false;
 
             base.Initialize();
         }

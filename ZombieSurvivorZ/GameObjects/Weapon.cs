@@ -16,16 +16,26 @@ namespace ZombieSurvivorZ
             Switching,
         }
 
-        public float fireTime;
-        public float reloadTime;
-        public float switchTime;
-        public int clipSize;
+        public State WeaponState { get; protected set; } = State.Holstered;
 
-        public bool canAutoFire;
-        public int ammoReserve;
-        public int ammoInClip;
+        // Stats
+        protected float _fireTime;
+        protected float _reloadTime;
+        protected float _switchTime;
+        protected int _clipSize;
+        protected bool _canAutoFire;
 
-        public State state = State.Holstered;
+        public float FireTime => _fireTime;
+        public float ReloadTime => _reloadTime;
+        public float SwitchTime => _switchTime;
+        public int ClipSize => _clipSize;
+        public bool CanAutoFire => _canAutoFire;
+
+        // Ammo
+        public int AmmoReserve { get; protected set; }
+        public int AmmoInClip { get; protected set; }
+
+        // Time control
         private float fireTimeCount;
         private float reloadTimeCount;
         private float switchTimeCount;
@@ -38,13 +48,13 @@ namespace ZombieSurvivorZ
 
         public virtual void HoldWeapon()
         {
-            state = State.Switching;
-            switchTimeCount = switchTime;
+            WeaponState = State.Switching;
+            switchTimeCount = SwitchTime;
         }
 
         public virtual void HolsterWeapon()
         {
-            state = State.Holstered;
+            WeaponState = State.Holstered;
         }
 
         public virtual void SemiFire()
@@ -54,7 +64,7 @@ namespace ZombieSurvivorZ
 
         public virtual void AutoFire()
         {
-            if (canAutoFire)
+            if (CanAutoFire)
             {
                 Fire();
             }
@@ -62,19 +72,19 @@ namespace ZombieSurvivorZ
 
         protected virtual void Fire()
         {
-            if (state == State.Holstered)
+            if (WeaponState == State.Holstered)
             {
                 throw new Exception("Weapon is holstered??/");
             }
 
-            if (state == State.Switching)
+            if (WeaponState == State.Switching)
             {
                 //Switching
                 Console.WriteLine("IsSwitching!");
                 return;
             }
 
-            if (state == State.Reload)
+            if (WeaponState == State.Reload)
             {
                 //Reloading
                 Console.WriteLine("IsReloading!");
@@ -89,7 +99,7 @@ namespace ZombieSurvivorZ
                 return;
             }
 
-            if (ammoInClip == 0)
+            if (AmmoInClip == 0)
             {
                 //No ammo, try to reload
                 Reload();
@@ -97,63 +107,62 @@ namespace ZombieSurvivorZ
             }
 
             Console.WriteLine("Bang!!");
-            ammoInClip--;
-            fireTimeCount = fireTime;
+            AmmoInClip--;
+            fireTimeCount = FireTime;
         }
 
         public virtual void Reload()
         {
-            if (ammoInClip == clipSize)
+            if (AmmoInClip == ClipSize)
             {
                 //No need to reload, full
                 return;
             }
-            if (ammoReserve == 0)
+            if (AmmoReserve == 0)
             {
                 //No more ammo to reload
                 return;
             }
             Console.WriteLine("RELOAD!");
-            state = State.Reload;
-            reloadTimeCount = reloadTime;
+            WeaponState = State.Reload;
+            reloadTimeCount = ReloadTime;
         }
 
         protected virtual void FinishReload()
         {
-            state = State.Ready;
-            int initialAmmoInClip = ammoInClip;
-            int requiredAmmo = clipSize - initialAmmoInClip;
-            int amountReloading = Math.Min(ammoReserve, requiredAmmo);
-            ammoReserve -= amountReloading;
-            ammoInClip += amountReloading;
+            WeaponState = State.Ready;
+            int initialAmmoInClip = AmmoInClip;
+            int requiredAmmo = ClipSize - initialAmmoInClip;
+            int amountReloading = Math.Min(AmmoReserve, requiredAmmo);
+            AmmoReserve -= amountReloading;
+            AmmoInClip += amountReloading;
         }
 
         protected virtual void FinishSwitching()
         {
-            state = State.Ready;
+            WeaponState = State.Ready;
         }
 
         public override void Update()
         {
-            if (state == State.Holstered)
+            if (WeaponState == State.Holstered)
             {
                 return;
             }
 
-            if (state == State.Switching)
+            if (WeaponState == State.Switching)
             {
                 if (switchTimeCount > 0)
                 {
                     //Switching...
                     switchTimeCount -= Time.deltaTime;
-                    Console.WriteLine(switchTimeCount);
                     return;
                 }
                 FinishSwitching();
                 return;
             }
 
-            if (state == State.Reload)
+            if (WeaponState == State.Reload)
             {
                 if (reloadTimeCount > 0)
                 {

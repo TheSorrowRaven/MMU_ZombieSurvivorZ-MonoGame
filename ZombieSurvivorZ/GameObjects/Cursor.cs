@@ -8,9 +8,9 @@ namespace ZombieSurvivorZ
     public class Cursor : SpriteObject
     {
 
-        public float spread = 0;
-        public float minSpread = 32;
-        public float Spread => spread + minSpread * Scale.X;
+        private float spread = 0;
+        private float minSpread = 32;
+        private float Spread => spread + minSpread * Scale.X;
 
         public override void Initialize()
         {
