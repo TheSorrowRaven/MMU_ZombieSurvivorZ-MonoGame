@@ -41,7 +41,7 @@ namespace ZombieSurvivorZ
             }
         }
 
-        public int RenderOrder { get; set; } = 0;
+        public int RenderOrder { get; set; } = 1;
 
         // Internally, this is the origin used when drawing.
         private Vector2 originPixels;

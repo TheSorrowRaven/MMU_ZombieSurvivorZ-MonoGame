@@ -26,6 +26,18 @@
 /processorParam:TextureFormat=Color
 /build:cursor_piece.png
 
+#begin Objects/crate.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Objects/crate.png
+
 #begin player.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -38,18 +50,6 @@
 /processorParam:TextureFormat=Color
 /build:player.png
 
-#begin Player/player_body_firingpistol.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Player/player_body_firingpistol.png
-
 #begin Player/player_body_holdingpistol.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -61,6 +61,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Player/player_body_holdingpistol.png
+
+#begin Player/player_body_recoilingpistol.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Player/player_body_recoilingpistol.png
+
+#begin Player/player_body_reloadingpistol.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Player/player_body_reloadingpistol.png
 
 #begin Player/player_body.png
 /importer:TextureImporter
@@ -98,6 +122,18 @@
 /processorParam:TextureFormat=Color
 /build:Player/player_pistol.png
 
+#begin Player/player_pistolflash.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Player/player_pistolflash.png
+
 #begin Player/player_recoilingpistol.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -109,6 +145,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Player/player_recoilingpistol.png
+
+#begin Player/player_reloadingpistol.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Player/player_reloadingpistol.png
 
 #begin Player/Player.png
 /importer:TextureImporter

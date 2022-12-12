@@ -11,7 +11,8 @@ namespace ZombieSurvivorZ
         public enum State
         {
             Ready,
-            Reload,
+            Recoiling,
+            Reloading,
             Holstered,
             Switching,
         }
@@ -38,26 +39,24 @@ namespace ZombieSurvivorZ
         private float switchTimeCount;
 
         //Graphics
-        public bool IsRecoiling { get; protected set; }
+        public bool IsRecoiling => WeaponState == State.Recoiling;
+
         public Texture2D PlayerBodyTextureHolding { get; protected set; }
         public Texture2D PlayerBodyTextureRecoiling { get; protected set; }
+        public Texture2D PlayerBodyTextureReloading { get; protected set; }
+
         public Texture2D WeaponTexture { get; protected set; }
         public Texture2D WeaponRecoilTexture { get; protected set; }
+        public Texture2D WeaponReloadTexture { get; protected set; }
+
+        public Texture2D WeaponFlashTexture { get; protected set; }
 
 
         public override void Initialize()
         {
-
+            HolsterWeapon();
         }
 
-        public virtual Texture2D GetPlayerBodyTexture()
-        {
-            if (IsRecoiling)
-            {
-                return PlayerBodyTextureRecoiling;
-            }
-            return PlayerBodyTextureHolding;
-        }
 
         public virtual void HoldWeapon()
         {
@@ -98,7 +97,7 @@ namespace ZombieSurvivorZ
                 return;
             }
 
-            if (WeaponState == State.Reload)
+            if (WeaponState == State.Reloading)
             {
                 //Reloading
                 Console.WriteLine("IsReloading!");
@@ -134,13 +133,13 @@ namespace ZombieSurvivorZ
 
         protected virtual void Recoil()
         {
+            WeaponState = State.Recoiling;
             recoilTimeCount = RecoilTime;
-            IsRecoiling = true;
         }
 
         protected virtual void FinishRecoil()
         {
-            IsRecoiling = false;
+            WeaponState = State.Ready;
         }
 
         public virtual void Reload()
@@ -156,7 +155,7 @@ namespace ZombieSurvivorZ
                 return;
             }
             Console.WriteLine("RELOAD!");
-            WeaponState = State.Reload;
+            WeaponState = State.Reloading;
             reloadTimeCount = ReloadTime;
         }
 
@@ -194,7 +193,7 @@ namespace ZombieSurvivorZ
                 return;
             }
 
-            if (WeaponState == State.Reload)
+            if (WeaponState == State.Reloading)
             {
                 if (reloadTimeCount > 0)
                 {
@@ -207,13 +206,13 @@ namespace ZombieSurvivorZ
                 return;
             }
 
-            //state == State.Ready
+            //state == State.Ready || state == State.Recoiling
             if (fireTimeCount > 0)
             {
                 fireTimeCount -= Time.deltaTime;
             }
 
-            if (IsRecoiling)
+            if (WeaponState == State.Recoiling)
             {
                 if (recoilTimeCount > 0)
                 {
@@ -227,18 +226,31 @@ namespace ZombieSurvivorZ
 
         }
 
+        public virtual Texture2D GetPlayerBodyTexture() => WeaponState switch
+        {
+            State.Recoiling => PlayerBodyTextureRecoiling,
+            State.Reloading => PlayerBodyTextureReloading,
+            State.Switching => PlayerBodyTextureReloading,
+            _ => PlayerBodyTextureHolding,
+        };
+
         public override void Draw(SpriteBatch spriteBatch)
         {
-            Texture2D texture;
-            if (IsRecoiling)
+            Texture2D texture = WeaponState switch
             {
-                texture = WeaponRecoilTexture;
-            }
-            else
-            {
-                texture = WeaponTexture;
-            }
+                State.Recoiling => WeaponRecoilTexture,
+                State.Reloading => WeaponReloadTexture,
+                State.Switching => WeaponReloadTexture,
+                _ => WeaponTexture,
+            };
+
+
             spriteBatch.Draw(texture, Position, null, Color, Rotation, OriginPixels, Scale, SpriteEffects.None, RenderOrder);
+
+            if (WeaponState == State.Recoiling)
+            {
+                spriteBatch.Draw(WeaponFlashTexture, Position, null, Color, Rotation, OriginPixels, Scale, SpriteEffects.None, RenderOrder);
+            }
         }
 
 

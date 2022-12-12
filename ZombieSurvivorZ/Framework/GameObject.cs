@@ -6,6 +6,7 @@ namespace ZombieSurvivorZ
 {
     public abstract class GameObject
     {
+        public virtual World World => World.objects;
         public bool Active { get; set; } = true;
         public string Name { get; set; }
         public Vector2 Position { get; set; }
@@ -60,6 +61,7 @@ namespace ZombieSurvivorZ
             World.AddGameObject(this);
         }
 
+        //Used in collisions
         public abstract Rectangle Bounds();
 
         public virtual void Initialize()
@@ -86,7 +88,7 @@ namespace ZombieSurvivorZ
         {
             go.Active = false;
             go._alive = false;
-            World.RemoveGameObject(go);
+            go.World.RemoveGameObject(go);
         }
     }
 }
