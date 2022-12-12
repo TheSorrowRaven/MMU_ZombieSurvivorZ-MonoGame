@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended;
+using MonoGame.Extended.ViewportAdapters;
 using System.Collections.Generic;
 
 namespace ZombieSurvivorZ
@@ -16,6 +18,16 @@ namespace ZombieSurvivorZ
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
+
+        //UI render order in the world (affected by camera)
+        public const int RenderOrder_WorldUI = 0;
+
+
+        public Camera Camera { get; private set; }
+
+        public Player Player { get; private set; }
+
+
         private Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -26,8 +38,12 @@ namespace ZombieSurvivorZ
         protected override void Initialize()
         {
             Screen = Window;
+            IsMouseVisible = false;
+
+            Camera = new();
 
             base.Initialize();
+
         }
 
         protected override void LoadContent()
@@ -37,12 +53,17 @@ namespace ZombieSurvivorZ
             //TextureBank.Add("player", Content.Load<Texture2D>("player"));
             //TextureBank.Add("cursor_piece", Content.Load<Texture2D>("cursor_piece"));
 
-            Player player = new()
+            Player = new();
+
+            new Crate()
             {
-                Position = new(100, 100)
+                Position = new(200, 100)
             };
 
-            Cursor cursor = new();
+            new Crate()
+            {
+                Position = new(-400, -300)
+            };
 
         }
 
@@ -68,7 +89,11 @@ namespace ZombieSurvivorZ
                 Exit();
 
             //Collision.Simulate();
-            World.Update(gameTime);
+            World.UI.Update(gameTime);
+            World.floor.Update(gameTime);
+            World.objects.Update(gameTime);
+
+            Camera.Update();
 
             base.Update(gameTime);
         }
@@ -77,11 +102,18 @@ namespace ZombieSurvivorZ
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            _spriteBatch.Begin();
 
-            World.Draw(_spriteBatch, gameTime);
-
+            Matrix transformMatrix = Camera.GetViewMatrix();
+            _spriteBatch.Begin(transformMatrix: transformMatrix);
+            World.floor.Draw(_spriteBatch, gameTime);
+            World.objects.Draw(_spriteBatch, gameTime);
             _spriteBatch.End();
+
+
+            _spriteBatch.Begin();
+            World.UI.Draw(_spriteBatch, gameTime);
+            _spriteBatch.End();
+
 
             base.Draw(gameTime);
         }

@@ -14,7 +14,7 @@ namespace ZombieSurvivorZ
             FireTime = 0.2f;
             RecoilTime = 0.05f;
             ReloadTime = 2.2f;
-            SwitchTime = 0.5f;
+            SwitchTime = 0.3f;
             ClipSize = 9;
             CanAutoFire = false;
 
@@ -25,10 +25,15 @@ namespace ZombieSurvivorZ
         public override void Initialize()
         {
             PlayerBodyTextureHolding = Game1.GetTexture("Player/player_body_holdingpistol");
-            PlayerBodyTextureRecoiling = Game1.GetTexture("Player/player_body_firingpistol");
+            PlayerBodyTextureRecoiling = Game1.GetTexture("Player/player_body_recoilingpistol");
+            PlayerBodyTextureReloading = Game1.GetTexture("Player/player_body_reloadingpistol");
 
             WeaponTexture = Game1.GetTexture("Player/player_pistol");
             WeaponRecoilTexture = Game1.GetTexture("Player/player_recoilingpistol");
+            WeaponReloadTexture = Game1.GetTexture("Player/player_reloadingpistol");
+
+            WeaponFlashTexture = Game1.GetTexture("Player/player_pistolflash");
+
 
             Texture = WeaponTexture;
 

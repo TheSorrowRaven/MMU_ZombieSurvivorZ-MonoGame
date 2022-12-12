@@ -12,10 +12,11 @@ namespace ZombieSurvivorZ
         private float minSpread = 32;
         private float Spread => spread + minSpread * Scale.X;
 
+        public override World World => World.UI;
+
         public override void Initialize()
         {
             Texture = Game1.GetTexture("cursor_piece");
-            Position = Game1.ScreenCenter;
             Scale = new(0.5f, 0.5f);
         }
 

@@ -13,7 +13,12 @@ namespace ZombieSurvivorZ
 
     public class World
     {
-        public static readonly World Current = new();
+
+        public static readonly World floor = new();
+        public static readonly World objects = new();
+        public static readonly World UI = new();
+
+
 
         // Currently active GameObjects are in this list
         private readonly List<GameObject> gameObjects = new();
@@ -28,7 +33,7 @@ namespace ZombieSurvivorZ
         // add it to the world in one line
         // Usage:
         // T go = World.CreateGameObject<T>("objectName");
-        public static T CreateGameObject<T>(string name) where T : GameObject
+        public T CreateGameObject<T>(string name) where T : GameObject
         {
             T go = (T)Activator.CreateInstance(typeof(T));
             go.Name = name;
@@ -42,40 +47,40 @@ namespace ZombieSurvivorZ
         // E.g.
         // ConcreteGameObject go = new ConcreteGameObject("foo");
         // World.AddGameObject(go);
-        public static void AddGameObject(GameObject go)
+        public void AddGameObject(GameObject go)
         {
-            Current.newObjects.Add(go);
+            newObjects.Add(go);
         }
 
         // Called by GameObject.Destroy
-        public static void RemoveGameObject(GameObject go)
+        public void RemoveGameObject(GameObject go)
         {
-            Current.flaggedObjects.Add(go);
+            flaggedObjects.Add(go);
         }
 
-        public static GameObject FindGameObject(string name)
+        public GameObject FindGameObject(string name)
         {
-            return Current.gameObjects.Find(x => x.Name.Equals(name));
+            return gameObjects.Find(x => x.Name.Equals(name));
         }
 
-        public static GameObject FindGameObject(GameObject go)
+        public GameObject FindGameObject(GameObject go)
         {
-            return Current.gameObjects.Find(x => x.Equals(go));
+            return gameObjects.Find(x => x.Equals(go));
         }
 
-        public static void Clear()
+        public void Clear()
         {
-            Current.gameObjects.Clear();
+            gameObjects.Clear();
         }
 
-        public static void Update(GameTime gameTime)
+        public void Update(GameTime gameTime)
         {
-            var worldGameObjects = Current.gameObjects;
+            var worldGameObjects = gameObjects;
 
             // Remove GameObjects that are marked for deletion
-            var list = new List<GameObject>(Current.flaggedObjects);
+            var list = new List<GameObject>(flaggedObjects);
             // Clear flaggedObjects for next frame
-            Current.flaggedObjects.Clear();
+            flaggedObjects.Clear();
             if (list.Count > 0)
             {
                 foreach (var entity in list)
@@ -87,9 +92,9 @@ namespace ZombieSurvivorZ
 
             // Initialize newly added GameObjects
             // Then add them to gameObjects list
-            list = new List<GameObject>(Current.newObjects);
+            list = new List<GameObject>(newObjects);
             // Clear newObjects for next frame
-            Current.newObjects.Clear();
+            newObjects.Clear();
             if (list.Count > 0)
             {
                 foreach (var entity in list)
@@ -106,9 +111,9 @@ namespace ZombieSurvivorZ
             }
         }
 
-        public static void Draw(SpriteBatch batch, GameTime gameTime)
+        public void Draw(SpriteBatch batch, GameTime gameTime)
         {
-            foreach (GameObject entity in Current.gameObjects)
+            foreach (GameObject entity in gameObjects)
             {
                 if (!entity.Active)
                 {
