@@ -38,5 +38,9 @@ namespace ZombieSurvivorZ
             spriteBatch.Draw(Texture, Position + offset, null, Color, Rotation + rotation, OriginPixels, Scale, SpriteEffects.None, RenderOrder);
         }
 
+        public void SetSpread(float value)
+        {
+            spread = value;
+        }
     }
 }

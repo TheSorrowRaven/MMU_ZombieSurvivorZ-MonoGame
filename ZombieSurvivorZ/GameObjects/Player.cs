@@ -12,7 +12,7 @@ namespace ZombieSurvivorZ
         private float movementSpeed = 100;
         private bool sameKeyHolstersWeapon = true;
 
-        private Cursor cursor = new();
+        private Cursor cursor;
         private Weapon weapon;
 
         private Texture2D bodyTexture;
@@ -126,12 +126,13 @@ namespace ZombieSurvivorZ
             if (Input.IsLMouseFirstDown())
             {
                 weapon.SemiFire();
+                
             }
             else if (Input.IsLMouseDown())
             {
                 weapon.AutoFire();
             }
-            
+            cursor.SetSpread(weapon.CursorSpread);
 
         }
 
