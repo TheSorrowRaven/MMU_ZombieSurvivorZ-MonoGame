@@ -20,6 +20,10 @@ namespace ZombieSurvivorZ
 
             AmmoInClip = 9;
             AmmoReserve = 14;
+
+            CursorSpreadIncrease = 5.0f;
+            CursorSpreadDecrease = 50.0f;
+            CursorSpreadTime = 0.3f;
         }
 
         public override void Initialize()

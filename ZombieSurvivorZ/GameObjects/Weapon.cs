@@ -25,8 +25,10 @@ namespace ZombieSurvivorZ
         public float RecoilTime { get; protected set; }
         public float ReloadTime { get; protected set; }
         public float SwitchTime { get; protected set; }
+        public float CursorSpreadTime { get; protected set; }
         public int ClipSize { get; protected set; }
         public bool CanAutoFire { get; protected set; }
+
 
         //Ammo
         public int AmmoReserve { get; protected set; }
@@ -37,6 +39,7 @@ namespace ZombieSurvivorZ
         private float recoilTimeCount;
         private float reloadTimeCount;
         private float switchTimeCount;
+        private float cursorSpreadCount;
 
         //Graphics
         public bool IsRecoiling => WeaponState == State.Recoiling;
@@ -51,6 +54,9 @@ namespace ZombieSurvivorZ
 
         public Texture2D WeaponFlashTexture { get; protected set; }
 
+        public float CursorSpread { get; protected set; }
+        public float CursorSpreadIncrease { get; protected set; }
+        public float CursorSpreadDecrease { get; protected set; }
 
         public override void Initialize()
         {
@@ -127,6 +133,8 @@ namespace ZombieSurvivorZ
             Console.WriteLine("Bang!!");
             AmmoInClip--;
             fireTimeCount = FireTime;
+            CursorSpread += CursorSpreadIncrease;
+            cursorSpreadCount = CursorSpreadTime;
 
             Recoil();
         }
@@ -176,6 +184,15 @@ namespace ZombieSurvivorZ
 
         public override void Update()
         {
+            if (cursorSpreadCount > 0)
+            {
+                cursorSpreadCount -= Time.deltaTime;
+            }
+            if (CursorSpread > 0 && cursorSpreadCount < 0)
+            {
+                CursorSpread -= CursorSpreadDecrease * Time.deltaTime;
+            }
+
             if (WeaponState == State.Holstered)
             {
                 return;
@@ -211,6 +228,7 @@ namespace ZombieSurvivorZ
             {
                 fireTimeCount -= Time.deltaTime;
             }
+
 
             if (WeaponState == State.Recoiling)
             {
