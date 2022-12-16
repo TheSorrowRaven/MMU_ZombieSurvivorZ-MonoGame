@@ -12,17 +12,12 @@ namespace ZombieSurvivorZ
         private float movementSpeed = 100;
         private bool sameKeyHolstersWeapon = true;
 
-        private Cursor cursor;
+        private Reticle reticle;
         private Weapon weapon;
 
         private Texture2D bodyTexture;
 
         private readonly Dictionary<int, Weapon> keyNumToWeapon = new();
-
-        public Player()
-        {
-            cursor = new();
-        }
 
         public override void Initialize()
         {
@@ -30,10 +25,13 @@ namespace ZombieSurvivorZ
             bodyTexture = Game1.GetTexture("Player/player_body");
 
             RotationOffset = 90 * MathF.PI / 180;
-            //Position = Game1.ScreenCenter;
             Position = new(0, 0);
+
             Pistol pistol = new();
             keyNumToWeapon.Add(1, pistol);
+
+            reticle = new();
+            reticle.Disable();
         }
 
         public override void Update()
@@ -47,7 +45,7 @@ namespace ZombieSurvivorZ
         {
             Vector2 movement = Input.ConstructAxis2(Keys.S, Keys.W, Keys.D, Keys.A);
             Position += movement * movementSpeed * Time.deltaTime;
-            Heading = Game1.Current.Camera.camera.ScreenToWorld(cursor.Position) - Position;
+            Heading = Game1.Current.Camera.camera.ScreenToWorld(reticle.Position) - Position;
 
         }
 
@@ -97,6 +95,7 @@ namespace ZombieSurvivorZ
                 if (weapon == this.weapon)
                 {
                     this.weapon = null;
+                    reticle.Disable();
                     return;
                 }
             }
@@ -104,11 +103,14 @@ namespace ZombieSurvivorZ
 
             if (weapon == null)
             {
+                reticle.Disable();
                 return;
             }
             weapon.Active = true;
             weapon.RotationOffset = 90 * MathF.PI / 180;
             weapon.HoldWeapon();
+
+            reticle.Enable();
         }
 
         #endregion
@@ -132,7 +134,7 @@ namespace ZombieSurvivorZ
             {
                 weapon.AutoFire();
             }
-            cursor.SetSpread(weapon.CursorSpread);
+            reticle.SetSpread(weapon.GetVisualRecoilSpread());
 
         }
 
