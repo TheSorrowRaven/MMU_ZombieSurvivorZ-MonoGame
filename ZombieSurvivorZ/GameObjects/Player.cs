@@ -1,8 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended;
+using MonoGame.Extended.Collisions;
 using System;
 using System.Collections.Generic;
+using static ZombieSurvivorZ.Collision;
 
 namespace ZombieSurvivorZ
 {
@@ -18,6 +21,8 @@ namespace ZombieSurvivorZ
         private Texture2D bodyTexture;
 
         private readonly Dictionary<int, Weapon> keyNumToWeapon = new();
+
+        public CircleCollider PlayerCL;
 
         public override void Initialize()
         {
@@ -45,7 +50,7 @@ namespace ZombieSurvivorZ
         {
             Vector2 movement = Input.ConstructAxis2(Keys.S, Keys.W, Keys.D, Keys.A);
             Position += movement * movementSpeed * Time.deltaTime;
-            Heading = Game1.Current.Camera.camera.ScreenToWorld(reticle.Position) - Position;
+            Heading = Game1.Camera.ScreenToWorld(reticle.Position) - Position;
 
         }
 
@@ -138,7 +143,12 @@ namespace ZombieSurvivorZ
 
         }
 
-
+        public override void OnCollision(Collider current, Collider other, Vector2 penetrationVector)
+        {
+            base.OnCollision(current, other, penetrationVector);
+            Console.WriteLine("Hit!");
+            OnCollision_PushBack(current, other, penetrationVector);
+        }
 
 
         public override void Draw(SpriteBatch spriteBatch)
@@ -155,6 +165,11 @@ namespace ZombieSurvivorZ
             spriteBatch.Draw(bodyTexture, Position, null, Color, Rotation, OriginPixels, Scale, SpriteEffects.None, RenderOrder);
 
             spriteBatch.Draw(Texture, Position, null, Color, Rotation, OriginPixels, Scale, SpriteEffects.None, RenderOrder); //draw player head
+
+            if (Game1.CollisionDebugging)
+            {
+                spriteBatch.DrawCircle((CircleF)PlayerCL.Bounds, 20, Color.Red);
+            }
 
         }
 

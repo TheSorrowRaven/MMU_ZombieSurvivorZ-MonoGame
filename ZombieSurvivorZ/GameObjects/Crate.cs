@@ -12,9 +12,21 @@ namespace ZombieSurvivorZ
     public class Crate : SpriteObject
     {
 
+        public Collision.BoxCollider CrateCL;
+
         public Crate()
         {
             Texture = Game1.GetTexture("Objects/crate");
+        }
+
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            base.Draw(spriteBatch);
+
+            if (Game1.CollisionDebugging)
+            {
+                spriteBatch.DrawRectangle((RectangleF)CrateCL.Bounds, Color.Blue);
+            }
         }
 
     }

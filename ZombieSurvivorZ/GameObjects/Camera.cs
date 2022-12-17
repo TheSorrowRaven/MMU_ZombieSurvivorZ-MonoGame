@@ -16,19 +16,24 @@ namespace ZombieSurvivorZ
 
         public Camera()
         {
-            var viewportAdapter = new BoxingViewportAdapter(Game1.Screen, Game1.Current.GraphicsDevice, 800, 480);
+            var viewportAdapter = new BoxingViewportAdapter(Game1.Screen, Game1.Current.GraphicsDevice, (int)Game1.ScreenSize.X, (int)Game1.ScreenSize.Y);
             camera = new(viewportAdapter);
         }
 
         public void Update()
         {
-            Vector2 pos = -Game1.ScreenCenter + Game1.Current.Player.Position;
+            Vector2 pos = -Game1.ScreenCenter + Game1.Player.Position;
             camera.Position = pos;
         }
 
         public Matrix GetViewMatrix()
         {
             return camera.GetViewMatrix();
+        }
+
+        public Vector2 ScreenToWorld(Vector2 screen)
+        {
+            return camera.ScreenToWorld(screen);
         }
 
     }
