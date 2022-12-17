@@ -13,6 +13,7 @@ namespace ZombieSurvivorZ
     {
 
         public Collision.BoxCollider CrateCL;
+        //public Collision.CircleCollider CrateCL;
 
         public Crate()
         {
@@ -26,6 +27,7 @@ namespace ZombieSurvivorZ
             if (Game1.CollisionDebugging)
             {
                 spriteBatch.DrawRectangle((RectangleF)CrateCL.Bounds, Color.Blue);
+                //spriteBatch.DrawCircle((CircleF)CrateCL.Bounds, 10, Color.Blue);
             }
         }
 

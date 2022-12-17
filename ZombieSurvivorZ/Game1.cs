@@ -230,11 +230,11 @@ namespace ZombieSurvivorZ
             };
             c.CrateCL = new Collision.BoxCollider(c, 40, 40);
 
-            c = new Crate()
-            {
-                Position = new(-400, -300)
-            };
-            c.CrateCL = new Collision.BoxCollider(c, 40, 40);
+            //c = new Crate()
+            //{
+            //    Position = new(-400, -300)
+            //};
+            //c.CrateCL = new Collision.BoxCollider(c, 40, 40);
 
         }
 

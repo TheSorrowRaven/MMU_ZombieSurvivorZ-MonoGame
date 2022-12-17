@@ -1,8 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended;
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Security.AccessControl;
 
 namespace ZombieSurvivorZ
 {
@@ -30,12 +33,14 @@ namespace ZombieSurvivorZ
         public float ReloadTime { get; protected set; }
         public float SwitchTime { get; protected set; }
         public float MuzzleFlashTime { get; protected set; }
+        public float FiringLineFlashTime { get; protected set; }
 
         public int ClipSize { get; protected set; }
         public bool CanAutoFire { get; protected set; }
 
         public float RecoilSpreadIncrease { get; protected set; }
         public float RecoilSpreadDecrease { get; protected set; }
+        public float RecoilMaxSpread { get; protected set; }
 
         //Ammo
         public int AmmoReserve { get; protected set; }
@@ -61,6 +66,9 @@ namespace ZombieSurvivorZ
         public Texture2D WeaponReloadTexture { get; protected set; }
 
         public Texture2D WeaponFlashTexture { get; protected set; }
+
+
+        private readonly List<(Line, float)> firingLines = new();
 
 
         public override void Initialize()
@@ -141,13 +149,30 @@ namespace ZombieSurvivorZ
 
         protected virtual void Fire()
         {
-            Console.WriteLine("Bang!!");
+            FireRaycast();
             AmmoInClip--;
             fireTimeCount = FireTime;
 
             MuzzleFlash();
             Recoil();
         }
+
+        protected virtual void FireRaycast()
+        {
+            if (!Collision.Raycast(Position, Heading, out Dictionary<Collision.Collider, float> intersections))
+            {
+                //Console.WriteLine($"Miss");
+                //firingLines.Add(new(Position, Position + direction * 100));
+                return;
+            }
+            Vector2 direction = Heading;
+            foreach (var item in intersections)
+            {
+                Console.WriteLine($"Bang -> {item.Key.Go.GetType()}, {item.Value}");
+                firingLines.Add((new(Position, Position + direction * item.Value), FiringLineFlashTime));
+            }
+        }
+
 
         //Doesn't change state, is only visual
         protected virtual void MuzzleFlash()
@@ -165,6 +190,10 @@ namespace ZombieSurvivorZ
         {
             IsRecoiling = true;
             recoilSpread += RecoilSpreadIncrease;
+            if (recoilSpread > RecoilMaxSpread)
+            {
+                recoilSpread = RecoilMaxSpread;
+            }
             recoilTimeCount = RecoilTime;
         }
 
@@ -176,6 +205,10 @@ namespace ZombieSurvivorZ
 
         public virtual void Reload()
         {
+            if (IsMuzzleFlashing)
+            {
+                IsMuzzleFlashing = false;
+            }
             if (AmmoInClip == ClipSize)
             {
                 //No need to reload, full
@@ -208,6 +241,19 @@ namespace ZombieSurvivorZ
 
         public override void Update()
         {
+            for (int i = 0; i < firingLines.Count; i++)
+            {
+                (Line, float) item = firingLines[i];
+                float timeCount = item.Item2 - Time.deltaTime;
+                if (timeCount < 0)
+                {
+                    firingLines.RemoveAt(i);
+                    i--;
+                    continue;
+                }
+                item.Item2 = timeCount;
+                firingLines[i] = item;
+            }
 
             if (WeaponState == State.Holstered)
             {
@@ -319,6 +365,12 @@ namespace ZombieSurvivorZ
             if (IsMuzzleFlashing)
             {
                 spriteBatch.Draw(WeaponFlashTexture, Position, null, Color, Rotation, OriginPixels, Scale, SpriteEffects.None, RenderOrder);
+            }
+
+            for (int i = 0; i < firingLines.Count; i++)
+            {
+                Line line = firingLines[i].Item1;
+                spriteBatch.DrawLine(line.start, line.end, Color.Red);
             }
         }
 

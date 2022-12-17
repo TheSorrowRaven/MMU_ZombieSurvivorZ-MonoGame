@@ -6,26 +6,26 @@ using System.Runtime.CompilerServices;
 
 namespace ZombieSurvivorZ
 {
-    public class Pistol : Weapon
+    public class DebugGun : Weapon
     {
 
-        public Pistol()
+        public DebugGun()
         {
-            FireTime = 0.2f;
-            MuzzleFlashTime = 0.05f;
+            FireTime = 0.01f;
+            MuzzleFlashTime = 0.01f;
             FiringLineFlashTime = 0.05f;
-            ReloadTime = 2.2f;
-            SwitchTime = 0.3f;
-            ClipSize = 9;
+            ReloadTime = 0.1f;
+            SwitchTime = 0.1f;
+            ClipSize = 100;
             CanAutoFire = true;
 
-            AmmoInClip = 9;
-            AmmoReserve = 14;
+            AmmoInClip = 100;
+            AmmoReserve = 100000;
 
-            RecoilSpreadIncrease = 5.0f;
-            RecoilSpreadDecrease = 50.0f;
-            RecoilMaxSpread = 25f;
-            RecoilTime = 0.3f;
+            RecoilSpreadIncrease = 1.0f;
+            RecoilSpreadDecrease = 100.0f;
+            RecoilMaxSpread = 0f;
+            RecoilTime = 0.1f;
         }
 
         public override void Initialize()

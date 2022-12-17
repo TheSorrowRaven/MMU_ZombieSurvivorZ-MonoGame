@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 using MonoGame.Extended.Collisions;
+using MonoGame.Extended.Gui.Controls;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -51,15 +52,65 @@ namespace ZombieSurvivorZ
             ////CollisionComponent.Update(gameTime);
         }
 
+        public static bool Raycast(Vector2 position, Vector2 direction, out Collider collider, out float hitDistance)
+        {
+            collider = null;
+            if (!Raycast(position, direction, out Dictionary<Collider, float> intersections))
+            {
+                hitDistance = float.NaN;
+                return false;
+            }
+            hitDistance = float.MaxValue;
+            foreach (var item in intersections)
+            {
+                if (item.Value < hitDistance)
+                {
+                    collider = item.Key;
+                    hitDistance = item.Value;
+                }
+            }
+            return true;
+        }
+        public static bool Raycast(Vector2 position, Vector2 direction, out Dictionary<Collider, float> intersections)
+        {
+            Ray2 ray = new(position, direction);
+            intersections = new();
+            foreach (var collider in ActiveColliders)
+            {
+                if (collider.Bounds is RectangleF rect)
+                {
+                    if (GetIntersectionPoints(new Line(ray.Position, ray.Direction), rect, out float hitDistance))
+                    {
+                        intersections.Add(collider, hitDistance);
+                    }
+                    //if (ray.Intersects(rect, out float hitDistance, out float tt))
+                    //{
+                    //    if (float.IsNaN(hitDistance))
+                    //    {
+                    //        Console.WriteLine("NAN?? tt => " + tt);
+                    //    }
+                    //}
+                }
+                else if (collider.Bounds is CircleF circle)
+                {
+                    if (GetIntersectionPoints(ray, circle, out float rayNearDistance))
+                    {
+                        intersections.Add(collider, rayNearDistance);
+                    }
+                }
+            }
+            return intersections.Count > 0;
+        }
+
         public abstract class Collider//// : ICollisionActor
         {
 
-            private GameObject go;
+            public GameObject Go { get; private set; }
             public abstract IShapeF Bounds { get; protected set; }
 
             public Collider(GameObject go)
             {
-                this.go = go;
+                this.Go = go;
                 go.ActiveStateChanged += Go_ActiveStateChanged;
                 Go_ActiveStateChanged(true);
 
@@ -82,7 +133,7 @@ namespace ZombieSurvivorZ
 
             public void Update()
             {
-                SetBounds(go);
+                SetBounds(Go);
             }
 
             ////public void OnCollision(CollisionEventArgs collisionInfo)
@@ -93,14 +144,14 @@ namespace ZombieSurvivorZ
             ////}
             public void OnCollision(Collider other, Vector2 penetrationVector)
             {
-                go.OnCollision(this, other, penetrationVector);
+                Go.OnCollision(this, other, penetrationVector);
             }
 
             private void Destroy()
             {
-                go.ActiveStateChanged -= Go_ActiveStateChanged;
-                go.Destroyed -= Destroy;
-                go = null;
+                Go.ActiveStateChanged -= Go_ActiveStateChanged;
+                Go.Destroyed -= Destroy;
+                Go = null;
             }
 
             protected virtual void SetBounds(GameObject go)
@@ -154,6 +205,136 @@ namespace ZombieSurvivorZ
 
 
 
+
+
+
+
+
+
+
+
+        public static bool GetIntersectionPoints(Line ray, RectangleF rect, out float rayNearDistance)
+        {
+            // Check intersection with each of the four sides of the box
+            Line[] sides = new Line[4];
+            sides[0] = new Line(new Vector2(rect.X, rect.Y), new Vector2(rect.X + rect.Width, rect.Y));
+            sides[1] = new Line(new Vector2(rect.X + rect.Width, rect.Y), new Vector2(rect.X + rect.Width, rect.Y + rect.Height));
+            sides[2] = new Line(new Vector2(rect.X + rect.Width, rect.Y + rect.Height), new Vector2(rect.X, rect.Y + rect.Height));
+            sides[3] = new Line(new Vector2(rect.X, rect.Y + rect.Height), new Vector2(rect.X, rect.Y));
+
+            bool hit = false;
+            rayNearDistance = float.MaxValue;
+            foreach (Line side in sides)
+            {
+                if (!GetIntersectionDistance(ray, side, out float rayDistance))
+                {
+                    continue;
+                }
+                if (rayDistance < 0)
+                {
+                    continue;
+                }
+                hit = true;
+                if (rayDistance < rayNearDistance)
+                {
+                    rayNearDistance = rayDistance;
+                }
+            }
+
+            return hit;
+        }
+
+        private static bool GetIntersectionDistance(Line line1, Line line2, out float rayDistance)
+        {
+            // Calculate the intersection point using the formula from https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection
+            float x1 = line1.start.X;
+            float x2 = line1.end.X;
+            float x3 = line2.start.X;
+            float x4 = line2.end.X;
+            float y1 = line1.start.Y;
+            float y2 = line1.end.Y;
+            float y3 = line2.start.Y;
+            float y4 = line2.end.Y;
+
+            float divd = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+            float t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / divd;
+            //float u = ((x1 - x3) * (y1 - y2) - (y1 - y3) * (x1 - x2)) / divd;
+
+            Console.WriteLine(t);
+
+            //if (t >= 0 && t <= 1 && u >= 0 && u <= 1)
+            //{
+
+            //}
+            Vector2 t1 = new(x1 + t * (x2 - x1), y1 + t * (y2 - y1));
+            //Vector2 t2 = new(x3 + u * (x4 - x3), y3 + u * (y4 - y3));
+            rayDistance = float.NaN;
+            return false;
+
+
+
+            //Vector2 p = line1.Position;
+            //Vector2 r = line1.Direction;
+            //Vector2 q = line2.Position;
+            //Vector2 s = line2.Direction;
+
+            //rayDistance = CrossProduct((q - p), s) / CrossProduct(r, s);
+            //if (float.IsNaN(rayDistance))
+            //{
+            //    // Lines are parallel
+            //    return false;
+            //}
+            //return true;
+        }
+
+        private static float CrossProduct(Vector2 a, Vector2 b)
+        {
+            return a.X * b.Y - a.Y * b.X;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+        public static bool GetIntersectionPoints(Ray2 ray, CircleF circle, out float rayNearDistance)
+        {
+            // Calculate the intersection points using the formula from https://en.wikipedia.org/wiki/Line%E2%80%93circle_intersection
+            Vector2 p = ray.Position;
+            Vector2 d = ray.Direction;
+            Vector2 c = circle.Center;
+            float r = circle.Radius;
+
+            float a = d.X * d.X + d.Y * d.Y;
+            float b = 2 * (d.X * (p.X - c.X) + d.Y * (p.Y - c.Y));
+            float cc = c.X * c.X + c.Y * c.Y + p.X * p.X + p.Y * p.Y - 2 * (c.X * p.X + c.Y * p.Y) - r * r;
+
+            float discriminant = b * b - 4 * a * cc;
+            if (discriminant < 0)
+            {
+                // No intersections
+                rayNearDistance = float.NaN;
+                return false;
+            }
+            else if (discriminant == 0)
+            {
+                // One intersection
+                float t = -b / (2 * a);
+                rayNearDistance = t;
+                return true;
+            }
+            // Two intersections
+            float t1 = (-b + (float)Math.Sqrt(discriminant)) / (2 * a);
+            float t2 = (-b - (float)Math.Sqrt(discriminant)) / (2 * a);
+            rayNearDistance = t2;
+            return true;
+        }
 
 
 

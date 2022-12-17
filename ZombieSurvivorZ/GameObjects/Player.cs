@@ -34,6 +34,8 @@ namespace ZombieSurvivorZ
 
             Pistol pistol = new();
             keyNumToWeapon.Add(1, pistol);
+            DebugGun debugGun = new();
+            keyNumToWeapon.Add(2, debugGun);
 
             reticle = new();
             reticle.Disable();
@@ -65,7 +67,7 @@ namespace ZombieSurvivorZ
 
         private void WeaponSwitchUpdate()
         {
-            int numKey = Input.GetNumberKeysFirstDown(1, 1);
+            int numKey = Input.GetNumberKeysFirstDown(1, 2);
             if (numKey == -1)
             {
                 return;
