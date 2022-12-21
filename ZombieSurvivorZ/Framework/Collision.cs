@@ -79,10 +79,14 @@ namespace ZombieSurvivorZ
             {
                 if (collider.Bounds is RectangleF rect)
                 {
-                    if (GetIntersectionPoints(new Line(ray.Position, ray.Direction), rect, out float hitDistance))
-                    {
-                        intersections.Add(collider, hitDistance);
-                    }
+                    //if (ray.Intersects(new(rect.Center, rect.Size / 2), out _, out float hitDistance))
+                    //{
+                    //    intersections.Add(collider, hitDistance);
+                    //}
+                    //if (GetIntersectionPoints(new Line(ray.Position, ray.Direction), rect, out float hitDistance))
+                    //{
+                    //    intersections.Add(collider, hitDistance);
+                    //}
                     //if (ray.Intersects(rect, out float hitDistance, out float tt))
                     //{
                     //    if (float.IsNaN(hitDistance))
@@ -90,6 +94,10 @@ namespace ZombieSurvivorZ
                     //        Console.WriteLine("NAN?? tt => " + tt);
                     //    }
                     //}
+                    if (IntersectsRectangle(ray, rect, out float hitDistance))
+                    {
+                        intersections.Add(collider, hitDistance);
+                    }
                 }
                 else if (collider.Bounds is CircleF circle)
                 {
@@ -195,18 +203,71 @@ namespace ZombieSurvivorZ
 
 
 
+        public static bool IntersectsRectangle(Ray2 ray, RectangleF rect, out float hitDistance)
+        {
+            // First, we need to find the intersection points of the ray with the
+            // four lines that make up the rectangle. To do this, we find the
+            // intersection point with each line using the line-line intersection
+            // formula.
+            float left = rect.Left, right = rect.Right;
+            float top = rect.Top, bottom = rect.Bottom;
 
+            // Intersection with left and right lines
+            float tLeft = (left - ray.Position.X) / ray.Direction.X;
+            float tRight = (right - ray.Position.X) / ray.Direction.X;
+            float yLeft = ray.Position.Y + tLeft * ray.Direction.Y;
+            float yRight = ray.Position.Y + tRight * ray.Direction.Y;
 
+            // Intersection with top and bottom lines
+            float tTop = (top - ray.Position.Y) / ray.Direction.Y;
+            float tBottom = (bottom - ray.Position.Y) / ray.Direction.Y;
+            float xTop = ray.Position.X + tTop * ray.Direction.X;
+            float xBottom = ray.Position.X + tBottom * ray.Direction.X;
 
+            // Now we need to check if the intersection points are within the
+            // bounds of the rectangle. If the ray intersects with the rectangle,
+            // at least one intersection point must be within the bounds of the
+            // rectangle.
+            Vector2 intersection;
+            if ((left <= xTop && xTop <= right) || (left <= xBottom && xBottom <= right))
+            {
+                if (top <= yLeft && yLeft <= bottom)
+                {
+                    // Intersection with top line
+                    intersection = new(xTop, top);
+                    hitDistance = (intersection - (Vector2)ray.Position).Length();
+                    return true;
+                }
+                else if (top <= yRight && yRight <= bottom)
+                {
+                    // Intersection with bottom line
+                    intersection = new(xBottom, bottom);
+                    hitDistance = (intersection - (Vector2)ray.Position).Length();
+                    return true;
+                }
+            }
+            else if ((top <= yLeft && yLeft <= bottom) || (top <= yRight && yRight <= bottom))
+            {
+                if (left <= xTop && xTop <= right)
+                {
+                    // Intersection with left line
+                    intersection = new(left, yLeft);
+                    hitDistance = (intersection - (Vector2)ray.Position).Length();
+                    return true;
+                }
+                else if (left <= xBottom && xBottom <= right)
+                {
+                    // Intersection with right line
+                    intersection = new(right, yRight);
+                    hitDistance = (intersection - (Vector2)ray.Position).Length();
+                    return true;
+                }
+            }
 
-
-
-
-
-
-
-
-
+            // No intersection
+            hitDistance = float.NaN;
+            return false;
+        }
 
 
 
