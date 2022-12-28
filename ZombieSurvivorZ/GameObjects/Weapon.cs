@@ -89,6 +89,8 @@ namespace ZombieSurvivorZ
         {
             IgnoreObjects[0] = Game1.Player;
 
+            Scale = Game1.Player.Scale;
+
             WeaponState = State.Switching;
             switchTimeCount = SwitchTime;
             FinishRecoil();
@@ -173,7 +175,7 @@ namespace ZombieSurvivorZ
             }
             //Console.WriteLine($"Bang -> {collider.Go.GetType()}, {hitDistance}");
             //TODO hit zombie
-            Vector2 start = Position + direction * FiringLineStartOffset;
+            Vector2 start = Position + direction * FiringLineStartOffset * Scale.X;
             Vector2 end = Position + direction * hitDistance;
             firingLines.Add((new(start, end), FiringLineFlashTime));
         }

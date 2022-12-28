@@ -67,7 +67,6 @@ namespace ZombieSurvivorZ
             ////_spriteBatch = new(GraphicsDevice);
 
             Player = new();
-            //Player.PlayerCL = new Collision.CircleCollider(Player, 25);
 
 
 
@@ -75,13 +74,11 @@ namespace ZombieSurvivorZ
             {
                 Position = new(200, 100)
             };
-            c.CrateCL = new Collision.BoxCollider(c, 40, 40);
 
             c = new Crate()
             {
                 Position = new(-100, -100)
             };
-            c.CrateCL = new Collision.BoxCollider(c, 40, 40);
 
         }
 

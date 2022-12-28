@@ -141,7 +141,7 @@ namespace ZombieSurvivorZ
 
             public void Update()
             {
-                SetBounds(Go);
+                SetBoundsUpdate(Go);
             }
 
             ////public void OnCollision(CollisionEventArgs collisionInfo)
@@ -162,13 +162,7 @@ namespace ZombieSurvivorZ
                 Go = null;
             }
 
-            public void Destroy(bool _)
-            {
-                Destroy();
-                Go_ActiveStateChanged(false);
-            }
-
-            protected virtual void SetBounds(GameObject go)
+            protected virtual void SetBoundsUpdate(GameObject go)
             {
                 Bounds.Position = go.Position;
             }
@@ -181,8 +175,12 @@ namespace ZombieSurvivorZ
 
             public CircleCollider(GameObject go, float radius) : base(go)
             {
+                Set(radius);
+            }
+            public void Set(float radius)
+            {
                 Radius = radius;
-                Bounds = new CircleF(go.Position, radius);
+                Bounds = new CircleF(Go.Position, radius);
             }
         }
 
@@ -194,14 +192,17 @@ namespace ZombieSurvivorZ
 
             public BoxCollider(GameObject go, float width, float height) : base(go)
             {
-                Width = width;
-                Height = height;
-                Bounds = new RectangleF(go.Position.X - (width / 2), go.Position.Y - (height / 2), width, height);
+                Set(width, height);
             }
-
-            protected override void SetBounds(GameObject go)
+            protected override void SetBoundsUpdate(GameObject go)
             {
                 Bounds.Position = new(go.Position.X - (Width / 2), go.Position.Y - Height / 2);
+            }
+            public void Set(float width, float height)
+            {
+                Width = width;
+                Height = height;
+                Bounds = new RectangleF(Go.Position.X - (width / 2), Go.Position.Y - (height / 2), width, height);
             }
         }
 
