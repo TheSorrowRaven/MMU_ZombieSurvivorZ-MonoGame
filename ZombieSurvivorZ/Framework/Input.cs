@@ -98,19 +98,51 @@ namespace ZombieSurvivorZ
 
         public static bool IsLMouseDown()
         {
+            if (Game1.UISuppressClick)
+            {
+                return false;
+            }
             return MouseState.LeftButton == ButtonState.Pressed;
         }
         public static bool IsLMouseUp()
         {
+            if (Game1.UISuppressClick)
+            {
+                return false;
+            }
             return MouseState.LeftButton == ButtonState.Released;
         }
         public static bool IsLMouseFirstDown()
         {
+            if (Game1.UISuppressClick)
+            {
+                return false;
+            }
             return IsLMouseDown() && LastMouseState.LeftButton == ButtonState.Released;
         }
         public static bool IsLMouseFirstUp()
         {
+            if (Game1.UISuppressClick)
+            {
+                return false;
+            }
             return IsLMouseUp() && LastMouseState.LeftButton == ButtonState.Pressed;
+        }
+        public static bool IsLMouseDownUI()
+        {
+            return MouseState.LeftButton == ButtonState.Pressed;
+        }
+        public static bool IsLMouseUpUI()
+        {
+            return MouseState.LeftButton == ButtonState.Released;
+        }
+        public static bool IsLMouseFirstDownUI()
+        {
+            return IsLMouseDownUI() && LastMouseState.LeftButton == ButtonState.Released;
+        }
+        public static bool IsLMouseFirstUpUI()
+        {
+            return IsLMouseUpUI() && LastMouseState.LeftButton == ButtonState.Pressed;
         }
 
     }

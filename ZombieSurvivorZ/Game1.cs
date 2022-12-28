@@ -30,7 +30,8 @@ namespace ZombieSurvivorZ
 
         public static Player Player { get; private set; }
 
-
+        public static UpgradeWindowUI UpgradeWindowUI { get; private set; }
+        public static bool UISuppressClick { get; set; } = false;
 
 
         private Game1()
@@ -64,6 +65,7 @@ namespace ZombieSurvivorZ
         protected override void LoadContent()
         {
             SpriteBatch = new SpriteBatch(GraphicsDevice);
+            Font.Load();
             ////_spriteBatch = new(GraphicsDevice);
 
             Player = new();
@@ -80,6 +82,8 @@ namespace ZombieSurvivorZ
                 Position = new(-100, -100)
             };
 
+            UpgradeWindowUI = new();
+
         }
 
         public static Texture2D GetTexture(string name)
@@ -92,6 +96,12 @@ namespace ZombieSurvivorZ
             return texture;
         }
 
+        public static T GetContent<T>(string name)
+        {
+            return Current.Content.Load<T>(name);
+        }
+
+
         protected override void Update(GameTime gameTime)
         {
             Time.time = (float)gameTime.TotalGameTime.TotalSeconds;
@@ -103,6 +113,7 @@ namespace ZombieSurvivorZ
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
+            UISuppressClick = false;
             //Objects Update
             World.UI.Update(gameTime);
             World.floor.Update(gameTime);

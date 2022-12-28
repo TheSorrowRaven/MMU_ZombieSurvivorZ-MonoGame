@@ -69,6 +69,7 @@ namespace ZombieSurvivorZ
         public Texture2D WeaponFlashTexture { get; protected set; }
 
 
+        //TODO move this to a non weapon dependent class
         private readonly List<(Line, float)> firingLines = new();
 
         private readonly GameObject[] IgnoreObjects = new GameObject[1];
