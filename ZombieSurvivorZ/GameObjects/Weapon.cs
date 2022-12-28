@@ -37,6 +37,7 @@ namespace ZombieSurvivorZ
 
         public int ClipSize { get; protected set; }
         public bool CanAutoFire { get; protected set; }
+        public float FiringLineStartOffset { get; protected set; }
 
         public float RecoilSpreadIncrease { get; protected set; }
         public float RecoilSpreadDecrease { get; protected set; }
@@ -70,6 +71,8 @@ namespace ZombieSurvivorZ
 
         private readonly List<(Line, float)> firingLines = new();
 
+        private readonly GameObject[] IgnoreObjects = new GameObject[1];
+
 
         public override void Initialize()
         {
@@ -84,6 +87,8 @@ namespace ZombieSurvivorZ
 
         public virtual void HoldWeapon()
         {
+            IgnoreObjects[0] = Game1.Player;
+
             WeaponState = State.Switching;
             switchTimeCount = SwitchTime;
             FinishRecoil();
@@ -159,18 +164,18 @@ namespace ZombieSurvivorZ
 
         protected virtual void FireRaycast()
         {
-            if (!Collision.Raycast(Position, Heading, out Dictionary<Collision.Collider, float> intersections))
+            Vector2 direction = Heading;
+            if (!Collision.Raycast(Position, direction, IgnoreObjects, out Collision.Collider collider, out float hitDistance))
             {
                 //Console.WriteLine($"Miss");
                 //firingLines.Add(new(Position, Position + direction * 100));
                 return;
             }
-            Vector2 direction = Heading;
-            foreach (var item in intersections)
-            {
-                Console.WriteLine($"Bang -> {item.Key.Go.GetType()}, {item.Value}");
-                firingLines.Add((new(Position, Position + direction * item.Value), FiringLineFlashTime));
-            }
+            //Console.WriteLine($"Bang -> {collider.Go.GetType()}, {hitDistance}");
+            //TODO hit zombie
+            Vector2 start = Position + direction * FiringLineStartOffset;
+            Vector2 end = Position + direction * hitDistance;
+            firingLines.Add((new(start, end), FiringLineFlashTime));
         }
 
 
@@ -370,7 +375,7 @@ namespace ZombieSurvivorZ
             for (int i = 0; i < firingLines.Count; i++)
             {
                 Line line = firingLines[i].Item1;
-                spriteBatch.DrawLine(line.start, line.end, Color.Red);
+                spriteBatch.DrawLine(line.start, line.end, Color.DarkGray);
             }
 
         }

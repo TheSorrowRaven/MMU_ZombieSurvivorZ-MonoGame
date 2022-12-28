@@ -32,6 +32,8 @@ namespace ZombieSurvivorZ
             RotationOffset = 90 * MathF.PI / 180;
             Position = new(0, 0);
 
+            PlayerCL = new(this, 25);
+
             Pistol pistol = new();
             keyNumToWeapon.Add(1, pistol);
             DebugGun debugGun = new();
@@ -148,7 +150,6 @@ namespace ZombieSurvivorZ
         public override void OnCollision(Collider current, Collider other, Vector2 penetrationVector)
         {
             base.OnCollision(current, other, penetrationVector);
-            Console.WriteLine("Hit!");
             OnCollision_PushBack(current, other, penetrationVector);
         }
 

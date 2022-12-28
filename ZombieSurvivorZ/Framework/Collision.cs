@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace ZombieSurvivorZ
@@ -52,8 +53,7 @@ namespace ZombieSurvivorZ
             ////CollisionComponent.Update(gameTime);
         }
 
-        //Only works if origin position is not a collider itself
-        public static bool Raycast(Vector2 position, Vector2 direction, out Collider collider, out float hitDistance)
+        public static bool Raycast(Vector2 position, Vector2 direction, GameObject[] ignoreObjects, out Collider collider, out float hitDistance)
         {
             collider = null;
             if (!Raycast(position, direction, out List<(Collider, float)> intersections))
@@ -62,15 +62,21 @@ namespace ZombieSurvivorZ
                 return false;
             }
             hitDistance = float.MaxValue;
+            bool hit = false;
             foreach (var item in intersections)
             {
+                if (ignoreObjects.Contains(item.Item1.Go))
+                {
+                    continue;
+                }
                 if (item.Item2 < hitDistance)
                 {
                     collider = item.Item1;
                     hitDistance = item.Item2;
+                    hit = true;
                 }
             }
-            return true;
+            return hit;
         }
         public static bool Raycast(Vector2 position, Vector2 direction, out List<(Collider, float)> intersections)
         {
@@ -154,6 +160,12 @@ namespace ZombieSurvivorZ
                 Go.ActiveStateChanged -= Go_ActiveStateChanged;
                 Go.Destroyed -= Destroy;
                 Go = null;
+            }
+
+            public void Destroy(bool _)
+            {
+                Destroy();
+                Go_ActiveStateChanged(false);
             }
 
             protected virtual void SetBounds(GameObject go)
