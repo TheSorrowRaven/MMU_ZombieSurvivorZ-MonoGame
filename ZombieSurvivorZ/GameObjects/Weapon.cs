@@ -1,8 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended;
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Security.AccessControl;
 
 namespace ZombieSurvivorZ
 {
@@ -11,7 +14,6 @@ namespace ZombieSurvivorZ
         public enum State
         {
             Ready,
-            Recoiling,
             Reloading,
             Holstered,
             Switching,
@@ -19,16 +21,26 @@ namespace ZombieSurvivorZ
 
         //State
         public State WeaponState { get; protected set; } = State.Holstered;
+        //Sub State
+        public bool IsRecoiling { get; protected set; } = false;
+        //Visual State
+        public bool IsMuzzleFlashing { get; protected set;} = false;
 
         //Stats
         public float FireTime { get; protected set; }
+        //Recoil time until the spread starts decreasing
         public float RecoilTime { get; protected set; }
         public float ReloadTime { get; protected set; }
         public float SwitchTime { get; protected set; }
-        public float CursorSpreadTime { get; protected set; }
+        public float MuzzleFlashTime { get; protected set; }
+        public float FiringLineFlashTime { get; protected set; }
+
         public int ClipSize { get; protected set; }
         public bool CanAutoFire { get; protected set; }
 
+        public float RecoilSpreadIncrease { get; protected set; }
+        public float RecoilSpreadDecrease { get; protected set; }
+        public float RecoilMaxSpread { get; protected set; }
 
         //Ammo
         public int AmmoReserve { get; protected set; }
@@ -39,28 +51,34 @@ namespace ZombieSurvivorZ
         private float recoilTimeCount;
         private float reloadTimeCount;
         private float switchTimeCount;
-        private float cursorSpreadCount;
+        private float muzzleFlashTimeCount;
 
-        //Graphics
-        public bool IsRecoiling => WeaponState == State.Recoiling;
+        //Recoil control
+        private float recoilSpread;
 
+        //Texture
         public Texture2D PlayerBodyTextureHolding { get; protected set; }
-        public Texture2D PlayerBodyTextureRecoiling { get; protected set; }
+        public Texture2D PlayerBodyTextureMuzzleFlashing { get; protected set; }
         public Texture2D PlayerBodyTextureReloading { get; protected set; }
 
         public Texture2D WeaponTexture { get; protected set; }
-        public Texture2D WeaponRecoilTexture { get; protected set; }
+        public Texture2D WeaponMuzzleFlashingTexture { get; protected set; }
         public Texture2D WeaponReloadTexture { get; protected set; }
 
         public Texture2D WeaponFlashTexture { get; protected set; }
 
-        public float CursorSpread { get; protected set; }
-        public float CursorSpreadIncrease { get; protected set; }
-        public float CursorSpreadDecrease { get; protected set; }
+
+        private readonly List<(Line, float)> firingLines = new();
+
 
         public override void Initialize()
         {
             HolsterWeapon();
+        }
+
+        public virtual float GetVisualRecoilSpread()
+        {
+            return recoilSpread;
         }
 
 
@@ -68,6 +86,7 @@ namespace ZombieSurvivorZ
         {
             WeaponState = State.Switching;
             switchTimeCount = SwitchTime;
+            FinishRecoil();
         }
 
         public virtual void HolsterWeapon()
@@ -130,28 +149,66 @@ namespace ZombieSurvivorZ
 
         protected virtual void Fire()
         {
-            Console.WriteLine("Bang!!");
+            FireRaycast();
             AmmoInClip--;
             fireTimeCount = FireTime;
-            CursorSpread += CursorSpreadIncrease;
-            cursorSpreadCount = CursorSpreadTime;
 
+            MuzzleFlash();
             Recoil();
+        }
+
+        protected virtual void FireRaycast()
+        {
+            if (!Collision.Raycast(Position, Heading, out Dictionary<Collision.Collider, float> intersections))
+            {
+                //Console.WriteLine($"Miss");
+                //firingLines.Add(new(Position, Position + direction * 100));
+                return;
+            }
+            Vector2 direction = Heading;
+            foreach (var item in intersections)
+            {
+                Console.WriteLine($"Bang -> {item.Key.Go.GetType()}, {item.Value}");
+                firingLines.Add((new(Position, Position + direction * item.Value), FiringLineFlashTime));
+            }
+        }
+
+
+        //Doesn't change state, is only visual
+        protected virtual void MuzzleFlash()
+        {
+            IsMuzzleFlashing = true;
+            muzzleFlashTimeCount = MuzzleFlashTime;
+        }
+
+        protected virtual void FinishMuzzleFlash()
+        {
+            IsMuzzleFlashing = false;
         }
 
         protected virtual void Recoil()
         {
-            WeaponState = State.Recoiling;
+            IsRecoiling = true;
+            recoilSpread += RecoilSpreadIncrease;
+            if (recoilSpread > RecoilMaxSpread)
+            {
+                recoilSpread = RecoilMaxSpread;
+            }
             recoilTimeCount = RecoilTime;
         }
 
         protected virtual void FinishRecoil()
         {
-            WeaponState = State.Ready;
+            IsRecoiling = false;
+            recoilSpread = 0;
         }
 
         public virtual void Reload()
         {
+            if (IsMuzzleFlashing)
+            {
+                IsMuzzleFlashing = false;
+            }
             if (AmmoInClip == ClipSize)
             {
                 //No need to reload, full
@@ -184,13 +241,18 @@ namespace ZombieSurvivorZ
 
         public override void Update()
         {
-            if (cursorSpreadCount > 0)
+            for (int i = 0; i < firingLines.Count; i++)
             {
-                cursorSpreadCount -= Time.deltaTime;
-            }
-            if (CursorSpread > 0 && cursorSpreadCount < 0)
-            {
-                CursorSpread -= CursorSpreadDecrease * Time.deltaTime;
+                (Line, float) item = firingLines[i];
+                float timeCount = item.Item2 - Time.deltaTime;
+                if (timeCount < 0)
+                {
+                    firingLines.RemoveAt(i);
+                    i--;
+                    continue;
+                }
+                item.Item2 = timeCount;
+                firingLines[i] = item;
             }
 
             if (WeaponState == State.Holstered)
@@ -210,6 +272,23 @@ namespace ZombieSurvivorZ
                 return;
             }
 
+            //Decrease Recoil Spread even when the weapon is reloading
+            if (IsRecoiling)
+            {
+                recoilTimeCount -= Time.deltaTime;
+                if (recoilTimeCount < 0)
+                {
+                    if (recoilSpread > 0)
+                    {
+                        recoilSpread -= RecoilSpreadDecrease * Time.deltaTime;
+                    }
+                    else
+                    {
+                        FinishRecoil();
+                    }
+                }
+            }
+
             if (WeaponState == State.Reloading)
             {
                 if (reloadTimeCount > 0)
@@ -223,52 +302,77 @@ namespace ZombieSurvivorZ
                 return;
             }
 
-            //state == State.Ready || state == State.Recoiling
+            //state == State.Ready
             if (fireTimeCount > 0)
             {
                 fireTimeCount -= Time.deltaTime;
             }
 
 
-            if (WeaponState == State.Recoiling)
+            if (IsMuzzleFlashing)
             {
-                if (recoilTimeCount > 0)
+                if (muzzleFlashTimeCount > 0)
                 {
                     //Recoiling...
-                    recoilTimeCount -= Time.deltaTime;
+                    muzzleFlashTimeCount -= Time.deltaTime;
                     return;
                 }
-                FinishRecoil();
-                return;
+                FinishMuzzleFlash();
             }
 
         }
 
-        public virtual Texture2D GetPlayerBodyTexture() => WeaponState switch
+        public virtual Texture2D GetPlayerBodyTexture()
         {
-            State.Recoiling => PlayerBodyTextureRecoiling,
-            State.Reloading => PlayerBodyTextureReloading,
-            State.Switching => PlayerBodyTextureReloading,
-            _ => PlayerBodyTextureHolding,
-        };
+            Texture2D texture;
+
+            if (IsMuzzleFlashing)
+            {
+                texture = PlayerBodyTextureMuzzleFlashing;
+            }
+            else
+            {
+                texture = WeaponState switch
+                {
+                    State.Reloading => PlayerBodyTextureReloading,
+                    State.Switching => PlayerBodyTextureReloading,
+                    _ => PlayerBodyTextureHolding,
+                };
+            }
+            return texture;
+        }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            Texture2D texture = WeaponState switch
-            {
-                State.Recoiling => WeaponRecoilTexture,
-                State.Reloading => WeaponReloadTexture,
-                State.Switching => WeaponReloadTexture,
-                _ => WeaponTexture,
-            };
+            Texture2D texture;
 
+            if (IsMuzzleFlashing)
+            {
+                texture = WeaponMuzzleFlashingTexture;
+            }
+            else
+            {
+                texture = WeaponState switch
+                {
+                    State.Reloading => WeaponReloadTexture,
+                    State.Switching => WeaponReloadTexture,
+                    _ => WeaponTexture,
+                };
+            }
 
             spriteBatch.Draw(texture, Position, null, Color, Rotation, OriginPixels, Scale, SpriteEffects.None, RenderOrder);
 
-            if (WeaponState == State.Recoiling)
+            if (IsMuzzleFlashing)
             {
                 spriteBatch.Draw(WeaponFlashTexture, Position, null, Color, Rotation, OriginPixels, Scale, SpriteEffects.None, RenderOrder);
             }
+
+            for (int i = 0; i < firingLines.Count; i++)
+            {
+                Line line = firingLines[i].Item1;
+                spriteBatch.DrawLine(line.start, line.end, Color.Red);
+            }
+
         }
 
 

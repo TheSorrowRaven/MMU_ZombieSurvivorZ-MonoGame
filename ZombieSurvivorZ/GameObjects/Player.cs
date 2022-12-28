@@ -1,8 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended;
+using MonoGame.Extended.Collisions;
 using System;
 using System.Collections.Generic;
+using static ZombieSurvivorZ.Collision;
 
 namespace ZombieSurvivorZ
 {
@@ -12,17 +15,14 @@ namespace ZombieSurvivorZ
         private float movementSpeed = 100;
         private bool sameKeyHolstersWeapon = true;
 
-        private Cursor cursor;
+        private Reticle reticle;
         private Weapon weapon;
 
         private Texture2D bodyTexture;
 
         private readonly Dictionary<int, Weapon> keyNumToWeapon = new();
 
-        public Player()
-        {
-            cursor = new();
-        }
+        public CircleCollider PlayerCL;
 
         public override void Initialize()
         {
@@ -30,10 +30,15 @@ namespace ZombieSurvivorZ
             bodyTexture = Game1.GetTexture("Player/player_body");
 
             RotationOffset = 90 * MathF.PI / 180;
-            //Position = Game1.ScreenCenter;
             Position = new(0, 0);
+
             Pistol pistol = new();
             keyNumToWeapon.Add(1, pistol);
+            DebugGun debugGun = new();
+            keyNumToWeapon.Add(2, debugGun);
+
+            reticle = new();
+            reticle.Disable();
         }
 
         public override void Update()
@@ -47,7 +52,7 @@ namespace ZombieSurvivorZ
         {
             Vector2 movement = Input.ConstructAxis2(Keys.S, Keys.W, Keys.D, Keys.A);
             Position += movement * movementSpeed * Time.deltaTime;
-            Heading = Game1.Current.Camera.camera.ScreenToWorld(cursor.Position) - Position;
+            Heading = Game1.Camera.ScreenToWorld(reticle.Position) - Position;
 
         }
 
@@ -62,7 +67,7 @@ namespace ZombieSurvivorZ
 
         private void WeaponSwitchUpdate()
         {
-            int numKey = Input.GetNumberKeysFirstDown(1, 1);
+            int numKey = Input.GetNumberKeysFirstDown(1, 2);
             if (numKey == -1)
             {
                 return;
@@ -97,6 +102,7 @@ namespace ZombieSurvivorZ
                 if (weapon == this.weapon)
                 {
                     this.weapon = null;
+                    reticle.Disable();
                     return;
                 }
             }
@@ -104,11 +110,14 @@ namespace ZombieSurvivorZ
 
             if (weapon == null)
             {
+                reticle.Disable();
                 return;
             }
             weapon.Active = true;
             weapon.RotationOffset = 90 * MathF.PI / 180;
             weapon.HoldWeapon();
+
+            reticle.Enable();
         }
 
         #endregion
@@ -132,11 +141,16 @@ namespace ZombieSurvivorZ
             {
                 weapon.AutoFire();
             }
-            cursor.SetSpread(weapon.CursorSpread);
+            reticle.SetSpread(weapon.GetVisualRecoilSpread());
 
         }
 
-
+        public override void OnCollision(Collider current, Collider other, Vector2 penetrationVector)
+        {
+            base.OnCollision(current, other, penetrationVector);
+            Console.WriteLine("Hit!");
+            OnCollision_PushBack(current, other, penetrationVector);
+        }
 
 
         public override void Draw(SpriteBatch spriteBatch)
@@ -153,6 +167,11 @@ namespace ZombieSurvivorZ
             spriteBatch.Draw(bodyTexture, Position, null, Color, Rotation, OriginPixels, Scale, SpriteEffects.None, RenderOrder);
 
             spriteBatch.Draw(Texture, Position, null, Color, Rotation, OriginPixels, Scale, SpriteEffects.None, RenderOrder); //draw player head
+
+            if (Game1.CollisionDebugging)
+            {
+                spriteBatch.DrawCircle((CircleF)PlayerCL.Bounds, 20, Color.Red);
+            }
 
         }
 
