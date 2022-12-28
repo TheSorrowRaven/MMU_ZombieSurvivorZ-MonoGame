@@ -69,6 +69,7 @@ namespace ZombieSurvivorZ
         public Texture2D WeaponFlashTexture { get; protected set; }
 
 
+        //TODO move this to a non weapon dependent class
         private readonly List<(Line, float)> firingLines = new();
 
         private readonly GameObject[] IgnoreObjects = new GameObject[1];
@@ -88,6 +89,8 @@ namespace ZombieSurvivorZ
         public virtual void HoldWeapon()
         {
             IgnoreObjects[0] = Game1.Player;
+
+            Scale = Game1.Player.Scale;
 
             WeaponState = State.Switching;
             switchTimeCount = SwitchTime;
@@ -173,7 +176,7 @@ namespace ZombieSurvivorZ
             }
             //Console.WriteLine($"Bang -> {collider.Go.GetType()}, {hitDistance}");
             //TODO hit zombie
-            Vector2 start = Position + direction * FiringLineStartOffset;
+            Vector2 start = Position + direction * FiringLineStartOffset * Scale.X;
             Vector2 end = Position + direction * hitDistance;
             firingLines.Add((new(start, end), FiringLineFlashTime));
         }

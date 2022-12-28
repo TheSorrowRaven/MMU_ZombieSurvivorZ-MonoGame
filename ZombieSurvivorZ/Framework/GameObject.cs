@@ -30,7 +30,16 @@ namespace ZombieSurvivorZ
         }
         public string Name { get; set; }
         public Vector2 Position { get; set; }
-        public Vector2 Scale { get; set; } = Vector2.One;
+        private Vector2 scale = Vector2.One;
+        public Vector2 Scale
+        {
+            get => scale;
+            set
+            {
+                scale = value;
+                ScaleChanged();
+            }
+        }
 
         private Vector2 _heading = new(1, 0);
         private bool _headingDirty = true;
@@ -109,6 +118,11 @@ namespace ZombieSurvivorZ
         public virtual void OnCollision_PushBack(Collider current, Collider other, Vector2 penetrationVector)
         {
             Position -= penetrationVector;
+        }
+
+        protected virtual void ScaleChanged()
+        {
+
         }
 
         public void Destroy()

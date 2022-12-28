@@ -22,7 +22,12 @@ namespace ZombieSurvivorZ
 
         private readonly Dictionary<int, Weapon> keyNumToWeapon = new();
 
-        public CircleCollider PlayerCL;
+        private readonly CircleCollider PlayerCL;
+
+        public Player()
+        {
+            PlayerCL = new(this, 25);
+        }
 
         public override void Initialize()
         {
@@ -32,7 +37,7 @@ namespace ZombieSurvivorZ
             RotationOffset = 90 * MathF.PI / 180;
             Position = new(0, 0);
 
-            PlayerCL = new(this, 25);
+            Scale = new(0.5f, 0.5f);
 
             Pistol pistol = new();
             keyNumToWeapon.Add(1, pistol);
@@ -41,6 +46,17 @@ namespace ZombieSurvivorZ
 
             reticle = new();
             reticle.Disable();
+
+        }
+
+        protected override void ScaleChanged()
+        {
+            base.ScaleChanged();
+            PlayerCL.Set(25 * Scale.X);
+            if (weapon != null)
+            {
+                weapon.Scale = Scale;
+            }
         }
 
         public override void Update()
@@ -152,7 +168,6 @@ namespace ZombieSurvivorZ
             base.OnCollision(current, other, penetrationVector);
             OnCollision_PushBack(current, other, penetrationVector);
         }
-
 
         public override void Draw(SpriteBatch spriteBatch)
         {

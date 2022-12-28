@@ -9,15 +9,12 @@ using MonoGame.Extended.ViewportAdapters;
 
 namespace ZombieSurvivorZ
 {
-    public class Crate : SpriteObject
+    public class UIBox : UIBase
     {
 
-        private readonly Collision.BoxCollider CrateCL;
-
-        public Crate()
+        public UIBox(UIBase parent, Vector2 pos, Vector2 size) : base(parent, pos, size)
         {
-            Texture = Game1.GetTexture("Objects/crate");
-            CrateCL = new Collision.BoxCollider(this, 40, 40);
+            Color = Color.LightGray;
         }
 
         public override void Initialize()
@@ -28,11 +25,6 @@ namespace ZombieSurvivorZ
         public override void Draw(SpriteBatch spriteBatch)
         {
             base.Draw(spriteBatch);
-
-            if (Game1.CollisionDebugging)
-            {
-                spriteBatch.DrawRectangle((RectangleF)CrateCL.Bounds, Color.Blue);
-            }
         }
 
     }

@@ -21,7 +21,44 @@ namespace ZombieSurvivorZ
             }
         }
 
-        public Color Color { get; set; } = Color.White;
+        private Color DrawColor { get; set; } = Color.White;
+
+
+        private byte alpha = 255;
+        public float Alpha
+        {
+            get => alpha / 255f;
+            set
+            {
+                float val = value;
+                if (val < 0) val = 0;
+                else if (val > 1) val = 1;
+                alpha = (byte)(val * 255);
+                UpdateColor();
+            }
+        }
+
+        private Color _color;
+        public Color Color
+        {
+            get
+            {
+                return DrawColor;
+            }
+            set
+            {
+                Color c = value;
+                c.A = 255;
+                _color = c;
+                UpdateColor();
+            }
+        }
+
+        private void UpdateColor()
+        {
+            DrawColor = _color * Alpha;
+        }
+
 
         // It is far easier for developers to set origin in normalized values
         // Center is (0.5, 0.5) instead of having to query texture bounds
@@ -51,7 +88,7 @@ namespace ZombieSurvivorZ
 
         public SpriteObject()
         {
-
+            _color = Color;
         }
 
         private void Recalculate()
