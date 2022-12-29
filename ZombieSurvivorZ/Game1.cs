@@ -31,6 +31,7 @@ namespace ZombieSurvivorZ
         public static Player Player { get; private set; }
 
         public static UpgradeWindowUI UpgradeWindowUI { get; private set; }
+        public static HUDDisplayUI HUDDisplayUI { get; private set; }
         public static bool UISuppressClick { get; set; } = false;
 
 
@@ -83,6 +84,7 @@ namespace ZombieSurvivorZ
             };
 
             UpgradeWindowUI = new();
+            HUDDisplayUI = new();
 
         }
 

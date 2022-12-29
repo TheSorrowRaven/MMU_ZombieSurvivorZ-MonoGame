@@ -17,10 +17,11 @@ namespace ZombieSurvivorZ
             Alpha = 0.4f;
             Color = Color.Red;
             UIBorder border = new(this, new(0, 0), new(200, 500));
-            UIButton button = UIButton.CreateWithText(this, new(50, 50), new(100, 50), "Click Me Bitch");
+            UIButton button = UIButton.CreateWithText(this, new(50, 50), new(100, 50), "Purchase");
             button.OnClick += () =>
             {
                 Console.WriteLine("Button Click");
+                Game1.Player.RemoveMaterials(5);
             };
             UIText title = new(this, new(0, 0), new(200, 50));
             title.Text = "Hello World";

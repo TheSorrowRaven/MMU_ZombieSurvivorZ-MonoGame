@@ -21,6 +21,7 @@ namespace ZombieSurvivorZ
         private Texture2D bodyTexture;
 
         private readonly Dictionary<int, Weapon> keyNumToWeapon = new();
+        public int Materials { get; private set; }
 
         private readonly CircleCollider PlayerCL;
 
@@ -73,6 +74,21 @@ namespace ZombieSurvivorZ
             Heading = Game1.Camera.ScreenToWorld(reticle.Position) - Position;
 
         }
+
+        #region Materials
+
+        public void AddMaterials(int materials)
+        {
+            Materials += materials;
+            Game1.HUDDisplayUI.MaterialsDisplayUI.UpdateMaterials(Materials);
+        }
+        public void RemoveMaterials(int materials)
+        {
+            Materials -= materials;
+            Game1.HUDDisplayUI.MaterialsDisplayUI.UpdateMaterials(Materials);
+        }
+
+        #endregion
 
         #region Weapon Operation
 
@@ -160,7 +176,7 @@ namespace ZombieSurvivorZ
                 weapon.AutoFire();
             }
             reticle.SetSpread(weapon.GetVisualRecoilSpread());
-
+            Game1.HUDDisplayUI.AmmoDisplayUI.UpdateAmmoCount(weapon.AmmoInClip, weapon.AmmoReserve);
         }
 
         public override void OnCollision(Collider current, Collider other, Vector2 penetrationVector)
