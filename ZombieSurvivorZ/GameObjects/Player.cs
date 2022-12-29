@@ -21,6 +21,7 @@ namespace ZombieSurvivorZ
         private Texture2D bodyTexture;
 
         private readonly Dictionary<int, Weapon> keyNumToWeapon = new();
+        public int Materials { get; private set; }
 
         private readonly CircleCollider PlayerCL;
 
@@ -37,7 +38,7 @@ namespace ZombieSurvivorZ
             RotationOffset = 90 * MathF.PI / 180;
             Position = new(0, 0);
 
-            Scale = new(0.5f, 0.5f);
+            //Scale = new(0.5f, 0.5f);
 
             Pistol pistol = new();
             keyNumToWeapon.Add(1, pistol);
@@ -73,6 +74,21 @@ namespace ZombieSurvivorZ
             Heading = Game1.Camera.ScreenToWorld(reticle.Position) - Position;
 
         }
+
+        #region Materials
+
+        public void AddMaterials(int materials)
+        {
+            Materials += materials;
+            Game1.HUDDisplayUI.MaterialsDisplayUI.UpdateMaterials(Materials);
+        }
+        public void RemoveMaterials(int materials)
+        {
+            Materials -= materials;
+            Game1.HUDDisplayUI.MaterialsDisplayUI.UpdateMaterials(Materials);
+        }
+
+        #endregion
 
         #region Weapon Operation
 
@@ -121,6 +137,7 @@ namespace ZombieSurvivorZ
                 {
                     this.weapon = null;
                     reticle.Disable();
+                    Game1.HUDDisplayUI.AmmoDisplayUI.WeaponNotActive();
                     return;
                 }
             }
@@ -129,6 +146,7 @@ namespace ZombieSurvivorZ
             if (weapon == null)
             {
                 reticle.Disable();
+                Game1.HUDDisplayUI.AmmoDisplayUI.WeaponNotActive();
                 return;
             }
             weapon.Active = true;
@@ -136,6 +154,7 @@ namespace ZombieSurvivorZ
             weapon.HoldWeapon();
 
             reticle.Enable();
+            Game1.HUDDisplayUI.AmmoDisplayUI.WeaponActive();
         }
 
         #endregion
@@ -160,7 +179,7 @@ namespace ZombieSurvivorZ
                 weapon.AutoFire();
             }
             reticle.SetSpread(weapon.GetVisualRecoilSpread());
-
+            Game1.HUDDisplayUI.AmmoDisplayUI.UpdateAmmoCount(weapon.AmmoInClip, weapon.AmmoReserve);
         }
 
         public override void OnCollision(Collider current, Collider other, Vector2 penetrationVector)

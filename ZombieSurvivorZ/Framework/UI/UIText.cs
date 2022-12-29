@@ -27,6 +27,8 @@ namespace ZombieSurvivorZ
 
         private Vector2 StringSize;
 
+        public Vector2 Align = new(0.5f, 0.5f);
+
         private string text = "";
         public string Text
         {
@@ -79,7 +81,7 @@ namespace ZombieSurvivorZ
                 }
             }
             Vector2 diff = Scale - StringSize;
-            return pos + diff / 2;
+            return pos + (diff * Align);
         }
 
         public override void Draw(SpriteBatch spriteBatch)

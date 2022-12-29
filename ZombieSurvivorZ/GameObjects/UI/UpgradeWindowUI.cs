@@ -12,18 +12,21 @@ namespace ZombieSurvivorZ
     public class UpgradeWindowUI : UIBox
     {
 
-        public UpgradeWindowUI() : base(null, new(400, 200), new(200, 500))
+        public UpgradeWindowUI() : base(null, new(800, 100), new(300, 500))
         {
             Alpha = 0.4f;
             Color = Color.Red;
-            UIBorder border = new(this, new(0, 0), new(200, 500));
-            UIButton button = UIButton.CreateWithText(this, new(50, 50), new(100, 50), "Click Me Bitch");
+            UIBorder border = new(this, Vector2.Zero, Size);
+            UIButton button = UIButton.CreateWithText(this, new(50, 50), new(100, 50), "Purchase");
             button.OnClick += () =>
             {
                 Console.WriteLine("Button Click");
+                Game1.Player.RemoveMaterials(5);
             };
             UIText title = new(this, new(0, 0), new(200, 50));
             title.Text = "Hello World";
+
+            WeaponUpgradeUI pistolUpgradeUI = new(this, new((Size.X - WeaponUpgradeUI.Size.X) / 2, 300));
         }
 
         public override void Initialize()
