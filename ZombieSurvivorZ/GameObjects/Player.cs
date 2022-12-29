@@ -38,7 +38,7 @@ namespace ZombieSurvivorZ
             RotationOffset = 90 * MathF.PI / 180;
             Position = new(0, 0);
 
-            Scale = new(0.5f, 0.5f);
+            //Scale = new(0.5f, 0.5f);
 
             Pistol pistol = new();
             keyNumToWeapon.Add(1, pistol);
@@ -137,6 +137,7 @@ namespace ZombieSurvivorZ
                 {
                     this.weapon = null;
                     reticle.Disable();
+                    Game1.HUDDisplayUI.AmmoDisplayUI.WeaponNotActive();
                     return;
                 }
             }
@@ -145,6 +146,7 @@ namespace ZombieSurvivorZ
             if (weapon == null)
             {
                 reticle.Disable();
+                Game1.HUDDisplayUI.AmmoDisplayUI.WeaponNotActive();
                 return;
             }
             weapon.Active = true;
@@ -152,6 +154,7 @@ namespace ZombieSurvivorZ
             weapon.HoldWeapon();
 
             reticle.Enable();
+            Game1.HUDDisplayUI.AmmoDisplayUI.WeaponActive();
         }
 
         #endregion

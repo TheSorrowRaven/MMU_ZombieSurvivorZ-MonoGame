@@ -17,6 +17,12 @@ namespace ZombieSurvivorZ
 
         public UIBase Parent { get; private set; }
 
+        public virtual Vector2 Size
+        {
+            get => Scale;
+            set => Scale = value;
+        }
+
         public UIBase(UIBase parent, Vector2 pos, Vector2 size)
         {
             Parent = parent;
@@ -56,7 +62,7 @@ namespace ZombieSurvivorZ
         {
             //base.Draw(spriteBatch);
             //Draw from the top right
-            spriteBatch.Draw(Texture, GetOffset() + (Scale / 2), null, Color, Rotation, OriginPixels, Scale, SpriteEffects.None, RenderOrder);
+            spriteBatch.Draw(Texture, GetOffset() + (Size / 2), null, Color, Rotation, OriginPixels, Scale, SpriteEffects.None, RenderOrder);
         }
 
     }

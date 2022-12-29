@@ -12,12 +12,14 @@ namespace ZombieSurvivorZ
     public class AmmoDisplayUI : UIText
     {
 
+        private bool isDashed = false;
         private int lastAmmoInClip;
         private int lastAmmoReserve;
 
         public AmmoDisplayUI(UIBase parent, Vector2 pos, Vector2 size) : base(parent, pos, size)
         {
-            Text = "12/50";
+            isDashed = true;
+            Text = "-";
             Align = new(0.5f, 1f);
         }
 
@@ -29,7 +31,18 @@ namespace ZombieSurvivorZ
             }
             lastAmmoInClip = ammoInClip;
             lastAmmoReserve = ammoReserve;
-            Text = $"{ammoInClip}/{ammoReserve}";
+            Text = $"{ammoInClip} / {ammoReserve}";
+        }
+
+        public void WeaponNotActive()
+        {
+            isDashed = true;
+            Text = "-";
+        }
+        public void WeaponActive()
+        {
+            isDashed = false;
+            Text = $"{lastAmmoInClip} / {lastAmmoReserve}";
         }
 
     }
