@@ -95,11 +95,6 @@ namespace ZombieSurvivorZ
         public event Action Destroyed = () => { };
 
 
-
-
-        //Used in collisions
-        public abstract Rectangle Bounds();
-
         public virtual void Initialize()
         { }
 
@@ -109,13 +104,13 @@ namespace ZombieSurvivorZ
         public virtual void Draw(SpriteBatch spriteBatch)
         { }
 
-        public virtual void OnCollision(Collider current, Collider other, Vector2 penetrationVector)
+        public virtual void OnCollision(DynamicCollider current, Collider other, Vector2 penetrationVector)
         { }
 
         public virtual void OnDestroy()
         { }
 
-        public virtual void OnCollision_PushBack(Collider current, Collider other, Vector2 penetrationVector)
+        public virtual void OnCollision_PushBack(DynamicCollider current, Collider other, Vector2 penetrationVector)
         {
             Position -= penetrationVector;
         }

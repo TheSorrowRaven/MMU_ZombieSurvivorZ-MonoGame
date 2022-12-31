@@ -51,12 +51,18 @@ namespace ZombieSurvivorZ
                 c.A = 255;
                 _color = c;
                 UpdateColor();
+                ColorUpdated(c);
             }
         }
 
         private void UpdateColor()
         {
             DrawColor = _color * Alpha;
+        }
+
+        protected virtual void ColorUpdated(Color color)
+        {
+
         }
 
 
@@ -108,14 +114,6 @@ namespace ZombieSurvivorZ
 
             bounds.Width = Texture.Width;
             bounds.Height = Texture.Height;
-        }
-
-        public override Rectangle Bounds()
-        {
-            Vector2 pos = Position - originPixels;
-            bounds.X = (int)pos.X;
-            bounds.Y = (int)pos.Y;
-            return bounds;
         }
 
         public override void Draw(SpriteBatch spriteBatch)

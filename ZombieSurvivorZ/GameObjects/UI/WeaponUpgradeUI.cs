@@ -6,6 +6,7 @@ using MonoGame.Extended;
 using System;
 using System.Runtime.CompilerServices;
 using MonoGame.Extended.ViewportAdapters;
+using System.Linq;
 
 namespace ZombieSurvivorZ
 {
@@ -24,10 +25,12 @@ namespace ZombieSurvivorZ
         public readonly UIText WeaponPurchaseMaterials;
         public readonly UITexture WeaponPurchaseTexture;
 
+        public Weapon weapon;
+
         //Forces Size
         public static new Vector2 Size = new(275, 100);
 
-        public WeaponUpgradeUI(UIBase parent, Vector2 pos) : base(parent, pos, Size)
+        public WeaponUpgradeUI(UIBase parent, Vector2 pos, Weapon weapon, int order) : base(parent, pos, Size)
         {
             Alpha = 0.4f;
             Color = Color.LightSlateGray;
@@ -39,10 +42,9 @@ namespace ZombieSurvivorZ
             WeaponTexture = new(this, new(16, 8), new(64, 64), Game1.GetTexture("pistol_texture"));
 
             WeaponNumber = new(this, new(12, 4), new(16, 16));
-            WeaponNumber.Text = "1";
+            WeaponNumber.Text = order.ToString();
 
             WeaponName = new(WeaponTexture, new(0, WeaponTexture.Size.Y), new(WeaponTexture.Size.X, 20));
-            WeaponName.Text = "Pistol";
             WeaponName.Align = new(0.5f, 0f);
 
             WeaponPurchase = UIButton.Create(this, new(88, 10), new(104, 80));
@@ -55,7 +57,111 @@ namespace ZombieSurvivorZ
             AmmoPurchaseMaterials = new(AmmoPurchase, new(37, 5), new(32, 32));
             AmmoPurchaseMaterials.Text = "50";
 
+            SetStatsFromWeapon(weapon);
+        }
 
+        private void SetStatsFromWeapon(Weapon weapon)
+        {
+            this.weapon = weapon;
+            weapon.SetWeaponUpgradeUI(this);
+            WeaponName.Text = weapon.WeaponName;
+            WeaponTexture.Texture = weapon.WeaponUITexture;
+
+            string purchaseUpgradeMaterials;
+            string iconTextureName;
+            if (weapon.IsOwned)
+            {
+                if (!weapon.IsMaxLevel)
+                {
+                    purchaseUpgradeMaterials = weapon.GetNextLevelCost().Value.ToString();
+                    WeaponPurchase.SetClickable(true);
+                }
+                else
+                {
+                    purchaseUpgradeMaterials = "MAXED";
+                    WeaponPurchase.SetClickable(false);
+                }
+                iconTextureName = "icon_upgrade";
+
+                AmmoPurchaseMaterials.Text = weapon.MaterialsToPurchaseAmmo.ToString();
+                AmmoPurchase.SetActive(true);
+
+                WeaponPurchase.ClearOnClick();
+                WeaponPurchase.OnClick += WeaponUpgrade_OnClick;
+            }
+            else
+            {
+                purchaseUpgradeMaterials = weapon.MaterialsToPurchase.ToString();
+                iconTextureName = "icon_purchase";
+                AmmoPurchase.SetActive(false);
+
+                WeaponPurchase.ClearOnClick();
+                WeaponPurchase.OnClick += WeaponPurchase_OnClick;
+            }
+            WeaponPurchaseTexture.Texture = Game1.GetTexture(iconTextureName);
+            WeaponPurchaseMaterials.Text = purchaseUpgradeMaterials;
+
+
+            AmmoPurchase.ClearOnClick();
+            AmmoPurchase.OnClick += AmmoPurchase_OnClick;
+        }
+
+        private void WeaponPurchase_OnClick()
+        {
+            if (Game1.Player.TryRemoveMaterials(weapon.MaterialsToPurchase))
+            {
+                Game1.Player.OwnWeapon(weapon);
+                return;
+            }
+            //NOT ENOUGH
+            Game1.HUDDisplayUI.MaterialsDisplayUI.WarnInsufficientMaterials();
+        }
+        private void WeaponUpgrade_OnClick()
+        {
+            int? cost = weapon.GetNextLevelCost();
+            if (cost == null)
+            {
+                weapon.UpdateWeaponUpgradeUI();
+                return;
+            }
+            if (Game1.Player.TryRemoveMaterials(cost.Value))
+            {
+                weapon.UpgradeLevel();
+                weapon.UpdateWeaponUpgradeUI();
+                return;
+            }
+            //NOT ENOUGH
+            Game1.HUDDisplayUI.MaterialsDisplayUI.WarnInsufficientMaterials();
+        }
+        private void AmmoPurchase_OnClick()
+        {
+            if (Game1.Player.TryRemoveMaterials(weapon.MaterialsToPurchaseAmmo))
+            {
+                weapon.AmmoPurchased();
+                return;
+            }
+            //NOT ENOUGH
+            Game1.HUDDisplayUI.MaterialsDisplayUI.WarnInsufficientMaterials();
+        }
+
+
+        public void WeaponChangedUpdate(Weapon weapon)
+        {
+            SetStatsFromWeapon(weapon);
+        }
+
+        public override void SetActive(bool active)
+        {
+            base.SetActive(active);
+            WeaponTexture.SetActive(active);
+            WeaponNumber.SetActive(active);
+            WeaponName.SetActive(active);
+            AmmoPurchase.SetActive(active);
+            AmmoPurchaseMaterials.SetActive(active);
+            AmmoPurchaseTexture.SetActive(active);
+            WeaponPurchase.SetActive(active);
+            WeaponPurchaseMaterials.SetActive(active);
+            WeaponPurchaseTexture.SetActive(active);
         }
 
         public override void Initialize()

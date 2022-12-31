@@ -11,6 +11,11 @@ namespace ZombieSurvivorZ
 
         public DebugGun()
         {
+            WeaponName = "Cheat Gun";
+            WeaponUITexture = Game1.GetTexture("pistol_texture");
+            MaterialsToPurchase = 0;
+            MaterialsToPurchaseAmmo = 0;
+
             FireTime = 0.01f;
             MuzzleFlashTime = 0.01f;
             FiringLineFlashTime = 0.05f;

@@ -12,16 +12,16 @@ namespace ZombieSurvivorZ
     public class Crate : SpriteObject
     {
 
-        private readonly Collision.BoxCollider CrateCL;
+        private Collision.BoxStaticCollider CrateCL;
 
         public Crate()
         {
             Texture = Game1.GetTexture("Objects/crate");
-            CrateCL = new Collision.BoxCollider(this, 40, 40);
         }
 
         public override void Initialize()
         {
+            CrateCL = new Collision.BoxStaticCollider(this, 32, 32);
             base.Initialize();
         }
 
