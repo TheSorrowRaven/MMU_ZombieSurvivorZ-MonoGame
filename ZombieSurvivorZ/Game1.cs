@@ -30,6 +30,8 @@ namespace ZombieSurvivorZ
 
         public static Player Player { get; private set; }
 
+        public static FiringLines FiringLines { get; private set; }
+
         public static UpgradeWindowUI UpgradeWindowUI { get; private set; }
         public static HUDDisplayUI HUDDisplayUI { get; private set; }
         public static bool UISuppressClick { get; set; } = false;
@@ -73,19 +75,33 @@ namespace ZombieSurvivorZ
 
 
 
-            var c = new Crate()
-            {
-                Position = new(200, 100)
-            };
+            //var c = new Crate()
+            //{
+            //    Position = new(200, 100)
+            //};
 
-            c = new Crate()
+            //c = new Crate()
+            //{
+            //    Position = new(-100, -100)
+            //};
+            //new Crate()
+            //{
+            //    Position = new(0, 0)
+            //};
+            for (int x = 0; x < 32; x++)
             {
-                Position = new(-100, -100)
-            };
+                for (int y = 0; y < 32; y++)
+                {
+                    new Crate()
+                    {
+                        Position = new(100 + x * 32, 100 + y * 32)
+                    };
+                }
+            }
 
+            FiringLines = new();
             UpgradeWindowUI = new();
             HUDDisplayUI = new();
-
         }
 
         public static Texture2D GetTexture(string name)

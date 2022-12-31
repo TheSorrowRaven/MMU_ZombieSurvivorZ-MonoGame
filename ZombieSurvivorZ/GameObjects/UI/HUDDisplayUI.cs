@@ -21,7 +21,10 @@ namespace ZombieSurvivorZ
         {
             Vector2 size = new(200, 100);
             BottomRightContainer = new(this, new(Game1.ScreenSize.X - size.X, Game1.ScreenSize.Y - size.Y), size);
-            BottomRightContainer.Active = false;
+            //BottomRightContainer.Active = false;
+            //Improve this?
+            BottomRightContainer.Color = Color.White;
+            BottomRightContainer.Alpha = 0.1f;
 
             Vector2 lSize = new(70, 2);
             BottomRightLineSeparator = new(BottomRightContainer, (size / 2) - (lSize / 2), lSize);
@@ -29,6 +32,15 @@ namespace ZombieSurvivorZ
 
             AmmoDisplayUI = new(BottomRightContainer, new(0, 0), new(200, 50));
             MaterialsDisplayUI = new(BottomRightContainer, new(0, 50), new(200, 50));
+        }
+
+        public override void SetActive(bool active)
+        {
+            base.SetActive(active);
+            BottomRightContainer.SetActive(active);
+            BottomRightLineSeparator.SetActive(active);
+            MaterialsDisplayUI.SetActive(active);
+            AmmoDisplayUI.SetActive(active);
         }
 
         public override void Draw(SpriteBatch spriteBatch)

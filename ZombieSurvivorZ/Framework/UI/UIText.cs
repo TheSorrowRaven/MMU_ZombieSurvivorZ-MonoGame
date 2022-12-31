@@ -25,7 +25,7 @@ namespace ZombieSurvivorZ
             }
         }
 
-        private Vector2 StringSize;
+        public Vector2 StringSize { get; private set; }
 
         public Vector2 Align = new(0.5f, 0.5f);
 
@@ -37,6 +37,10 @@ namespace ZombieSurvivorZ
             {
                 text = value;
                 StringSize = spriteFont.MeasureString(text);
+                if (fontUndefined)
+                {
+                    SpriteFont = Font.Biggest;
+                }
             }
         }
 
@@ -64,13 +68,17 @@ namespace ZombieSurvivorZ
         private Vector2 GetActualPosition()
         {
             Vector2 pos = GetOffset();
+            return pos + GetLocalAlignedPosition();
+        }
+        private Vector2 GetLocalAlignedPosition()
+        {
             float relScale = MathF.Max(StringSize.X / Scale.X, StringSize.Y / Scale.Y);
             if (!fontUndefined)
             {
                 if (relScale > 1)
                 {
                     Console.WriteLine($"Text cannot fit! Required:{StringSize}, Size:{Scale}");
-                    return pos;
+                    return Vector2.Zero;
                 }
             }
             else
@@ -81,7 +89,21 @@ namespace ZombieSurvivorZ
                 }
             }
             Vector2 diff = Scale - StringSize;
-            return pos + (diff * Align);
+            return diff * Align;
+        }
+
+        public RectangleF GetTextBounds()
+        {
+            Vector2 pos = GetActualPosition();
+            Vector2 size = StringSize;
+            return new(pos, size);
+        }
+
+        public RectangleF GetTextLocalBounds()
+        {
+            Vector2 pos = GetLocalAlignedPosition();
+            Vector2 size = StringSize;
+            return new(pos, size);
         }
 
         public override void Draw(SpriteBatch spriteBatch)

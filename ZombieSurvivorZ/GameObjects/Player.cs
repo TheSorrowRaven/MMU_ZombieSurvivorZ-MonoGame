@@ -5,6 +5,7 @@ using MonoGame.Extended;
 using MonoGame.Extended.Collisions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using static ZombieSurvivorZ.Collision;
 
 namespace ZombieSurvivorZ
@@ -20,10 +21,12 @@ namespace ZombieSurvivorZ
 
         private Texture2D bodyTexture;
 
+        private readonly List<Weapon> weapons = new();
         private readonly Dictionary<int, Weapon> keyNumToWeapon = new();
+        private int keyNumCount = 1;
         public int Materials { get; private set; }
 
-        private readonly CircleCollider PlayerCL;
+        private readonly CircleDynamicCollider PlayerCL;
 
         public Player()
         {
@@ -40,14 +43,18 @@ namespace ZombieSurvivorZ
 
             //Scale = new(0.5f, 0.5f);
 
-            Pistol pistol = new();
-            keyNumToWeapon.Add(1, pistol);
-            DebugGun debugGun = new();
-            keyNumToWeapon.Add(2, debugGun);
+            Pistol pistol = CreateWeapon(new Pistol());
+            OwnWeapon(pistol);
+
+            DebugGun debugGun = CreateWeapon(new DebugGun());
+            OwnWeapon(debugGun);
+
+            AddWeaponsToWeaponUpgradeUI();
 
             reticle = new();
             reticle.Disable();
 
+            AddMaterials(100);  //Initial Materials
         }
 
         protected override void ScaleChanged()
@@ -77,20 +84,50 @@ namespace ZombieSurvivorZ
 
         #region Materials
 
-        public void AddMaterials(int materials)
+        private void AddMaterials(int materials)
         {
             Materials += materials;
-            Game1.HUDDisplayUI.MaterialsDisplayUI.UpdateMaterials(Materials);
+            Game1.HUDDisplayUI?.MaterialsDisplayUI.UpdateMaterials(Materials);
         }
-        public void RemoveMaterials(int materials)
+        private void RemoveMaterials(int materials)
         {
             Materials -= materials;
             Game1.HUDDisplayUI.MaterialsDisplayUI.UpdateMaterials(Materials);
+        }
+        public bool TryRemoveMaterials(int materials)
+        {
+            if (Materials >= materials)
+            {
+                RemoveMaterials(materials);
+                return true;
+            }
+            return false;
         }
 
         #endregion
 
         #region Weapon Operation
+
+        private T CreateWeapon<T>(T weapon) where T : Weapon
+        {
+            weapons.Add(weapon);
+            weapon.IsOwned = false;
+            return weapon;
+        }
+        public void OwnWeapon(Weapon weapon)
+        {
+            keyNumToWeapon.Add(keyNumCount++, weapon);
+            weapon.IsOwned = true;
+            weapon.UpdateWeaponUpgradeUI();
+        }
+
+        private void AddWeaponsToWeaponUpgradeUI()
+        {
+            foreach (Weapon weapon in weapons)
+            {
+                Game1.UpgradeWindowUI.Player_AddWeaponToList(weapon);
+            }
+        }
 
         private void WeaponOperationUpdate()
         {
@@ -182,7 +219,7 @@ namespace ZombieSurvivorZ
             Game1.HUDDisplayUI.AmmoDisplayUI.UpdateAmmoCount(weapon.AmmoInClip, weapon.AmmoReserve);
         }
 
-        public override void OnCollision(Collider current, Collider other, Vector2 penetrationVector)
+        public override void OnCollision(DynamicCollider current, Collider other, Vector2 penetrationVector)
         {
             base.OnCollision(current, other, penetrationVector);
             OnCollision_PushBack(current, other, penetrationVector);

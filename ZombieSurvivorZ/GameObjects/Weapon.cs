@@ -19,12 +19,55 @@ namespace ZombieSurvivorZ
             Switching,
         }
 
+        public class Level
+        {
+            public int UpgradeCost; //To NEXT LEVEL
+
+            public float? FireTime;
+            public float? RecoilTime;
+            public float? ReloadTime;
+            public float? SwitchTime;
+            public float? MuzzleFlashTime;
+            public float? FiringLineFlashTime;
+            public int? ClipSize;
+            public bool? CanAutoFire;
+            public float? RecoilSpreadIncrease;
+            public float? RecoilSpreadDecrease;
+            public float? RecoilMaxSpread;
+        }
+
+
         //State
         public State WeaponState { get; protected set; } = State.Holstered;
         //Sub State
         public bool IsRecoiling { get; protected set; } = false;
         //Visual State
         public bool IsMuzzleFlashing { get; protected set;} = false;
+
+        //Ownership
+        public bool IsOwned { get; set; } = false;
+
+        //Properties
+        public string WeaponName { get; protected set; }
+        public Texture2D WeaponUITexture { get; protected set; }
+        public int MaterialsToPurchase { get; protected set; }
+        public int MaterialsToPurchaseAmmo { get; protected set; }
+
+        //Upgrades
+        public int LevelNumber { get; protected set; } = -1;
+        public Level[] Levels { get; protected set; } = Array.Empty<Level>();
+        public Level CurrentLevel {
+            get
+            {
+                if (LevelNumber == -1)
+                {
+                    return null;
+                }
+                return Levels[LevelNumber];
+            }
+        }
+        public bool IsMaxLevel => LevelNumber + 1 >= Levels.Length;
+
 
         //Stats
         public float FireTime { get; protected set; }
@@ -68,11 +111,17 @@ namespace ZombieSurvivorZ
 
         public Texture2D WeaponFlashTexture { get; protected set; }
 
-
-        //TODO move this to a non weapon dependent class
-        private readonly List<(Line, float)> firingLines = new();
-
         private readonly GameObject[] IgnoreObjects = new GameObject[1];
+        private WeaponUpgradeUI WeaponUpgradeUIRef;
+
+        public void SetWeaponUpgradeUI(WeaponUpgradeUI weaponUpgradeUIRef)
+        {
+            WeaponUpgradeUIRef = weaponUpgradeUIRef;
+        }
+        public void UpdateWeaponUpgradeUI()
+        {
+            WeaponUpgradeUIRef?.WeaponChangedUpdate(this);
+        }
 
 
         public override void Initialize()
@@ -83,6 +132,86 @@ namespace ZombieSurvivorZ
         public virtual float GetVisualRecoilSpread()
         {
             return recoilSpread;
+        }
+
+
+        public Level GetNextLevel()
+        {
+            int l = LevelNumber + 1;
+            if (l >= Levels.Length)
+            {
+                return null;
+            }
+            return Levels[l];
+        }
+        public int? GetNextLevelCost()
+        {
+            Level level = GetNextLevel();
+            if (level == null)
+            {
+                return null;
+            }
+            return level.UpgradeCost;
+        }
+
+        public virtual void AmmoPurchased()
+        {
+            AmmoReserve += ClipSize;
+        }
+        public virtual void UpgradeLevel()
+        {
+            if (IsMaxLevel)
+            {
+                return;
+            }
+            LevelNumber++;
+            Level level = CurrentLevel;
+
+            if (level.FireTime != null)
+            {
+                FireTime = level.FireTime.Value;
+            }
+            if (level.RecoilTime != null)
+            {
+                RecoilTime = level.RecoilTime.Value;
+            }
+            if (level.ReloadTime != null)
+            {
+                ReloadTime = level.ReloadTime.Value;
+            }
+            if (level.SwitchTime != null)
+            {
+                SwitchTime = level.SwitchTime.Value;
+            }
+            if (level.MuzzleFlashTime != null)
+            {
+                MuzzleFlashTime = level.MuzzleFlashTime.Value;
+            }
+            if (level.FiringLineFlashTime != null)
+            {
+                FiringLineFlashTime = level.FiringLineFlashTime.Value;
+            }
+            if (level.ClipSize != null)
+            {
+                ClipSize = level.ClipSize.Value;
+            }
+            if (level.CanAutoFire != null)
+            {
+                CanAutoFire = level.CanAutoFire.Value;
+            }
+            if (level.RecoilSpreadIncrease != null)
+            {
+                RecoilSpreadIncrease = level.RecoilSpreadIncrease.Value;
+            }
+            if (level.RecoilSpreadDecrease != null)
+            {
+                RecoilSpreadDecrease = level.RecoilSpreadDecrease.Value;
+            }
+            if (level.RecoilMaxSpread != null)
+            {
+                RecoilMaxSpread = level.RecoilMaxSpread.Value;
+            }
+
         }
 
 
@@ -168,17 +297,18 @@ namespace ZombieSurvivorZ
         protected virtual void FireRaycast()
         {
             Vector2 direction = Heading;
+            Vector2 start = Position + direction * FiringLineStartOffset * Scale.X;
+            Vector2 end;
             if (!Collision.Raycast(Position, direction, IgnoreObjects, out Collision.Collider collider, out float hitDistance))
             {
-                //Console.WriteLine($"Miss");
-                //firingLines.Add(new(Position, Position + direction * 100));
-                return;
+                hitDistance = 1000;
             }
-            //Console.WriteLine($"Bang -> {collider.Go.GetType()}, {hitDistance}");
-            //TODO hit zombie
-            Vector2 start = Position + direction * FiringLineStartOffset * Scale.X;
-            Vector2 end = Position + direction * hitDistance;
-            firingLines.Add((new(start, end), FiringLineFlashTime));
+            else
+            {
+                //TODO Hit collider
+            }
+            end = Position + direction * hitDistance;
+            Game1.FiringLines.CreateFiringLine(new(start, end), FiringLineFlashTime);
         }
 
 
@@ -249,19 +379,6 @@ namespace ZombieSurvivorZ
 
         public override void Update()
         {
-            for (int i = 0; i < firingLines.Count; i++)
-            {
-                (Line, float) item = firingLines[i];
-                float timeCount = item.Item2 - Time.deltaTime;
-                if (timeCount < 0)
-                {
-                    firingLines.RemoveAt(i);
-                    i--;
-                    continue;
-                }
-                item.Item2 = timeCount;
-                firingLines[i] = item;
-            }
 
             if (WeaponState == State.Holstered)
             {
@@ -373,12 +490,6 @@ namespace ZombieSurvivorZ
             if (IsMuzzleFlashing)
             {
                 spriteBatch.Draw(WeaponFlashTexture, Position, null, Color, Rotation, OriginPixels, Scale, SpriteEffects.None, RenderOrder);
-            }
-
-            for (int i = 0; i < firingLines.Count; i++)
-            {
-                Line line = firingLines[i].Item1;
-                spriteBatch.DrawLine(line.start, line.end, Color.DarkGray);
             }
 
         }

@@ -17,7 +17,10 @@ namespace ZombieSurvivorZ
     {
 
         private static CollisionComponent CollisionComponent;
-        private static readonly HashSet<Collider> ActiveColliders = new();
+
+        private static readonly HashSet<Collider> AllColliders = new();
+        private static readonly HashSet<DynamicCollider> DynamicColliders = new();
+        private static readonly HashSet<StaticCollider> StaticColliders = new();
 
 
 
@@ -29,14 +32,14 @@ namespace ZombieSurvivorZ
 
         public static void Update(GameTime gameTime)
         {
-            foreach (var collider in ActiveColliders)
+            foreach (var collider in DynamicColliders)
             {
                 collider.Update();
             }
 
-            foreach (var collider in ActiveColliders)
+            foreach (var collider in DynamicColliders)
             {
-                foreach (var other in ActiveColliders)
+                foreach (var other in DynamicColliders)
                 {
                     if (collider == other)
                     {
@@ -48,6 +51,16 @@ namespace ZombieSurvivorZ
                         collider.OnCollision(other, penetration);
                     }
                 }
+
+                foreach (var other in StaticColliders)
+                {
+                    if (collider.Bounds.Intersects(other.Bounds))
+                    {
+                        Vector2 penetration = CalculatePenetrationVector(collider.Bounds, other.Bounds);
+                        collider.OnCollision(other, penetration);
+                    }
+                }
+
             }
 
             ////CollisionComponent.Update(gameTime);
@@ -81,7 +94,7 @@ namespace ZombieSurvivorZ
         public static bool Raycast(Vector2 position, Vector2 direction, out List<(Collider, float)> intersections)
         {
             intersections = new();
-            foreach (var collider in ActiveColliders)
+            foreach (var collider in AllColliders)
             {
                 if (collider.Bounds is RectangleF rect)
                 {
@@ -110,9 +123,8 @@ namespace ZombieSurvivorZ
             return intersections.Count > 0;
         }
 
-        public abstract class Collider//// : ICollisionActor
+        public abstract class Collider
         {
-
             public GameObject Go { get; private set; }
             public abstract IShapeF Bounds { get; protected set; }
 
@@ -125,18 +137,104 @@ namespace ZombieSurvivorZ
                 go.Destroyed += Destroy;
             }
 
-            private void Go_ActiveStateChanged(bool active)
+
+            private void Destroy()
+            {
+                Go.ActiveStateChanged -= Go_ActiveStateChanged;
+                Go.Destroyed -= Destroy;
+                Go = null;
+            }
+
+            protected abstract void Go_ActiveStateChanged(bool active);
+
+        }
+
+        /// <summary>
+        /// Static Colliders won't be tested against each other, will not move, and will not call the OnCollision of the GameObject
+        /// </summary>
+        public abstract class StaticCollider : Collider
+        {
+
+            public StaticCollider(GameObject go) : base(go)
+            {
+            }
+
+            protected override void Go_ActiveStateChanged(bool active)
             {
                 if (active)
                 {
                     ////CollisionComponent.Insert(this);
-                    ActiveColliders.Add(this);
-                    Console.WriteLine("Insert");
+                    StaticColliders.Add(this);
+                    AllColliders.Add(this);
+                    Console.WriteLine("Staic Collider inserted");
                     return;
                 }
                 ////CollisionComponent.Remove(this);
-                ActiveColliders.Remove(this);
-                Console.WriteLine("Removed");
+                StaticColliders.Remove(this);
+                AllColliders.Remove(this);
+                Console.WriteLine("Staic Collider Removed");
+            }
+
+        }
+
+        public class CircleStaticCollider : StaticCollider
+        {
+            public float Radius { get; private set; }
+            public override IShapeF Bounds { get; protected set; }
+
+            public CircleStaticCollider(GameObject go, float radius) : base(go)
+            {
+                Set(radius);
+            }
+            public void Set(float radius)
+            {
+                Radius = radius;
+                Bounds = new CircleF(Go.Position, radius);
+            }
+        }
+
+        public class BoxStaticCollider : StaticCollider
+        {
+            public float Width { get; private set; }
+            public float Height { get; private set; }
+            public override IShapeF Bounds { get; protected set; }
+
+            public BoxStaticCollider(GameObject go, float width, float height) : base(go)
+            {
+                Set(width, height);
+            }
+            public void Set(float width, float height)
+            {
+                Width = width;
+                Height = height;
+                Bounds = new RectangleF(Go.Position.X - (width / 2), Go.Position.Y - (height / 2), width, height);
+            }
+        }
+
+
+
+        public abstract class DynamicCollider : Collider
+        {
+
+
+            public DynamicCollider(GameObject go) : base(go)
+            {
+            }
+
+            protected override void Go_ActiveStateChanged(bool active)
+            {
+                if (active)
+                {
+                    ////CollisionComponent.Insert(this);
+                    DynamicColliders.Add(this);
+                    AllColliders.Add(this);
+                    Console.WriteLine("Dynamic Collider Inserted");
+                    return;
+                }
+                ////CollisionComponent.Remove(this);
+                DynamicColliders.Remove(this);
+                AllColliders.Remove(this);
+                Console.WriteLine("Dynamic Collider Removed");
             }
 
             public void Update()
@@ -155,25 +253,18 @@ namespace ZombieSurvivorZ
                 Go.OnCollision(this, other, penetrationVector);
             }
 
-            private void Destroy()
-            {
-                Go.ActiveStateChanged -= Go_ActiveStateChanged;
-                Go.Destroyed -= Destroy;
-                Go = null;
-            }
-
             protected virtual void SetBoundsUpdate(GameObject go)
             {
                 Bounds.Position = go.Position;
             }
         }
 
-        public class CircleCollider : Collider
+        public class CircleDynamicCollider : DynamicCollider
         {
             public float Radius { get; private set; }
             public override IShapeF Bounds { get; protected set; }
 
-            public CircleCollider(GameObject go, float radius) : base(go)
+            public CircleDynamicCollider(GameObject go, float radius) : base(go)
             {
                 Set(radius);
             }
@@ -184,13 +275,13 @@ namespace ZombieSurvivorZ
             }
         }
 
-        public class BoxCollider : Collider
+        public class BoxDynamicCollider : DynamicCollider
         {
             public float Width { get; private set; }
             public float Height { get; private set; }
             public override IShapeF Bounds { get; protected set; }
 
-            public BoxCollider(GameObject go, float width, float height) : base(go)
+            public BoxDynamicCollider(GameObject go, float width, float height) : base(go)
             {
                 Set(width, height);
             }

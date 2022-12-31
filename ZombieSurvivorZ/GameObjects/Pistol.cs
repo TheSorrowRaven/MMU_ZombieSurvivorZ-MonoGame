@@ -11,6 +11,11 @@ namespace ZombieSurvivorZ
 
         public Pistol()
         {
+            WeaponName = "Pistol";
+            WeaponUITexture = Game1.GetTexture("pistol_texture");
+            MaterialsToPurchase = 100;
+            MaterialsToPurchaseAmmo = 5;
+
             FireTime = 0.2f;
             MuzzleFlashTime = 0.05f;
             FiringLineFlashTime = 0.05f;
@@ -28,6 +33,20 @@ namespace ZombieSurvivorZ
             RecoilSpreadDecrease = 50.0f;
             RecoilMaxSpread = 25f;
             RecoilTime = 0.3f;
+
+            Levels = new Level[]
+            {
+                new Level
+                {
+                    UpgradeCost = 100,
+                    ClipSize = 12,
+                },
+                new Level
+                {
+                    UpgradeCost = 150,
+                    ReloadTime = 0.5f,
+                }
+            };
         }
 
         public override void Initialize()

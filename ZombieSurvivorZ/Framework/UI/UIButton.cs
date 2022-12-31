@@ -17,12 +17,18 @@ namespace ZombieSurvivorZ
 
         public UIText text;
 
+        public bool Clickable = true;
+
         public bool ClickHeld = false;
         public bool FirstClickInBounds = false;
         public bool Hovering = false;
 
+        public Color ClickableColor;
         public float HoverAlpha = 0.2f;
         public float HeldAlpha = 0.6f;
+
+        public Color UnclickableColor = Color.Black;
+        public float UnclickableAlpha = 0.6f;
 
         public event Action OnClick = () => { };
 
@@ -59,6 +65,38 @@ namespace ZombieSurvivorZ
             return button;
         }
 
+        protected override void ColorUpdated(Color color)
+        {
+            base.ColorUpdated(color);
+            ClickableColor = color;
+        }
+
+        public void ClearOnClick()
+        {
+            OnClick = () => { };
+        }
+
+        public override void SetActive(bool active)
+        {
+            base.SetActive(active);
+            border.SetActive(active);
+            fill.SetActive(active);
+            text?.SetActive(active);
+        }
+
+        public void SetClickable(bool clickable)
+        {
+            Clickable = clickable;
+            if (Clickable)
+            {
+                Color = ClickableColor;
+            }
+            else
+            {
+                Color = UnclickableColor;
+            }
+        }
+
         public override void Initialize()
         {
             base.Initialize();
@@ -67,6 +105,11 @@ namespace ZombieSurvivorZ
         public override void Update()
         {
             base.Update();
+
+            if (!Clickable)
+            {
+                return;
+            }
 
             if (MouseWithinBounds())
             {
@@ -108,7 +151,11 @@ namespace ZombieSurvivorZ
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            if (ClickHeld)
+            if (!Clickable)
+            {
+                Alpha = UnclickableAlpha;
+            }
+            else if (ClickHeld)
             {
                 Alpha = HeldAlpha;
             }

@@ -36,6 +36,11 @@ namespace ZombieSurvivorZ
             base.Initialize();
         }
 
+        public virtual void SetActive(bool active)
+        {
+            Active = active;
+        }
+
         public bool MouseWithinBounds()
         {
             Vector2 screenPos = Input.MousePos;
