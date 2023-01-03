@@ -28,6 +28,7 @@ namespace ZombieSurvivorZ
 
         public static Camera Camera { get; private set; }
 
+        public static MapManager MapManager { get; private set; }
         public static Player Player { get; private set; }
 
         public static FiringLines FiringLines { get; private set; }
@@ -71,7 +72,7 @@ namespace ZombieSurvivorZ
             Font.Load();
             ////_spriteBatch = new(GraphicsDevice);
 
-            Map map = new();
+            MapManager = new();
             Player = new();
 
 
@@ -150,7 +151,7 @@ namespace ZombieSurvivorZ
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.Black);
 
 
             Matrix transformMatrix = Camera.GetViewMatrix();

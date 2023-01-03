@@ -11,19 +11,18 @@ using MonoGame.Extended.Tiled.Renderers;
 
 namespace ZombieSurvivorZ
 {
-    public class Map : SpriteObject
+    public abstract class BaseMap : SpriteObject
     {
+        protected static MapManager MapManager => Game1.MapManager;
 
-        private TiledMap map;
-        private TiledMapLayer layer;
-        private TiledMapRenderer tiledMapRenderer;
+        public readonly TiledMapLayer Layer;
+        protected readonly TiledMapRenderer Renderer;
 
-        public Map()
+        public BaseMap(TiledMapLayer layer, TiledMap map)
         {
-            map = Game1.GetContent<TiledMap>("zombie-survivorz");
-            layer = map.GetLayer("Tile Layer 1");
-            tiledMapRenderer = new TiledMapRenderer(Game1.Current.GraphicsDevice, map);
-            Position = new(map.TileWidth * map.Width * -0.5f, map.TileHeight * map.Height * -0.5f);
+            Layer = layer;
+            Renderer = new TiledMapRenderer(Game1.Current.GraphicsDevice, map);
+            Console.WriteLine(Renderer);
         }
 
         public override void Initialize()
@@ -35,14 +34,14 @@ namespace ZombieSurvivorZ
         public override void Update()
         {
             base.Update();
-            tiledMapRenderer.Update(Time.gameTime);
+            Renderer.Update(Time.gameTime);
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
             Matrix viewMatrix = Game1.Camera.GetViewMatrix();
-            viewMatrix.Translation += new Vector3(Position.X, Position.Y, 0);
-            tiledMapRenderer.Draw(layer, viewMatrix);
+            viewMatrix.Translation += new Vector3(Position.X + MapManager.Position.X, Position.Y + MapManager.Position.Y, 0);
+            Renderer.Draw(Layer, viewMatrix);
         }
 
     }
