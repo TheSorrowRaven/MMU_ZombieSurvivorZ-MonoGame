@@ -71,14 +71,15 @@ namespace ZombieSurvivorZ
             Font.Load();
             ////_spriteBatch = new(GraphicsDevice);
 
+            Map map = new();
             Player = new();
 
 
 
-            //var c = new Crate()
-            //{
-            //    Position = new(200, 100)
-            //};
+            var c = new Crate()
+            {
+                Position = new(200, 100)
+            };
 
             //c = new Crate()
             //{
@@ -88,16 +89,16 @@ namespace ZombieSurvivorZ
             //{
             //    Position = new(0, 0)
             //};
-            for (int x = 0; x < 32; x++)
-            {
-                for (int y = 0; y < 32; y++)
-                {
-                    new Crate()
-                    {
-                        Position = new(100 + x * 32, 100 + y * 32)
-                    };
-                }
-            }
+            //for (int x = 0; x < 32; x++)
+            //{
+            //    for (int y = 0; y < 32; y++)
+            //    {
+            //        new Crate()
+            //        {
+            //            Position = new(100 + x * 32, 100 + y * 32)
+            //        };
+            //    }
+            //}
 
             FiringLines = new();
             UpgradeWindowUI = new();
@@ -122,6 +123,7 @@ namespace ZombieSurvivorZ
 
         protected override void Update(GameTime gameTime)
         {
+            Time.gameTime = gameTime;
             Time.time = (float)gameTime.TotalGameTime.TotalSeconds;
             Time.deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             Time.frameCount++;
