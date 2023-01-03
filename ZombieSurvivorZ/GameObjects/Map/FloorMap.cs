@@ -16,7 +16,7 @@ namespace ZombieSurvivorZ
 
         public override World World => World.floor;
 
-        public FloorMap(TiledMapLayer layer, TiledMap map) : base(layer, map)
+        public FloorMap(TiledMapTileLayer layer) : base(layer)
         {
 
         }

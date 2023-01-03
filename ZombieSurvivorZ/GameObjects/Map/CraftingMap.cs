@@ -14,7 +14,7 @@ namespace ZombieSurvivorZ
     public class CraftingMap : BaseMap
     {
 
-        public CraftingMap(TiledMapLayer layer, TiledMap map) : base(layer, map)
+        public CraftingMap(TiledMapTileLayer layer) : base(layer)
         {
 
         }

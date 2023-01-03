@@ -14,15 +14,15 @@ namespace ZombieSurvivorZ
     public abstract class BaseMap : SpriteObject
     {
         protected static MapManager MapManager => Game1.MapManager;
+        protected static TiledMap Map => MapManager.Map;
 
-        public readonly TiledMapLayer Layer;
+        public readonly TiledMapTileLayer Layer;
         protected readonly TiledMapRenderer Renderer;
 
-        public BaseMap(TiledMapLayer layer, TiledMap map)
+        public BaseMap(TiledMapTileLayer layer)
         {
             Layer = layer;
-            Renderer = new TiledMapRenderer(Game1.Current.GraphicsDevice, map);
-            Console.WriteLine(Renderer);
+            Renderer = new TiledMapRenderer(Game1.Current.GraphicsDevice, Map);
         }
 
         public override void Initialize()
@@ -36,6 +36,8 @@ namespace ZombieSurvivorZ
             base.Update();
             Renderer.Update(Time.gameTime);
         }
+
+        public Vector2 ActualPosition => Position + MapManager.Position;
 
         public override void Draw(SpriteBatch spriteBatch)
         {

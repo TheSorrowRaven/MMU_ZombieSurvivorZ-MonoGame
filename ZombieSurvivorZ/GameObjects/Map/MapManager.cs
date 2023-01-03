@@ -13,7 +13,7 @@ namespace ZombieSurvivorZ
 {
     public class MapManager : SpriteObject
     {
-        public readonly TiledMap Map;
+        public static readonly TiledMap Map = Game1.GetContent<TiledMap>("zombie-survivorz");
         public readonly FloorMap FloorLayer;
         public readonly WallsMap WallsLayer;
         public readonly WindowsMap WindowsLayer;
@@ -23,14 +23,12 @@ namespace ZombieSurvivorZ
 
         public MapManager()
         {
-            Map = Game1.GetContent<TiledMap>("zombie-survivorz");
-
-            FloorLayer = new(Map.GetLayer("Floor"), Map);
-            WallsLayer = new(Map.GetLayer("Walls"), Map);
-            WindowsLayer = new(Map.GetLayer("Windows"), Map);
-            DoorsLayer = new(Map.GetLayer("Doors"), Map);
-            ZombieSpawnLayer = new(Map.GetLayer("ZombieSpawn"), Map);
-            CraftingLayer = new(Map.GetLayer("Crafting"), Map);
+            FloorLayer = new(Map.GetLayer<TiledMapTileLayer>("Floor"));
+            WallsLayer = new(Map.GetLayer<TiledMapTileLayer>("Walls"));
+            WindowsLayer = new(Map.GetLayer<TiledMapTileLayer>("Windows"));
+            DoorsLayer = new(Map.GetLayer<TiledMapTileLayer>("Doors"));
+            ZombieSpawnLayer = new(Map.GetLayer<TiledMapTileLayer>("ZombieSpawn"));
+            CraftingLayer = new(Map.GetLayer<TiledMapTileLayer>("Crafting"));
             Active = false;
 
             Position = new(Map.TileWidth * Map.Width * -0.5f, Map.TileHeight * Map.Height * -0.5f);

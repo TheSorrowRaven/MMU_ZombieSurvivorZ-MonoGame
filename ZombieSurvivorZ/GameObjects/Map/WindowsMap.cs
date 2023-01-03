@@ -14,7 +14,7 @@ namespace ZombieSurvivorZ
     public class WindowsMap : BaseMap
     {
 
-        public WindowsMap(TiledMapLayer layer, TiledMap map) : base(layer, map)
+        public WindowsMap(TiledMapTileLayer layer) : base(layer)
         {
 
         }

@@ -14,7 +14,7 @@ namespace ZombieSurvivorZ
     public class DoorsMap : BaseMap
     {
 
-        public DoorsMap(TiledMapLayer layer, TiledMap map) : base(layer, map)
+        public DoorsMap(TiledMapTileLayer layer) : base(layer)
         {
 
         }

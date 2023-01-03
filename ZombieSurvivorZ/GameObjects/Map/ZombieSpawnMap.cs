@@ -14,7 +14,7 @@ namespace ZombieSurvivorZ
     public class ZombieSpawnMap : BaseMap
     {
 
-        public ZombieSpawnMap(TiledMapLayer layer, TiledMap map) : base(layer, map)
+        public ZombieSpawnMap(TiledMapTileLayer layer) : base(layer)
         {
 
         }

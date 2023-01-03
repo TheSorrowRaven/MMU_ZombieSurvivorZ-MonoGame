@@ -201,13 +201,17 @@ namespace ZombieSurvivorZ
 
             public BoxStaticCollider(GameObject go, float width, float height) : base(go)
             {
-                Set(width, height);
+                Set(width, height, Go.Position.X - (width / 2), Go.Position.Y - (height / 2));
             }
-            public void Set(float width, float height)
+            public BoxStaticCollider(GameObject go, float width, float height, float xPos, float yPos) : base(go)
+            {
+                Set(width, height, xPos, yPos);
+            }
+            public void Set(float width, float height, float xPos, float yPos)
             {
                 Width = width;
                 Height = height;
-                Bounds = new RectangleF(Go.Position.X - (width / 2), Go.Position.Y - (height / 2), width, height);
+                Bounds = new RectangleF(xPos, yPos, width, height);
             }
         }
 

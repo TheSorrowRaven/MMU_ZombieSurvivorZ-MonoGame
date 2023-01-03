@@ -155,7 +155,7 @@ namespace ZombieSurvivorZ
 
 
             Matrix transformMatrix = Camera.GetViewMatrix();
-            SpriteBatch.Begin(transformMatrix: transformMatrix);
+            SpriteBatch.Begin(transformMatrix: transformMatrix, samplerState: SamplerState.AnisotropicWrap);
             World.floor.Draw(SpriteBatch, gameTime);
             World.objects.Draw(SpriteBatch, gameTime);
             SpriteBatch.End();

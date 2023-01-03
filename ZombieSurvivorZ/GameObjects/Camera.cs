@@ -23,6 +23,7 @@ namespace ZombieSurvivorZ
         public void Update()
         {
             Vector2 pos = -Game1.ScreenCenter + Game1.Player.Position;
+            pos = new((int)pos.X, (int)pos.Y);
             camera.Position = pos;
         }
 
