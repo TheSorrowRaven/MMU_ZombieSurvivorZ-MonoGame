@@ -340,6 +340,7 @@ namespace ZombieSurvivorZ
 
 
 
+        #region Penetration Vector (Monogame.Extended.Collisions)
 
         //
         // Summary:
@@ -465,16 +466,7 @@ namespace ZombieSurvivorZ
         }
 
 
-
-
-
-
-
-
-
-
-
-
+        #endregion
 
 
 
