@@ -23,7 +23,7 @@ namespace ZombieSurvivorZ
         {
             base.InitializeTile(x, y, tile);
             Vector2 topLeftTile = LocalToTileTopLeftPosition(x, y);
-            Collision.BoxStaticCollider box = new(this, TileSize.X, TileSize.Y, topLeftTile.X, topLeftTile.Y);
+            new Collision.BoxStaticCollider(this, TileSize.X, TileSize.Y, topLeftTile.X, topLeftTile.Y);
         }
 
     }

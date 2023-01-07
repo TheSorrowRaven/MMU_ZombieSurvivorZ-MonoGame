@@ -19,14 +19,32 @@ namespace ZombieSurvivorZ
             Y = y;
         }
 
-        public bool Equals(Vector2Int x, Vector2Int y)
+        public bool Equals(Vector2Int a, Vector2Int b)
         {
-            return X == y.X && Y == x.Y;
+            return a == b;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is Vector2Int b)
+            {
+                return this == b;
+            }
+            return false;
         }
 
         public int GetHashCode([DisallowNull] Vector2Int obj)
         {
+            return obj.GetHashCode();
+        }
+        public override int GetHashCode()
+        {
             return X << 16 | Y;
+        }
+
+        public override string ToString()
+        {
+            return $"{X}, {Y}";
         }
 
         public static Vector2Int operator +(Vector2Int a, Vector2Int b)
@@ -37,7 +55,14 @@ namespace ZombieSurvivorZ
         {
             return new(a.X - b.X, a.Y - b.Y);
         }
-
+        public static bool operator ==(Vector2Int a, Vector2Int b)
+        {
+            return a.X == b.X && a.Y == b.Y;
+        }
+        public static bool operator !=(Vector2Int a, Vector2Int b)
+        {
+            return a.X != b.X || a.Y != b.Y;
+        }
 
     }
 }

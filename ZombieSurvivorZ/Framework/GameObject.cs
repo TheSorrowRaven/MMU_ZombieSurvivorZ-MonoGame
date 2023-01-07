@@ -29,7 +29,12 @@ namespace ZombieSurvivorZ
             }
         }
         public string Name { get; set; }
-        public Vector2 Position { get; set; }
+        private Vector2 position;
+        public virtual Vector2 Position
+        {
+            get => position;
+            set => position = value;
+        }
         private Vector2 scale = Vector2.One;
         public Vector2 Scale
         {

@@ -21,15 +21,12 @@ namespace ZombieSurvivorZ
 
 
         public Vector2 ActualPosition => Position + MapManager.Position;
-
-        private Vector2 tileSize;
-        public Vector2 TileSize => tileSize;
+        public static Vector2 TileSize => MapManager.TileSize;
 
         public BaseMap(TiledMapTileLayer layer)
         {
             Layer = layer;
             Renderer = new TiledMapRenderer(Game1.Current.GraphicsDevice, Map);
-            tileSize = new(Layer.TileWidth, Layer.TileHeight);
         }
 
         public override void Initialize()
@@ -54,10 +51,20 @@ namespace ZombieSurvivorZ
 
         }
 
-        public Vector2 LocalToTileTopLeftPosition(int x, int y)
+        public static Vector2 LocalToTileTopLeftPosition(Vector2Int local)
         {
-            return new(x * Layer.TileWidth + ActualPosition.X, y * Layer.TileHeight + ActualPosition.Y);
+            return MapManager.LocalToTileTopLeftPosition(local.X, local.Y);
         }
+        public static Vector2 LocalToTileTopLeftPosition(int x, int y)
+        {
+            return MapManager.LocalToTileTopLeftPosition(x, y);
+        }
+        public static Vector2Int PositionToLocal(Vector2 pos)
+        {
+            return MapManager.PositionToLocal(pos);
+        }
+
+
 
         public override void Update()
         {
