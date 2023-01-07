@@ -10,10 +10,10 @@ using static ZombieSurvivorZ.Collision;
 
 namespace ZombieSurvivorZ
 {
-    public class Player : SpriteObject
+    public class Player : SpriteColliderObject
     {
 
-        private float movementSpeed = 100;
+        private float movementSpeed = 300;
         private bool sameKeyHolstersWeapon = true;
 
         private Reticle reticle;
@@ -26,11 +26,29 @@ namespace ZombieSurvivorZ
         private int keyNumCount = 1;
         public int Materials { get; private set; }
 
-        private readonly CircleDynamicCollider PlayerCL;
+
+        private Vector2Int lastCellPos;
+
+        public bool DoorSelected = false;
+        public Vector2Int SelectingDoor;
+
+        public bool CraftingSelected = false;
+        public Vector2Int SelectingCrafting;
+
+
+        public override Vector2 Position
+        {
+            get => base.Position;
+            set
+            {
+                base.Position = value;
+                CL.UpdatePosition(value);
+            }
+        }
 
         public Player()
         {
-            PlayerCL = new(this, 25);
+            CL = new CircleDynamicCollider(this, 25);
         }
 
         public override void Initialize()
@@ -60,7 +78,7 @@ namespace ZombieSurvivorZ
         protected override void ScaleChanged()
         {
             base.ScaleChanged();
-            PlayerCL.Set(25 * Scale.X);
+            ((CircleDynamicCollider)CL).Set(25 * Scale.X);
             if (weapon != null)
             {
                 weapon.Scale = Scale;
@@ -72,6 +90,7 @@ namespace ZombieSurvivorZ
             TransformUpdate();
             WeaponOperationUpdate();
             WeaponUpdate();
+            InteractionUpdate();
         }
 
         private void TransformUpdate()
@@ -219,6 +238,102 @@ namespace ZombieSurvivorZ
             Game1.HUDDisplayUI.AmmoDisplayUI.UpdateAmmoCount(weapon.AmmoInClip, weapon.AmmoReserve);
         }
 
+        #region Interaction
+
+        private void InteractionUpdate()
+        {
+            Vector2Int playerCell = Game1.MapManager.PositionToLocal(Position);
+            if (playerCell != lastCellPos)
+            {
+                //Checks
+                DoorCheck(playerCell);
+                CraftingCheck(playerCell);
+            }
+
+            //Updates
+            DoorUpdate();
+            CraftingUpdate();
+        }
+
+        private void DoorUpdate()
+        {
+            if (!DoorSelected)
+            {
+                return;
+            }
+            if (Input.IsKeyFirstDown(Keys.F))
+            {
+                Game1.MapManager.DoorsLayer.ToggleDoor(SelectingDoor);
+            }
+        }
+
+        private void DoorCheck(Vector2Int playerCell)
+        {
+            if (!Game1.MapManager.DoorsLayer.SurroundingAreDoors(playerCell, out Vector2Int doorCell))
+            {
+                DeselectDoor();
+                return;
+            }
+            SetSelectingDoor(doorCell);
+        }
+
+        private void SetSelectingDoor(Vector2Int selectingDoor)
+        {
+            DoorSelected = true;
+            SelectingDoor = selectingDoor;
+        }
+        private void DeselectDoor()
+        {
+            DoorSelected = false;
+        }
+
+        private void CraftingUpdate()
+        {
+            if (!CraftingSelected)
+            {
+                return;
+            }
+            if (Input.IsKeyFirstDown(Keys.F))
+            {
+                Game1.UpgradeWindowUI.SetActive(!Game1.UpgradeWindowUI.Active);
+            }
+        }
+
+        private void CraftingCheck(Vector2Int playerCell)
+        {
+            if (!Game1.MapManager.CraftingLayer.SurroundingAreCrafting(playerCell, out Vector2Int craftingCell))
+            {
+                DeselectCrafting();
+                return;
+            }
+            SetSelectingCrafting(craftingCell);
+        }
+
+        private void SetSelectingCrafting(Vector2Int selectingCrafting)
+        {
+            CraftingSelected = true;
+            SelectingCrafting = selectingCrafting;
+        }
+        private void DeselectCrafting()
+        {
+            CraftingSelected = false;
+            if (Game1.UpgradeWindowUI.Active)
+            {
+                Game1.UpgradeWindowUI.SetActive(false);
+            }
+        }
+
+        #endregion
+
+
+
+        #region External
+
+
+
+
+        #endregion
+
         public override void OnCollision(DynamicCollider current, Collider other, Vector2 penetrationVector)
         {
             base.OnCollision(current, other, penetrationVector);
@@ -242,9 +357,20 @@ namespace ZombieSurvivorZ
 
             if (Game1.CollisionDebugging)
             {
-                spriteBatch.DrawCircle((CircleF)PlayerCL.Bounds, 20, Color.Red);
+                spriteBatch.DrawCircle((CircleF)CL.Bounds, 20, Color.Red);
             }
+            //Vector2 tl = Game1.MapManager.LocalToTileTopLeftPosition(Game1.MapManager.PositionToLocal(Position));
+            //spriteBatch.DrawRectangle(new RectangleF(tl, Game1.MapManager.TileSize), Color.Blue);
 
+
+            if (DoorSelected)
+            {
+                spriteBatch.DrawRectangle(new RectangleF(Game1.MapManager.LocalToTileTopLeftPosition(SelectingDoor), Game1.MapManager.TileSize), Color.Blue, 3);
+            }
+            if (CraftingSelected)
+            {
+                spriteBatch.DrawRectangle(new RectangleF(Game1.MapManager.LocalToTileTopLeftPosition(SelectingCrafting), Game1.MapManager.TileSize), Color.Red, 3);
+            }
         }
 
     }

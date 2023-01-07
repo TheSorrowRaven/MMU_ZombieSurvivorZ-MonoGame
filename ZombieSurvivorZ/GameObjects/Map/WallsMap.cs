@@ -19,23 +19,13 @@ namespace ZombieSurvivorZ
 
         }
 
-        public override void Initialize()
+        protected override void InitializeTile(int x, int y, TiledMapTile tile)
         {
-            base.Initialize();
-            for (ushort y = 0; y < Layer.Height; y++)
-            {
-                for (ushort x = 0; x < Layer.Width; x++)
-                {
-                    TiledMapTile tile = Layer.GetTile(x, y);
-                    if (tile.GlobalIdentifier == 0)
-                    {
-                        continue;
-                    }
-                    Collision.BoxStaticCollider box = new(this, Layer.TileWidth, Layer.TileHeight, x * Layer.TileWidth + ActualPosition.X, y * Layer.TileHeight + ActualPosition.Y);
-                    Console.WriteLine(box.Bounds);
-                }
-            }
+            base.InitializeTile(x, y, tile);
+            Vector2 topLeftTile = LocalToTileTopLeftPosition(x, y);
+            new Collision.BoxStaticCollider(this, TileSize.X, TileSize.Y, topLeftTile.X, topLeftTile.Y);
         }
 
     }
+
 }

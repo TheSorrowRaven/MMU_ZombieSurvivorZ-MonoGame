@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Security.AccessControl;
+using static ZombieSurvivorZ.Collision;
 
 namespace ZombieSurvivorZ
 {
@@ -29,6 +30,7 @@ namespace ZombieSurvivorZ
             public float? SwitchTime;
             public float? MuzzleFlashTime;
             public float? FiringLineFlashTime;
+            public int? Damage;
             public int? ClipSize;
             public bool? CanAutoFire;
             public float? RecoilSpreadIncrease;
@@ -78,6 +80,7 @@ namespace ZombieSurvivorZ
         public float MuzzleFlashTime { get; protected set; }
         public float FiringLineFlashTime { get; protected set; }
 
+        public int Damage { get; protected set; }
         public int ClipSize { get; protected set; }
         public bool CanAutoFire { get; protected set; }
         public float FiringLineStartOffset { get; protected set; }
@@ -305,12 +308,22 @@ namespace ZombieSurvivorZ
             }
             else
             {
-                //TODO Hit collider
+                HitCollider(collider);
             }
             end = Position + direction * hitDistance;
             Game1.FiringLines.CreateFiringLine(new(start, end), FiringLineFlashTime);
         }
-
+        private void HitCollider(Collider cl)
+        {
+            if (cl.Go is Zombie zombie)
+            {
+                HitZombie(zombie);
+            }
+        }
+        private void HitZombie(Zombie zombie)
+        {
+            zombie.DealDamage(Damage);
+        }
 
         //Doesn't change state, is only visual
         protected virtual void MuzzleFlash()

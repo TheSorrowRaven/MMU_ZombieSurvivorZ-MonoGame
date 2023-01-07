@@ -70,17 +70,16 @@ namespace ZombieSurvivorZ
         {
             SpriteBatch = new SpriteBatch(GraphicsDevice);
             Font.Load();
-            ////_spriteBatch = new(GraphicsDevice);
 
             MapManager = new();
             Player = new();
 
 
 
-            var c = new Crate()
-            {
-                Position = new(200, 100)
-            };
+            //var c = new Crate()
+            //{
+            //    Position = new(200, 100)
+            //};
 
             //c = new Crate()
             //{
@@ -100,6 +99,11 @@ namespace ZombieSurvivorZ
             //        };
             //    }
             //}
+            var z = new Zombie()
+            {
+                Position = new(32, 32),
+                Scale = new(0.25f, 0.25f)
+            };
 
             FiringLines = new();
             UpgradeWindowUI = new();

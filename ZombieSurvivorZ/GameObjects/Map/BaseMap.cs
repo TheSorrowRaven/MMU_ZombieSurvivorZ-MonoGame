@@ -19,6 +19,10 @@ namespace ZombieSurvivorZ
         public readonly TiledMapTileLayer Layer;
         protected readonly TiledMapRenderer Renderer;
 
+
+        public Vector2 ActualPosition => Position + MapManager.Position;
+        public static Vector2 TileSize => MapManager.TileSize;
+
         public BaseMap(TiledMapTileLayer layer)
         {
             Layer = layer;
@@ -28,7 +32,38 @@ namespace ZombieSurvivorZ
         public override void Initialize()
         {
             base.Initialize();
+            for (ushort y = 0; y < Layer.Height; y++)
+            {
+                for (ushort x = 0; x < Layer.Width; x++)
+                {
+                    TiledMapTile tile = Layer.GetTile(x, y);
+                    if (tile.GlobalIdentifier == 0)
+                    {
+                        continue;
+                    }
+                    InitializeTile(x, y, tile);
+                }
+            }
         }
+
+        protected virtual void InitializeTile(int x, int y, TiledMapTile tile)
+        {
+
+        }
+
+        public static Vector2 LocalToTileTopLeftPosition(Vector2Int local)
+        {
+            return MapManager.LocalToTileTopLeftPosition(local.X, local.Y);
+        }
+        public static Vector2 LocalToTileTopLeftPosition(int x, int y)
+        {
+            return MapManager.LocalToTileTopLeftPosition(x, y);
+        }
+        public static Vector2Int PositionToLocal(Vector2 pos)
+        {
+            return MapManager.PositionToLocal(pos);
+        }
+
 
 
         public override void Update()
@@ -37,12 +72,11 @@ namespace ZombieSurvivorZ
             Renderer.Update(Time.gameTime);
         }
 
-        public Vector2 ActualPosition => Position + MapManager.Position;
-
         public override void Draw(SpriteBatch spriteBatch)
         {
             Matrix viewMatrix = Game1.Camera.GetViewMatrix();
-            viewMatrix.Translation += new Vector3(Position.X + MapManager.Position.X, Position.Y + MapManager.Position.Y, 0);
+            Vector2 actualPosition = ActualPosition;
+            viewMatrix.Translation += new Vector3(actualPosition.X, actualPosition.Y, 0);
             Renderer.Draw(Layer, viewMatrix);
         }
 

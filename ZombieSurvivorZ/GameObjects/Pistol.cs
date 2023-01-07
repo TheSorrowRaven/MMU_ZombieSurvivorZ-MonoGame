@@ -22,6 +22,7 @@ namespace ZombieSurvivorZ
             ReloadTime = 2.2f;
             SwitchTime = 0.3f;
 
+            Damage = 5;
             ClipSize = 9;
             CanAutoFire = true;
             FiringLineStartOffset = 20;

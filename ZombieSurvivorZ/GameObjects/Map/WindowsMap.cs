@@ -19,5 +19,12 @@ namespace ZombieSurvivorZ
 
         }
 
+        protected override void InitializeTile(int x, int y, TiledMapTile tile)
+        {
+            base.InitializeTile(x, y, tile);
+            Vector2 topLeftTile = LocalToTileTopLeftPosition(x, y);
+            new Collision.RaycastIgnoredBoxStaticCollider(this, TileSize.X, TileSize.Y, topLeftTile.X, topLeftTile.Y);
+        }
+
     }
 }
