@@ -28,6 +28,7 @@ namespace ZombieSurvivorZ
 
 
         private Vector2Int lastCellPos;
+        public Vector2Int CellPosition => lastCellPos;
 
         public bool DoorSelected = false;
         public Vector2Int SelectingDoor;
@@ -248,6 +249,8 @@ namespace ZombieSurvivorZ
                 //Checks
                 DoorCheck(playerCell);
                 CraftingCheck(playerCell);
+
+                lastCellPos = playerCell;
             }
 
             //Updates

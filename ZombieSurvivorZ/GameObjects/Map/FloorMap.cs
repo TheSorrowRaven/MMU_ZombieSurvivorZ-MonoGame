@@ -21,5 +21,10 @@ namespace ZombieSurvivorZ
 
         }
 
+        public override bool IsTileWalkable(ushort x, ushort y, out float cost)
+        {
+            cost = 0;
+            return true;
+        }
     }
 }

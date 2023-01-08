@@ -30,7 +30,7 @@ namespace ZombieSurvivorZ
         private static readonly Dictionary<Vector2Int, NodeRecord> records = new();
         private static readonly PriorityQueue<NodeRecord, float> pQueue = new();
 
-        public static LinkedList<Vector2Int> Compute(TileGraph graph, Vector2Int start, Vector2Int goal, Func<Vector2Int, Vector2Int, float> heuristicFunction)
+        public static LinkedList<Vector2Int> Compute(TileGraph graph, Vector2Int start, Vector2Int goal)
         {
             records.Clear();
             pQueue.Clear();
@@ -73,7 +73,7 @@ namespace ZombieSurvivorZ
                         if (successGetValue && newCost < neighbourRecord.costSoFar)
                         {
                             shouldEnqueue = true;
-                            neighbourRecord.costSoFar = newCost + heuristicFunction.Invoke(goal, neighbourTile);
+                            neighbourRecord.costSoFar = newCost + Manhattan(goal, neighbourTile);
                         }
                         else if (!successGetValue)
                         {
@@ -108,5 +108,11 @@ namespace ZombieSurvivorZ
 
             return path;
         }
+
+        private static float Manhattan(Vector2Int newNode, Vector2Int end)
+        {
+            return Math.Abs(newNode.X - end.X) + Math.Abs(newNode.Y - end.Y);
+        }
+
     }
 }

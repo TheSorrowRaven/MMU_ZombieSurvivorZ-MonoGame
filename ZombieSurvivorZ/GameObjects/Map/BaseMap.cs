@@ -51,6 +51,10 @@ namespace ZombieSurvivorZ
 
         }
 
+
+        public abstract bool IsTileWalkable(ushort x, ushort y, out float cost);
+
+
         public static Vector2 LocalToTileTopLeftPosition(Vector2Int local)
         {
             return MapManager.LocalToTileTopLeftPosition(local.X, local.Y);

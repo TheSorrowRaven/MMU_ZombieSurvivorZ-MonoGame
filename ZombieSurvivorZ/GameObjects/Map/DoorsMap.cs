@@ -34,6 +34,9 @@ namespace ZombieSurvivorZ
         private readonly Rectangle closedDoorRectangle;
         private readonly Rectangle openDoorRectangle;
 
+        private const int OpenDoorCost = 0;
+        private const int ClosedDoorCost = 1000;  //Base cost
+
         public DoorsMap(TiledMapTileLayer layer) : base(layer)
         {
             tilesetTexture = Game1.GetTexture("tileset_temp");
@@ -48,6 +51,20 @@ namespace ZombieSurvivorZ
             Collision.BoxStaticCollider box = new(this, TileSize.X, TileSize.Y, topLeftTile.X, topLeftTile.Y);
             Doors.Add(new(x, y), new(box));
             ClosedDoors.Add(topLeftTile);
+        }
+
+        public override bool IsTileWalkable(ushort x, ushort y, out float cost)
+        {
+            TiledMapTile tile = Layer.GetTile(x, y);
+            if (tile.GlobalIdentifier == 0)
+            {
+                cost = OpenDoorCost;
+            }
+            else
+            {
+                cost = ClosedDoorCost; //Base cost since nothing is barricaded yet
+            }
+            return true;
         }
 
         public bool SurroundingAreDoors(Vector2Int pos, out Vector2Int cell)
@@ -91,6 +108,8 @@ namespace ZombieSurvivorZ
             Vector2 doorPos = LocalToTileTopLeftPosition(doorCell.X, doorCell.Y);
             OpenDoors.Add(doorPos);
             ClosedDoors.Remove(doorPos);
+
+            MapManager.TileGraph.UpdateNodeCost(doorCell, OpenDoorCost);
         }
 
         public void CloseDoor(Vector2Int doorCell)
@@ -102,6 +121,8 @@ namespace ZombieSurvivorZ
             Vector2 doorPos = LocalToTileTopLeftPosition(doorCell.X, doorCell.Y);
             ClosedDoors.Add(doorPos);
             OpenDoors.Remove(doorPos);
+
+            MapManager.TileGraph.UpdateNodeCost(doorCell, ClosedDoorCost); //TODO add base cost with barricade weight
         }
 
 

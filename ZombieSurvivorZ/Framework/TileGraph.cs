@@ -7,6 +7,13 @@ namespace ZombieSurvivorZ
 {
     public class TileGraph
     {
+
+        public struct TileData
+        {
+            public bool walkable;
+            public float cost;
+        }
+
         public HashSet<Vector2Int> Nodes;
         public Dictionary<Vector2Int, float[]> Connections;
 
@@ -21,21 +28,32 @@ namespace ZombieSurvivorZ
             Connections = new();
         }
 
-        public void CreateFromMap(TiledMapTileLayer mapLayer, int xStart, int yStart)
+        public void UpdateNodeCost(Vector2Int target, float cost)
         {
-            bool hasTile = mapLayer.TryGetTile((ushort)xStart, (ushort)yStart, out _);
+            //Updates surrounding tiles' connection to target
+            int i = 8;  //Start from 8 (7 to 0)
+            for (int y = -1; y <= 1; y++)
+            {
+                for (int x = -1; x <= 1; x++)
+                {
+                    if (x == 0 && y == 0)
+                    {
+                        continue;
+                    }
 
-            if (hasTile)
-            {
-                BFSConstructGraph(mapLayer, xStart, yStart);
-            }
-            else
-            {
-                throw new Exception("Error: ColStart or RowStart is Invalid.");
+                    i--;
+                    Vector2Int cell = new(target.X + x, target.Y + y);
+                    if (!Connections.TryGetValue(cell, out float[] weights))
+                    {
+                        continue;
+                    }
+                    weights[i] = Cost[i] + cost;
+
+                }
             }
         }
 
-        private void BFSConstructGraph(TiledMapTileLayer mapLayer, int xStart, int yStart)
+        public void BFSConstructGraph(Func<ushort, ushort, TileData> getTileDataFunc, int xStart, int yStart)
         {
             Vector2Int start = new(xStart, yStart);
             Nodes.Add(start);
@@ -48,7 +66,7 @@ namespace ZombieSurvivorZ
                 int i = -1;
                 for (int y = -1; y <= 1; y++)
                 {
-                    for (int x = -1; x < 1; x++)
+                    for (int x = -1; x <= 1; x++)
                     {
                         if (x == 0 && y == 0)
                         {
@@ -63,32 +81,32 @@ namespace ZombieSurvivorZ
                         {
                             continue;
                         }
-                        if (!mapLayer.TryGetTile((ushort)xN, (ushort)yN, out TiledMapTile? neighbourTile))
+                        TileData tileData = getTileDataFunc((ushort)xN, (ushort)yN);
+                        if (!tileData.walkable)
                         {
+                            //No connections because not walkable
                             continue;
                         }
+                        float tileCost = tileData.cost;
 
                         //TODO Determine walls, and set costs based on barricade health
-                        if (neighbourTile.Value.GlobalIdentifier == 0)
+                        Vector2Int neighbour = new(xN, yN);
+
+                        if (!Nodes.Contains(neighbour))
                         {
-                            Vector2Int neighbour = new(xN, yN);
+                            Nodes.Add(neighbour);
+                            queue.Enqueue(neighbour);
+                        }
 
-                            if (!Nodes.Contains(neighbour))
-                            {
-                                Nodes.Add(neighbour);
-                                queue.Enqueue(neighbour);
-                            }
-
-                            if (Connections.TryGetValue(current, out float[] weights))
-                            {
-                                weights[i] = Cost[i];
-                            }
-                            else
-                            {
-                                weights = new float[Cost.Length];
-                                weights[i] = Cost[i];
-                                Connections.Add(current, weights);
-                            }
+                        if (Connections.TryGetValue(current, out float[] weights))
+                        {
+                            weights[i] = Cost[i] + tileCost;
+                        }
+                        else
+                        {
+                            weights = new float[Cost.Length];
+                            weights[i] = Cost[i];
+                            Connections.Add(current, weights);
                         }
                     }
                 }
