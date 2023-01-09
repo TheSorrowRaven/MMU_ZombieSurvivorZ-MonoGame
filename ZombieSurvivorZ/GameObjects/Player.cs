@@ -13,7 +13,7 @@ namespace ZombieSurvivorZ
     public class Player : SpriteColliderObject
     {
 
-        private float movementSpeed = 300;
+        private float movementSpeed = 250;
         private bool sameKeyHolstersWeapon = true;
 
         private Reticle reticle;
@@ -157,7 +157,7 @@ namespace ZombieSurvivorZ
 
         private void WeaponSwitchUpdate()
         {
-            int numKey = Input.GetNumberKeysFirstDown(1, 2);
+            int numKey = Input.GetNumberKeysFirstDown(1, weapons.Count);
             if (numKey == -1)
             {
                 return;

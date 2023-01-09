@@ -32,13 +32,15 @@ namespace ZombieSurvivorZ
 
         private readonly Texture2D tilesetTexture;
         private readonly Rectangle closedDoorRectangle;
-        private readonly Rectangle openDoorRectangle;
+        private readonly Rectangle openDoorRectangleHorizontal;
+        private readonly Rectangle openDoorRectangleVertical;
 
         public DoorsMap(TiledMapTileLayer layer) : base(layer)
         {
             tilesetTexture = Game1.GetTexture("tileset_temp");
             closedDoorRectangle = new(0, 0, 64, 64);
-            openDoorRectangle = new(128, 0, 64, 64);
+            openDoorRectangleHorizontal = new(192, 128, 64, 64);
+            openDoorRectangleVertical = new(0, 192s, 64, 64);
         }
 
         protected override void InitializeTile(int x, int y, TiledMapTile tile)
@@ -109,7 +111,7 @@ namespace ZombieSurvivorZ
         {
             for (int i = 0; i < OpenDoors.Count; i++)
             {
-                //spriteBatch.Draw(tilesetTexture, OpenDoors[i], openDoorRectangle, Color.White);
+                spriteBatch.Draw(tilesetTexture, OpenDoors[i], openDoorRectangleVertical, Color.White);
             }
             for (int i = 0; i < ClosedDoors.Count; i++)
             {
