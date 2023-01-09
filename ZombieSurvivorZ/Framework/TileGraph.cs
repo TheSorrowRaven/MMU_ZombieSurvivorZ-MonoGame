@@ -98,16 +98,27 @@ namespace ZombieSurvivorZ
                             queue.Enqueue(neighbour);
                         }
 
-                        if (Connections.TryGetValue(current, out float[] weights))
-                        {
-                            weights[i] = Cost[i] + tileCost;
-                        }
-                        else
+                        if (!Connections.TryGetValue(current, out float[] weights))
                         {
                             weights = new float[Cost.Length];
-                            weights[i] = Cost[i];
                             Connections.Add(current, weights);
                         }
+
+                        if (Math.Abs(x * y) == 1) //Is Diagonal
+                        {
+                            if (!getTileDataFunc((ushort)(current.X + x), (ushort)(current.Y)).walkable)
+                            {
+                                //No connection, Don't set weight
+                                continue;
+                            }
+                            if (!getTileDataFunc((ushort)(current.X), (ushort)(current.Y + y)).walkable)
+                            {
+                                //No connection, Don't set weight
+                                continue;
+                            }
+                        }
+
+                        weights[i] = Cost[i] + tileCost;
                     }
                 }
             }

@@ -18,24 +18,31 @@ namespace ZombieSurvivorZ
         {
             public readonly Collision.BoxStaticCollider CL;
             public bool IsOpen = false;
+            public bool Rotated = false;
+            public float ClosingScale = 0;
 
-            public Door(Collision.BoxStaticCollider CL)
+            public Door(Collision.BoxStaticCollider CL, bool Rotated)
             {
                 this.CL = CL;
+                this.Rotated = Rotated;
             }
 
         }
 
         public readonly Dictionary<Vector2Int, Door> Doors = new();
-        public readonly List<Vector2> OpenDoors = new();
-        public readonly List<Vector2> ClosedDoors = new();
+        public readonly List<Vector2Int> OpenDoors = new();
+        public readonly List<Vector2Int> ClosedDoors = new();
 
         private readonly Texture2D tilesetTexture;
         private readonly Rectangle closedDoorRectangle;
         private readonly Rectangle openDoorRectangle;
 
+        private readonly List<Vector2Int> ExpandingDoors = new();
+
         private const int OpenDoorCost = 0;
         private const int ClosedDoorCost = 1000;  //Base cost
+
+        private const float ClosingDoorSpeed = 0.1f;
 
         public DoorsMap(TiledMapTileLayer layer) : base(layer)
         {
@@ -49,8 +56,53 @@ namespace ZombieSurvivorZ
             base.InitializeTile(x, y, tile);
             Vector2 topLeftTile = LocalToTileTopLeftPosition(x, y);
             Collision.BoxStaticCollider box = new(this, TileSize.X, TileSize.Y, topLeftTile.X, topLeftTile.Y);
-            Doors.Add(new(x, y), new(box));
-            ClosedDoors.Add(topLeftTile);
+            Vector2Int doorCell = new(x, y);
+            Doors.Add(doorCell, new(box, tile.IsFlippedHorizontally));
+            ClosedDoors.Add(doorCell);
+        }
+
+        public override void Update()
+        {
+            base.Update();
+
+            for (int i = 0; i < ExpandingDoors.Count; i++)
+            {
+                Vector2Int doorCell = ExpandingDoors[i];
+                Door door = Doors[doorCell];
+
+                door.ClosingScale += Time.deltaTime / ClosingDoorSpeed;
+                if (door.ClosingScale > 1)
+                {
+                    door.ClosingScale = 1;
+                    ExpandingDoors.RemoveAt(i);
+                    i--;
+                }
+
+                Vector2 topLeftTile = LocalToTileTopLeftPosition(doorCell.X, doorCell.Y);
+                Vector2 size = TileSize * door.ClosingScale;
+                door.CL.Set(size.X, size.Y, topLeftTile.X, topLeftTile.Y);
+            }
+
+        }
+
+        public float GetCostFromDoor(Vector2Int doorCell)
+        {
+            if (!Doors.TryGetValue(doorCell, out Door door))
+            {
+                return ClosedDoorCost; //Base cost since nothing is barricaded yet
+            }
+            return GetCostFromDoor(door);
+        }
+        public float GetCostFromDoor(Door door)
+        {
+            if (door.IsOpen)
+            {
+                return OpenDoorCost;
+            }
+            else
+            {
+                return ClosedDoorCost; //TODO add base cost with barricade weight
+            }
         }
 
         public override bool IsTileWalkable(ushort x, ushort y, out float cost)
@@ -62,7 +114,7 @@ namespace ZombieSurvivorZ
             }
             else
             {
-                cost = ClosedDoorCost; //Base cost since nothing is barricaded yet
+                cost = GetCostFromDoor(new Vector2Int(x, y));
             }
             return true;
         }
@@ -102,27 +154,30 @@ namespace ZombieSurvivorZ
 
         public void OpenDoor(Vector2Int doorCell)
         {
+            ExpandingDoors.Remove(doorCell);
+
             Door door = Doors[doorCell];
             door.CL.Set(0, 0, 0, 0);
 
-            Vector2 doorPos = LocalToTileTopLeftPosition(doorCell.X, doorCell.Y);
-            OpenDoors.Add(doorPos);
-            ClosedDoors.Remove(doorPos);
+            OpenDoors.Add(doorCell);
+            ClosedDoors.Remove(doorCell);
 
             MapManager.TileGraph.UpdateNodeCost(doorCell, OpenDoorCost);
         }
 
         public void CloseDoor(Vector2Int doorCell)
         {
+            ExpandingDoors.Add(doorCell);
+
             Door door = Doors[doorCell];
-            Vector2 topLeftTile = LocalToTileTopLeftPosition(doorCell.X, doorCell.Y);
-            door.CL.Set(TileSize.X, TileSize.Y, topLeftTile.X, topLeftTile.Y);
+            door.ClosingScale = 0;
+            //Vector2 topLeftTile = LocalToTileTopLeftPosition(doorCell.X, doorCell.Y);
+            //door.CL.Set(TileSize.X, TileSize.Y, topLeftTile.X, topLeftTile.Y);
 
-            Vector2 doorPos = LocalToTileTopLeftPosition(doorCell.X, doorCell.Y);
-            ClosedDoors.Add(doorPos);
-            OpenDoors.Remove(doorPos);
+            ClosedDoors.Add(doorCell);
+            OpenDoors.Remove(doorCell);
 
-            MapManager.TileGraph.UpdateNodeCost(doorCell, ClosedDoorCost); //TODO add base cost with barricade weight
+            MapManager.TileGraph.UpdateNodeCost(doorCell, GetCostFromDoor(doorCell)); //TODO add base cost with barricade weight
         }
 
 
@@ -134,7 +189,8 @@ namespace ZombieSurvivorZ
             }
             for (int i = 0; i < ClosedDoors.Count; i++)
             {
-                spriteBatch.Draw(tilesetTexture, ClosedDoors[i], closedDoorRectangle, Color.White);
+                Vector2 doorPos = LocalToTileTopLeftPosition(ClosedDoors[i]);
+                spriteBatch.Draw(tilesetTexture, doorPos, closedDoorRectangle, Color.White);
             }
 
         }

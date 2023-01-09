@@ -13,6 +13,8 @@ namespace ZombieSurvivorZ
     public class Player : SpriteColliderObject
     {
 
+        private const float BaseColliderSize = 25;
+
         private float movementSpeed = 300;
         private bool sameKeyHolstersWeapon = true;
 
@@ -36,6 +38,8 @@ namespace ZombieSurvivorZ
         public bool CraftingSelected = false;
         public Vector2Int SelectingCrafting;
 
+        public float ColliderSize => Scale.X * BaseColliderSize;
+
 
         public override Vector2 Position
         {
@@ -49,7 +53,7 @@ namespace ZombieSurvivorZ
 
         public Player()
         {
-            CL = new CircleDynamicCollider(this, 25);
+            CL = new CircleDynamicCollider(this, BaseColliderSize);
         }
 
         public override void Initialize()
@@ -79,7 +83,7 @@ namespace ZombieSurvivorZ
         protected override void ScaleChanged()
         {
             base.ScaleChanged();
-            ((CircleDynamicCollider)CL).Set(25 * Scale.X);
+            ((CircleDynamicCollider)CL).Set(ColliderSize);
             if (weapon != null)
             {
                 weapon.Scale = Scale;
@@ -97,7 +101,7 @@ namespace ZombieSurvivorZ
         private void TransformUpdate()
         {
             Vector2 movement = Input.ConstructAxis2(Keys.S, Keys.W, Keys.D, Keys.A);
-            Position += movement * movementSpeed * Time.deltaTime;
+            Position += movement * (movementSpeed * Time.deltaTime);
             Heading = Game1.Camera.ScreenToWorld(reticle.Position) - Position;
 
         }
@@ -244,6 +248,21 @@ namespace ZombieSurvivorZ
         private void InteractionUpdate()
         {
             Vector2Int playerCell = Game1.MapManager.PositionToLocal(Position);
+            TileGraph.TileData tileData = Game1.MapManager.GetTileData((ushort)playerCell.X, (ushort)playerCell.Y);
+            if (!tileData.walkable || tileData.cost != 0)
+            {
+                Vector2Int targetCell = Game1.MapManager.GetNearestSideTile(playerCell, Position, true);
+                if (!Game1.MapManager.CellIs0CostWalkable(targetCell))
+                {
+                    playerCell = Game1.MapManager.GetNearestSideTile(playerCell, Position, false);
+                    //Game1.MapManager.CellIs0CostWalkable(playerCell);
+                }
+                else
+                {
+                    playerCell = targetCell;
+                }
+                Position = Game1.MapManager.LocalToTileCenterPosition(playerCell.X, playerCell.Y);
+            }
             if (playerCell != lastCellPos)
             {
                 //Checks
