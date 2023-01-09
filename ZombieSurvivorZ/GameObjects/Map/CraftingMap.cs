@@ -30,6 +30,13 @@ namespace ZombieSurvivorZ
             Crafting.Add(new(x, y));
         }
 
+        public override bool IsTileWalkable(ushort x, ushort y, out float cost)
+        {
+            TiledMapTile tile = Layer.GetTile(x, y);
+            cost = 0;
+            return tile.GlobalIdentifier == 0;
+        }
+
         public bool SurroundingAreCrafting(Vector2Int pos, out Vector2Int cell)
         {
             cell = pos;
