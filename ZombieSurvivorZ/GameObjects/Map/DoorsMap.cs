@@ -40,7 +40,7 @@ namespace ZombieSurvivorZ
             tilesetTexture = Game1.GetTexture("tileset_temp");
             closedDoorRectangle = new(0, 0, 64, 64);
             openDoorRectangleHorizontal = new(192, 128, 64, 64);
-            openDoorRectangleVertical = new(0, 192s, 64, 64);
+            openDoorRectangleVertical = new(0, 192, 64, 64);
         }
 
         protected override void InitializeTile(int x, int y, TiledMapTile tile)
