@@ -34,8 +34,10 @@ namespace ZombieSurvivorZ
         public readonly List<Vector2Int> ClosedDoors = new();
 
         private readonly Texture2D tilesetTexture;
-        private readonly Rectangle closedDoorRectangle;
-        private readonly Rectangle openDoorRectangle;
+        private readonly Rectangle closedDoorRectangleHorizontal;
+        private readonly Rectangle closedDoorRectangleVertical;
+        private readonly Rectangle openDoorRectangleHorizontal;
+        private readonly Rectangle openDoorRectangleVertical;
 
         private readonly List<Vector2Int> ExpandingDoors = new();
 
@@ -47,8 +49,10 @@ namespace ZombieSurvivorZ
         public DoorsMap(TiledMapTileLayer layer) : base(layer)
         {
             tilesetTexture = Game1.GetTexture("tileset_temp");
-            closedDoorRectangle = new(0, 0, 64, 64);
-            openDoorRectangle = new(128, 0, 64, 64);
+            closedDoorRectangleHorizontal = new(256, 128, 64, 64);
+            closedDoorRectangleVertical = new(320, 128, 64, 64);
+            openDoorRectangleHorizontal = new(192, 128, 64, 64);
+            openDoorRectangleVertical = new(0, 192, 64, 64);
         }
 
         protected override void InitializeTile(int x, int y, TiledMapTile tile)
@@ -185,12 +189,30 @@ namespace ZombieSurvivorZ
         {
             for (int i = 0; i < OpenDoors.Count; i++)
             {
-                //spriteBatch.Draw(tilesetTexture, OpenDoors[i], openDoorRectangle, Color.White);
+                Vector2 doorPos = LocalToTileTopLeftPosition(OpenDoors[i]);
+
+                if (Doors[OpenDoors[i]].Rotated)
+                {
+                    spriteBatch.Draw(tilesetTexture, doorPos, openDoorRectangleHorizontal, Color.White);
+                }
+                else
+                {
+                    spriteBatch.Draw(tilesetTexture, doorPos, openDoorRectangleVertical, Color.White);
+                }
+
             }
             for (int i = 0; i < ClosedDoors.Count; i++)
             {
                 Vector2 doorPos = LocalToTileTopLeftPosition(ClosedDoors[i]);
-                spriteBatch.Draw(tilesetTexture, doorPos, closedDoorRectangle, Color.White);
+
+                if (Doors[ClosedDoors[i]].Rotated)
+                {
+                    spriteBatch.Draw(tilesetTexture, doorPos, closedDoorRectangleVertical, Color.White);
+                }
+                else
+                {
+                    spriteBatch.Draw(tilesetTexture, doorPos, closedDoorRectangleHorizontal, Color.White);
+                }
             }
 
         }

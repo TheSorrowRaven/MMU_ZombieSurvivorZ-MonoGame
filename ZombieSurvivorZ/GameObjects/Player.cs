@@ -162,7 +162,7 @@ namespace ZombieSurvivorZ
 
         private void WeaponSwitchUpdate()
         {
-            int numKey = Input.GetNumberKeysFirstDown(1, 2);
+            int numKey = Input.GetNumberKeysFirstDown(1, weapons.Count);
             if (numKey == -1)
             {
                 return;
