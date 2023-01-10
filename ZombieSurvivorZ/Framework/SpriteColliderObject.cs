@@ -16,7 +16,7 @@ namespace ZombieSurvivorZ
             set
             {
                 base.Position = value;
-                CL.UpdatePosition(value);
+                CL?.UpdatePosition(value);
             }
         }
 
