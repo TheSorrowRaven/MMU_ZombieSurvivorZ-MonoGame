@@ -63,6 +63,10 @@ namespace ZombieSurvivorZ
         public override void Update()
         {
             base.Update();
+            if (!Active)
+            {
+                return;
+            }
             if (MouseWithinBounds())
             {
                 Game1.UISuppressClick = true;

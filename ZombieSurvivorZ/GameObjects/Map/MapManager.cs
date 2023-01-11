@@ -62,6 +62,10 @@ namespace ZombieSurvivorZ
             Vector2 position = Position;
             return new(x * Map.TileWidth + position.X, y * Map.TileHeight + position.Y);
         }
+        public Vector2 LocalToTileCenterPosition(Vector2Int local)
+        {
+            return LocalToTileCenterPosition(local.X, local.Y);
+        }
         public Vector2 LocalToTileCenterPosition(int x, int y)
         {
             Vector2 position = LocalToTileTopLeftPosition(x, y);
@@ -116,7 +120,7 @@ namespace ZombieSurvivorZ
 
         public Vector2Int GetNearestSideTile(Vector2Int tile, Vector2 position, bool horizontal)
         {
-            Vector2 center = LocalToTileCenterPosition(tile.X, tile.Y);
+            Vector2 center = LocalToTileCenterPosition(tile);
             if (horizontal)
             {
                 return new(tile.X + (position.X < center.X ? -1 : 1), tile.Y);
