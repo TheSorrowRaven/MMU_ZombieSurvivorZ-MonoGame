@@ -95,7 +95,7 @@ namespace ZombieSurvivorZ
         {
             if (Path.TryPop(out Vector2Int cell))
             {
-                nextTargetPos = Game1.MapManager.LocalToTileCenterPosition(cell.X, cell.Y);
+                nextTargetPos = Game1.MapManager.LocalToTileCenterPosition(cell);
                 hasNextTargetPos = true;
                 return;
             }
