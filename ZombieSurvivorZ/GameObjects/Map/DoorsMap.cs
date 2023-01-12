@@ -16,9 +16,21 @@ namespace ZombieSurvivorZ
     {
         public class Door
         {
+            public enum BarricadeState
+            {
+                Base,
+                Level1,
+                Level2,
+                Level3
+            }
+
             public readonly Collision.BoxStaticCollider CL;
             public bool IsOpen = false;
             public bool Rotated = false;
+            public bool barricaded = false;
+            public float barricadingCount = 0f;
+            public float barricadeTime = 3f;
+            public BarricadeState barricadeLevel = BarricadeState.Base;
             public float ClosingScale = 0;
 
             public Door(Collision.BoxStaticCollider CL, bool Rotated)
@@ -27,6 +39,33 @@ namespace ZombieSurvivorZ
                 this.Rotated = Rotated;
             }
 
+            public void Barricade()
+            {
+                TryBarricade();
+            }
+
+            private void TryBarricade()
+            {
+                if (barricadeLevel == BarricadeState.Level3)
+                {
+                    return;
+                }
+
+                barricadingCount += (float)Time.gameTime.ElapsedGameTime.TotalSeconds;
+                Console.WriteLine(barricadingCount);
+
+                if (barricadingCount > barricadeTime)
+                {
+                    ResetBarricading();
+                    barricadeLevel += 1;
+                    Console.WriteLine(barricadeLevel);
+                }
+            }
+
+            public void ResetBarricading()
+            {
+                barricadingCount = 0f;
+            }
         }
 
         public readonly Dictionary<Vector2Int, Door> Doors = new();
@@ -38,6 +77,11 @@ namespace ZombieSurvivorZ
         private readonly Rectangle closedDoorRectangleVertical;
         private readonly Rectangle openDoorRectangleHorizontal;
         private readonly Rectangle openDoorRectangleVertical;
+        private readonly Rectangle Level1BarricadeHorizontal;
+        private readonly Rectangle Level1BarricadeVertical;
+        private readonly Rectangle Level2BarricadeHorizontal;
+        private readonly Rectangle Level2BarricadeVertical;
+        
 
         private readonly List<Vector2Int> ExpandingDoors = new();
 
@@ -53,6 +97,10 @@ namespace ZombieSurvivorZ
             closedDoorRectangleVertical = new(320, 128, 64, 64);
             openDoorRectangleHorizontal = new(192, 128, 64, 64);
             openDoorRectangleVertical = new(0, 192, 64, 64);
+            Level1BarricadeHorizontal = new(0, 256, 64, 64);
+            Level1BarricadeVertical = new(64, 256, 64, 64);
+            Level2BarricadeHorizontal = new(128, 256, 64, 64);
+            Level2BarricadeVertical = new(192, 256, 64, 64);
         }
 
         protected override void InitializeTile(int x, int y, TiledMapTile tile)
@@ -193,10 +241,38 @@ namespace ZombieSurvivorZ
 
                 if (Doors[OpenDoors[i]].Rotated)
                 {
+                    switch (Doors[OpenDoors[i]].barricadeLevel)
+                    {
+                        case Door.BarricadeState.Base:
+                            break;
+                        case Door.BarricadeState.Level1:
+                            spriteBatch.Draw(tilesetTexture, doorPos, Level1BarricadeHorizontal, Color.White);
+                            break;
+                        case Door.BarricadeState.Level2:
+                            spriteBatch.Draw(tilesetTexture, doorPos, Level2BarricadeHorizontal, Color.White);
+                            break;
+                        case Door.BarricadeState.Level3:
+
+                            break;
+                    }
                     spriteBatch.Draw(tilesetTexture, doorPos, openDoorRectangleHorizontal, Color.White);
                 }
                 else
                 {
+                    switch (Doors[OpenDoors[i]].barricadeLevel)
+                    {
+                        case Door.BarricadeState.Base:
+                            break;
+                        case Door.BarricadeState.Level1:
+                            spriteBatch.Draw(tilesetTexture, doorPos, Level1BarricadeVertical, Color.White);
+                            break;
+                        case Door.BarricadeState.Level2:
+                            spriteBatch.Draw(tilesetTexture, doorPos, Level2BarricadeVertical, Color.White);
+                            break;
+                        case Door.BarricadeState.Level3:
+
+                            break;
+                    }
                     spriteBatch.Draw(tilesetTexture, doorPos, openDoorRectangleVertical, Color.White);
                 }
 
@@ -207,15 +283,49 @@ namespace ZombieSurvivorZ
 
                 if (Doors[ClosedDoors[i]].Rotated)
                 {
+                    switch (Doors[ClosedDoors[i]].barricadeLevel)
+                    {
+                        case Door.BarricadeState.Base:
+                            break;
+                        case Door.BarricadeState.Level1:
+                            spriteBatch.Draw(tilesetTexture, doorPos, Level1BarricadeVertical, Color.White);
+                            break;
+                        case Door.BarricadeState.Level2:
+                            spriteBatch.Draw(tilesetTexture, doorPos, Level2BarricadeVertical, Color.White);
+                            break;
+                        case Door.BarricadeState.Level3:
+
+                            break;
+                    }
                     spriteBatch.Draw(tilesetTexture, doorPos, closedDoorRectangleVertical, Color.White);
                 }
                 else
                 {
+                    switch (Doors[ClosedDoors[i]].barricadeLevel)
+                    {
+                        case Door.BarricadeState.Base:
+                            break;
+                        case Door.BarricadeState.Level1:
+                            spriteBatch.Draw(tilesetTexture, doorPos, Level1BarricadeHorizontal, Color.White);
+                            break;
+                        case Door.BarricadeState.Level2:
+                            spriteBatch.Draw(tilesetTexture, doorPos, Level2BarricadeHorizontal, Color.White);
+                            break;
+                        case Door.BarricadeState.Level3:
+
+                            break;
+                    }
                     spriteBatch.Draw(tilesetTexture, doorPos, closedDoorRectangleHorizontal, Color.White);
                 }
             }
 
         }
 
+        public bool Barricaded(Vector2Int doorCell)
+        {
+            Door door = Doors[doorCell];
+
+            return door.barricaded;
+        }
     }
 }
