@@ -34,9 +34,13 @@ namespace ZombieSurvivorZ
 
         public bool DoorSelected = false;
         public Vector2Int SelectingDoor;
+        //Door Prompts & Crafting prompts
+        private Texture2D UsePromptTexture;
 
         public bool CraftingSelected = false;
         public Vector2Int SelectingCrafting;
+
+        private Texture2D BarricadePromptTexture;
 
         public float ColliderSize => Scale.X * BaseColliderSize;
 
@@ -60,6 +64,9 @@ namespace ZombieSurvivorZ
         {
             Texture = Game1.GetTexture("Player/player_head");
             bodyTexture = Game1.GetTexture("Player/player_body");
+
+            UsePromptTexture = Game1.GetTexture("Keys/toggle_door");
+            BarricadePromptTexture = Game1.GetTexture("Keys/barricade");
 
             RotationOffset = 90 * MathF.PI / 180;
             Position = new(0, 0);
@@ -261,7 +268,7 @@ namespace ZombieSurvivorZ
                 {
                     playerCell = targetCell;
                 }
-                Position = Game1.MapManager.LocalToTileCenterPosition(playerCell.X, playerCell.Y);
+                Position = Game1.MapManager.LocalToTileCenterPosition(playerCell);
             }
             if (playerCell != lastCellPos)
             {
@@ -284,7 +291,7 @@ namespace ZombieSurvivorZ
             {
                 return;
             }
-            if (Input.IsKeyFirstDown(Keys.F))
+            if (Input.IsRMouseFirstDown())
             {
                 Game1.MapManager.DoorsLayer.ToggleDoor(SelectingDoor);
             }
@@ -343,7 +350,7 @@ namespace ZombieSurvivorZ
             {
                 return;
             }
-            if (Input.IsKeyFirstDown(Keys.F))
+            if (Input.IsRMouseFirstDown())
             {
                 Game1.UpgradeWindowUI.SetActive(!Game1.UpgradeWindowUI.Active);
             }
@@ -378,13 +385,6 @@ namespace ZombieSurvivorZ
 
 
 
-        #region External
-
-
-
-
-        #endregion
-
         public override void OnCollision(DynamicCollider current, Collider other, Vector2 penetrationVector)
         {
             base.OnCollision(current, other, penetrationVector);
@@ -416,11 +416,16 @@ namespace ZombieSurvivorZ
 
             if (DoorSelected)
             {
-                spriteBatch.DrawRectangle(new RectangleF(Game1.MapManager.LocalToTileTopLeftPosition(SelectingDoor), Game1.MapManager.TileSize), Color.Blue, 3);
+                Vector2 pos = Game1.MapManager.LocalToTileTopLeftPosition(SelectingDoor);
+                spriteBatch.Draw(UsePromptTexture, new Rectangle((int)pos.X + 16, (int)pos.Y - 32, 32, 32), Color.White);
+                //spriteBatch.DrawRectangle(new RectangleF(Game1.MapManager.LocalToTileTopLeftPosition(SelectingDoor), Game1.MapManager.TileSize), Color.Blue, 3);
+                spriteBatch.Draw(BarricadePromptTexture, new Rectangle((int)pos.X, (int)pos.Y + 48, 64, 64), Color.White);
             }
             if (CraftingSelected)
             {
-                spriteBatch.DrawRectangle(new RectangleF(Game1.MapManager.LocalToTileTopLeftPosition(SelectingCrafting), Game1.MapManager.TileSize), Color.Red, 3);
+                Vector2 pos = Game1.MapManager.LocalToTileTopLeftPosition(SelectingCrafting);
+                spriteBatch.Draw(UsePromptTexture, new Rectangle((int)pos.X + 16, (int)pos.Y - 32, 32, 32), Color.White);
+                //spriteBatch.DrawRectangle(new RectangleF(Game1.MapManager.LocalToTileTopLeftPosition(SelectingCrafting), Game1.MapManager.TileSize), Color.Red, 3);
             }
         }
 

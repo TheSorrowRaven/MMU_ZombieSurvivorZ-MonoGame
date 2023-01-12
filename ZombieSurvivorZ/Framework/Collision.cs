@@ -101,13 +101,11 @@ namespace ZombieSurvivorZ
 
         private static void RaycastSet<T>(Vector2 position, Vector2 direction, HashSet<T> colliders, List<(Collider, float)> intersections) where T : Collider
         {
+            Ray ray = new(new(position.X, position.Y, 0), new(direction.X, direction.Y, 0));
             foreach (var collider in colliders)
             {
                 if (collider.Bounds is RectangleF rect)
                 {
-                    //There's a bug in Ray2 intersection, thus 3D check is used.
-                    //Custom function doesn't seem to work too
-                    Ray ray = new(new(position.X, position.Y, 0), new(direction.X, direction.Y, 0));
                     Vector3 min = new(rect.Left, rect.Top, -1);
                     Vector3 max = new(rect.Right, rect.Bottom, 1);
                     BoundingBox box = new(min, max);
@@ -119,11 +117,11 @@ namespace ZombieSurvivorZ
                 }
                 else if (collider.Bounds is CircleF circle)
                 {
-                    //Custom function to detect it works perfectly
-                    Ray2 ray = new(position, direction);
-                    if (GetIntersectionPoints(ray, circle, out float rayNearDistance))
+                    BoundingSphere sphere = new(new(circle.Center, 0), circle.Radius);
+                    float? hitDistance = ray.Intersects(sphere);
+                    if (hitDistance != null)
                     {
-                        intersections.Add((collider, rayNearDistance));
+                        intersections.Add((collider, (float)hitDistance));
                     }
                 }
             }
@@ -322,41 +320,6 @@ namespace ZombieSurvivorZ
         }
 
 
-
-
-
-        public static bool GetIntersectionPoints(Ray2 ray, CircleF circle, out float rayNearDistance)
-        {
-            // Calculate the intersection points using the formula from https://en.wikipedia.org/wiki/Line%E2%80%93circle_intersection
-            Vector2 p = ray.Position;
-            Vector2 d = ray.Direction;
-            Vector2 c = circle.Center;
-            float r = circle.Radius;
-
-            float a = d.X * d.X + d.Y * d.Y;
-            float b = 2 * (d.X * (p.X - c.X) + d.Y * (p.Y - c.Y));
-            float cc = c.X * c.X + c.Y * c.Y + p.X * p.X + p.Y * p.Y - 2 * (c.X * p.X + c.Y * p.Y) - r * r;
-
-            float discriminant = b * b - 4 * a * cc;
-            if (discriminant < 0)
-            {
-                // No intersections
-                rayNearDistance = float.NaN;
-                return false;
-            }
-            else if (discriminant == 0)
-            {
-                // One intersection
-                float t = -b / (2 * a);
-                rayNearDistance = t;
-                return true;
-            }
-            // Two intersections
-            float t1 = (-b + (float)Math.Sqrt(discriminant)) / (2 * a);
-            float t2 = (-b - (float)Math.Sqrt(discriminant)) / (2 * a);
-            rayNearDistance = t2;
-            return true;
-        }
 
 
 
