@@ -29,7 +29,7 @@ namespace ZombieSurvivorZ
             public bool Rotated = false;
             public bool barricaded = false;
             public float barricadingCount = 0f;
-            public float barricadeTime = 3f;
+            public float barricadeTime = 2f;
             public BarricadeState barricadeLevel = BarricadeState.Base;
             public float ClosingScale = 0;
 
@@ -58,7 +58,7 @@ namespace ZombieSurvivorZ
                 {
                     ResetBarricading();
                     barricadeLevel += 1;
-                    Console.WriteLine(barricadeLevel);
+                    Console.WriteLine("barricade level: " + barricadeLevel);
                 }
             }
 
@@ -81,8 +81,9 @@ namespace ZombieSurvivorZ
         private readonly Rectangle Level1BarricadeVertical;
         private readonly Rectangle Level2BarricadeHorizontal;
         private readonly Rectangle Level2BarricadeVertical;
+        private readonly Rectangle Level3BarricadeHorizontal;
+        private readonly Rectangle Level3BarricadeVertical;
         
-
         private readonly List<Vector2Int> ExpandingDoors = new();
 
         private const int OpenDoorCost = 0;
@@ -101,6 +102,8 @@ namespace ZombieSurvivorZ
             Level1BarricadeVertical = new(64, 256, 64, 64);
             Level2BarricadeHorizontal = new(128, 256, 64, 64);
             Level2BarricadeVertical = new(192, 256, 64, 64);
+            Level3BarricadeHorizontal = new(256, 256, 64, 64);
+            Level3BarricadeVertical = new(312, 256, 64, 64);
         }
 
         protected override void InitializeTile(int x, int y, TiledMapTile tile)
@@ -252,7 +255,7 @@ namespace ZombieSurvivorZ
                             spriteBatch.Draw(tilesetTexture, doorPos, Level2BarricadeHorizontal, Color.White);
                             break;
                         case Door.BarricadeState.Level3:
-
+                            spriteBatch.Draw(tilesetTexture, doorPos, Level3BarricadeHorizontal, Color.White);
                             break;
                     }
                     spriteBatch.Draw(tilesetTexture, doorPos, openDoorRectangleHorizontal, Color.White);
@@ -270,7 +273,7 @@ namespace ZombieSurvivorZ
                             spriteBatch.Draw(tilesetTexture, doorPos, Level2BarricadeVertical, Color.White);
                             break;
                         case Door.BarricadeState.Level3:
-
+                            spriteBatch.Draw(tilesetTexture, doorPos, Level3BarricadeVertical, Color.White);
                             break;
                     }
                     spriteBatch.Draw(tilesetTexture, doorPos, openDoorRectangleVertical, Color.White);
@@ -294,7 +297,7 @@ namespace ZombieSurvivorZ
                             spriteBatch.Draw(tilesetTexture, doorPos, Level2BarricadeVertical, Color.White);
                             break;
                         case Door.BarricadeState.Level3:
-
+                            spriteBatch.Draw(tilesetTexture, doorPos, Level3BarricadeVertical, Color.White);
                             break;
                     }
                     spriteBatch.Draw(tilesetTexture, doorPos, closedDoorRectangleVertical, Color.White);
@@ -312,20 +315,13 @@ namespace ZombieSurvivorZ
                             spriteBatch.Draw(tilesetTexture, doorPos, Level2BarricadeHorizontal, Color.White);
                             break;
                         case Door.BarricadeState.Level3:
-
+                            spriteBatch.Draw(tilesetTexture, doorPos, Level3BarricadeHorizontal, Color.White);
                             break;
                     }
                     spriteBatch.Draw(tilesetTexture, doorPos, closedDoorRectangleHorizontal, Color.White);
                 }
             }
 
-        }
-
-        public bool Barricaded(Vector2Int doorCell)
-        {
-            Door door = Doors[doorCell];
-
-            return door.barricaded;
         }
     }
 }

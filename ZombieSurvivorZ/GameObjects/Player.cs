@@ -301,26 +301,17 @@ namespace ZombieSurvivorZ
         {
             if (!DoorSelected)
             {
+                if (SelectingDoor != new Vector2Int(0,0))
+                {
+                    // to stop barricading when the player stops selecting the door
+                    Game1.MapManager.DoorsLayer.Doors[SelectingDoor].ResetBarricading();
+                }
                 return;
             }
             if (Input.IsKeyDown(Keys.Space))
             {
                 //BarricadeDoor(SelectingDoor);
                 Game1.MapManager.DoorsLayer.Doors[SelectingDoor].Barricade();
-            }
-
-            if (Input.IsKeyFirstUp(Keys.Space))
-            {
-                if (Game1.MapManager.DoorsLayer.Doors[SelectingDoor].barricadingCount < Game1.MapManager.DoorsLayer.Doors[SelectingDoor].barricadeTime)
-                {
-                    Console.WriteLine("barricade unsuccessful");
-                }
-                else
-                {
-                    Console.WriteLine("barricaded");
-                }
-
-                Game1.MapManager.DoorsLayer.Doors[SelectingDoor].ResetBarricading();
             }
         }
 
