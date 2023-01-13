@@ -44,7 +44,7 @@ namespace ZombieSurvivorZ
         private const int OpenDoorCost = 0;
         private const int ClosedDoorCost = 1000;  //Base cost
 
-        private const float ClosingDoorSpeed = 0.1f;
+        private const float ClosingDoorSpeed = 0.5f;
 
         public DoorsMap(TiledMapTileLayer layer) : base(layer)
         {
@@ -82,9 +82,20 @@ namespace ZombieSurvivorZ
                     i--;
                 }
 
-                Vector2 topLeftTile = LocalToTileTopLeftPosition(doorCell.X, doorCell.Y);
-                Vector2 size = TileSize * door.ClosingScale;
-                door.CL.Set(size.X, size.Y, topLeftTile.X, topLeftTile.Y);
+                Vector2 tileCenter = MapManager.LocalToTileCenterPosition(doorCell);
+                Vector2 size = TileSize;
+                Vector2 tileTopLeft = tileCenter;
+                if (door.Rotated)
+                {
+                    size.X *= door.ClosingScale;
+                    tileTopLeft.X -= size.X / 2;
+                }
+                else
+                {
+                    size.Y *= door.ClosingScale;
+                    tileTopLeft.Y -= size.Y / 2;
+                }
+                door.CL.Set(size.X, size.Y, tileTopLeft.X, tileTopLeft.Y);
             }
 
         }
@@ -152,8 +163,6 @@ namespace ZombieSurvivorZ
             {
                 OpenDoor(doorCell);
             }
-            door.IsOpen = !door.IsOpen;
-
         }
 
         public void OpenDoor(Vector2Int doorCell)
@@ -162,6 +171,7 @@ namespace ZombieSurvivorZ
 
             Door door = Doors[doorCell];
             door.CL.Set(0, 0, 0, 0);
+            door.IsOpen = true;
 
             OpenDoors.Add(doorCell);
             ClosedDoors.Remove(doorCell);
@@ -171,10 +181,17 @@ namespace ZombieSurvivorZ
 
         public void CloseDoor(Vector2Int doorCell)
         {
+            if (MapManager.ZombieSpawnLayer.ZombieIsBlockingDoorClosing(doorCell))
+            {
+                //TODO cannot close door! zombie is blocking
+                return;
+            }
+
             ExpandingDoors.Add(doorCell);
 
             Door door = Doors[doorCell];
             door.ClosingScale = 0;
+            door.IsOpen = false;
             //Vector2 topLeftTile = LocalToTileTopLeftPosition(doorCell.X, doorCell.Y);
             //door.CL.Set(TileSize.X, TileSize.Y, topLeftTile.X, topLeftTile.Y);
 

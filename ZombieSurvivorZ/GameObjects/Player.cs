@@ -255,21 +255,21 @@ namespace ZombieSurvivorZ
         private void InteractionUpdate()
         {
             Vector2Int playerCell = Game1.MapManager.PositionToLocal(Position);
-            TileGraph.TileData tileData = Game1.MapManager.GetTileData((ushort)playerCell.X, (ushort)playerCell.Y);
-            if (!tileData.walkable || tileData.cost != 0)
-            {
-                Vector2Int targetCell = Game1.MapManager.GetNearestSideTile(playerCell, Position, true);
-                if (!Game1.MapManager.CellIs0CostWalkable(targetCell))
-                {
-                    playerCell = Game1.MapManager.GetNearestSideTile(playerCell, Position, false);
-                    //Game1.MapManager.CellIs0CostWalkable(playerCell);
-                }
-                else
-                {
-                    playerCell = targetCell;
-                }
-                Position = Game1.MapManager.LocalToTileCenterPosition(playerCell);
-            }
+            //TileGraph.TileData tileData = Game1.MapManager.GetTileData((ushort)playerCell.X, (ushort)playerCell.Y);
+            //if (!tileData.walkable || tileData.cost != 0)
+            //{
+            //    Vector2Int targetCell = Game1.MapManager.GetNearestSideTile(playerCell, Position, true);
+            //    if (!Game1.MapManager.CellIs0CostWalkable(targetCell))
+            //    {
+            //        playerCell = Game1.MapManager.GetNearestSideTile(playerCell, Position, false);
+            //        //Game1.MapManager.CellIs0CostWalkable(playerCell);
+            //    }
+            //    else
+            //    {
+            //        playerCell = targetCell;
+            //    }
+            //    Position = Game1.MapManager.LocalToTileCenterPosition(playerCell);
+            //}
             if (playerCell != lastCellPos)
             {
                 //Checks
