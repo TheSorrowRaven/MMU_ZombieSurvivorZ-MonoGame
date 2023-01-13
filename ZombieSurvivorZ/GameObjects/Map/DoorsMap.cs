@@ -100,6 +100,24 @@ namespace ZombieSurvivorZ
 
         }
 
+        public bool TryGetDoor(Vector2Int doorCell, out Door door)
+        {
+            return Doors.TryGetValue(doorCell, out door);
+        }
+
+        public bool TryGetClosedDoor(Vector2Int doorCell, out Door door)
+        {
+            if (!Doors.TryGetValue(doorCell, out door))
+            {
+                return false;
+            }
+            if (door.IsOpen)
+            {
+                return false;
+            }
+            return true;
+        }
+
         public float GetCostFromDoor(Vector2Int doorCell)
         {
             if (!Doors.TryGetValue(doorCell, out Door door))
@@ -167,11 +185,16 @@ namespace ZombieSurvivorZ
 
         public void OpenDoor(Vector2Int doorCell)
         {
-            ExpandingDoors.Remove(doorCell);
-
             Door door = Doors[doorCell];
+            if (door.IsOpen)
+            {
+                return;
+            }
+
             door.CL.Set(0, 0, 0, 0);
             door.IsOpen = true;
+
+            ExpandingDoors.Remove(doorCell);
 
             OpenDoors.Add(doorCell);
             ClosedDoors.Remove(doorCell);
@@ -181,19 +204,23 @@ namespace ZombieSurvivorZ
 
         public void CloseDoor(Vector2Int doorCell)
         {
+            Door door = Doors[doorCell];
+            if (!door.IsOpen)
+            {
+                return;
+            }
+
             if (MapManager.ZombieSpawnLayer.ZombieIsBlockingDoorClosing(doorCell))
             {
                 //TODO cannot close door! zombie is blocking
                 return;
             }
 
-            ExpandingDoors.Add(doorCell);
-
-            Door door = Doors[doorCell];
             door.ClosingScale = 0;
             door.IsOpen = false;
             //Vector2 topLeftTile = LocalToTileTopLeftPosition(doorCell.X, doorCell.Y);
             //door.CL.Set(TileSize.X, TileSize.Y, topLeftTile.X, topLeftTile.Y);
+            ExpandingDoors.Add(doorCell);
 
             ClosedDoors.Add(doorCell);
             OpenDoors.Remove(doorCell);

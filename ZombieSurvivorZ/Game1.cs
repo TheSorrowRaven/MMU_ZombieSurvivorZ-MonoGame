@@ -33,6 +33,8 @@ namespace ZombieSurvivorZ
 
         public static FiringLines FiringLines { get; private set; }
 
+        public static BloodManager BloodManager { get; private set; }
+
         public static UpgradeWindowUI UpgradeWindowUI { get; private set; }
         public static HUDDisplayUI HUDDisplayUI { get; private set; }
         public static bool UISuppressClick { get; set; } = false;
@@ -75,6 +77,7 @@ namespace ZombieSurvivorZ
             MapManager = new();
 
             FiringLines = new();
+            BloodManager = new();
             UpgradeWindowUI = new();
             HUDDisplayUI = new();
         }

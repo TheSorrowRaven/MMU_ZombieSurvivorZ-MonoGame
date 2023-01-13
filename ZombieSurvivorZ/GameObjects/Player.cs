@@ -15,8 +15,11 @@ namespace ZombieSurvivorZ
 
         private const float BaseColliderSize = 25;
 
-        private float movementSpeed = 300;
-        private bool sameKeyHolstersWeapon = true;
+        private const float MovementSpeed = 300;
+        private const bool SameKeyHolstersWeapon = true;
+        private const int MaterialGainPerZombie = 25;
+
+        private const int MaxHealth = 100;
 
         private Reticle reticle;
         private Weapon weapon;
@@ -27,6 +30,8 @@ namespace ZombieSurvivorZ
         private readonly Dictionary<int, Weapon> keyNumToWeapon = new();
         private int keyNumCount = 1;
         public int Materials { get; private set; }
+
+        private int health;
 
 
         private Vector2Int lastCellPos;
@@ -58,6 +63,7 @@ namespace ZombieSurvivorZ
         public Player()
         {
             CL = new CircleDynamicCollider(this, BaseColliderSize);
+            health = MaxHealth;
         }
 
         public override void Initialize()
@@ -108,9 +114,24 @@ namespace ZombieSurvivorZ
         private void TransformUpdate()
         {
             Vector2 movement = Input.ConstructAxis2(Keys.S, Keys.W, Keys.D, Keys.A);
-            Position += movement * (movementSpeed * Time.deltaTime);
+            Position += movement * (MovementSpeed * Time.deltaTime);
             Heading = Game1.Camera.ScreenToWorld(reticle.Position) - Position;
 
+        }
+
+        public void TakeDamage(int damage)
+        {
+            Game1.BloodManager.AddBlood(Position, 0);
+            health -= damage;
+            if (health <= 0)
+            {
+                Die();
+            }
+        }
+
+        private void Die()
+        {
+            Console.WriteLine("PLAYER DIED!!");
         }
 
         #region Materials
@@ -124,6 +145,10 @@ namespace ZombieSurvivorZ
         {
             Materials -= materials;
             Game1.HUDDisplayUI.MaterialsDisplayUI.UpdateMaterials(Materials);
+        }
+        public void ZombieKilledAddMaterials()
+        {
+            AddMaterials(MaterialGainPerZombie);
         }
         public bool TryRemoveMaterials(int materials)
         {
@@ -199,7 +224,7 @@ namespace ZombieSurvivorZ
         {
             Weapon previousWeapon = this.weapon;
             previousWeapon?.HolsterWeapon();
-            if (sameKeyHolstersWeapon)
+            if (SameKeyHolstersWeapon)
             {
                 if (weapon == this.weapon)
                 {

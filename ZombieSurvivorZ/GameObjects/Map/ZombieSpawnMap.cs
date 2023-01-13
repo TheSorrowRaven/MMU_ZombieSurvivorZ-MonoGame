@@ -31,8 +31,7 @@ namespace ZombieSurvivorZ
             for (int i = 0; i < Zombies.Count; i++)
             {
                 Zombie zombie = Zombies[i];
-                Vector2Int zombieCell = Game1.MapManager.PositionToLocal(zombie.Position);
-                if (zombieCell == doorCell)
+                if (zombie.CellPosition == doorCell)
                 {
                     return true;
                 }
