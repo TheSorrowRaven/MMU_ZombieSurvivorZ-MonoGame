@@ -282,6 +282,7 @@ namespace ZombieSurvivorZ
             //Updates
             DoorUpdate();
             CraftingUpdate();
+            BarricadeUpdate();
         }
 
         private void DoorUpdate()
@@ -293,6 +294,24 @@ namespace ZombieSurvivorZ
             if (Input.IsRMouseFirstDown())
             {
                 Game1.MapManager.DoorsLayer.ToggleDoor(SelectingDoor);
+            }
+        }
+
+        private void BarricadeUpdate()
+        {
+            if (!DoorSelected)
+            {
+                if (SelectingDoor != new Vector2Int(0,0))
+                {
+                    // to stop barricading when the player stops selecting the door
+                    Game1.MapManager.DoorsLayer.Doors[SelectingDoor].ResetBarricading();
+                }
+                return;
+            }
+            if (Input.IsKeyDown(Keys.Space))
+            {
+                //BarricadeDoor(SelectingDoor);
+                Game1.MapManager.DoorsLayer.Doors[SelectingDoor].Barricade();
             }
         }
 
@@ -351,6 +370,7 @@ namespace ZombieSurvivorZ
                 Game1.UpgradeWindowUI.SetActive(false);
             }
         }
+
 
         #endregion
 
