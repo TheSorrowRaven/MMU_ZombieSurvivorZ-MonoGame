@@ -73,11 +73,12 @@ namespace ZombieSurvivorZ
             SpriteBatch = new SpriteBatch(GraphicsDevice);
             Font.Load();
 
+
             Player = new();
             MapManager = new();
+            BloodManager = new();
 
             FiringLines = new();
-            BloodManager = new();
             UpgradeWindowUI = new();
             HUDDisplayUI = new();
         }

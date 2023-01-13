@@ -98,9 +98,9 @@ namespace ZombieSurvivorZ
 
         }
 
-        public void DealDamage(int damage)
+        public void DealDamage(int damage, Vector2 direction)
         {
-            Game1.BloodManager.AddBlood(Position, 0);
+            Game1.BloodManager.AddBlood(Position, MathF.Atan2(direction.Y, direction.X));
             health -= damage;
             if (health <= 0)
             {
@@ -316,7 +316,7 @@ namespace ZombieSurvivorZ
                     float requiredDistance = AttackDistance + AttackDistanceCompensation + BaseColliderSize;
                     if (hitDistance < requiredDistance)
                     {
-                        HitPlayer();
+                        HitPlayer(attackDirection);
                     }
                     Console.WriteLine($"{hitDistance < requiredDistance}, Distance: {hitDistance}, Required: {requiredDistance}");
                 }
@@ -336,13 +336,13 @@ namespace ZombieSurvivorZ
             //door.health??
             //if (door.health <= 0)
             {
-                Game1.MapManager.DoorsLayer.OpenDoor(doorCell);
+                Game1.MapManager.DoorsLayer.DealDamage(doorCell, Damage);
             }
         }
 
-        private void HitPlayer()
+        private void HitPlayer(Vector2 direction)
         {
-            Game1.Player.TakeDamage(Damage);
+            Game1.Player.DealDamage(Damage, direction);
         }
 
         private bool PlayerCheckUpdate(Vector2 directionToPlayer)

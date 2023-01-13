@@ -119,9 +119,10 @@ namespace ZombieSurvivorZ
 
         }
 
-        public void TakeDamage(int damage)
+        public void DealDamage(int damage, Vector2 direction)
         {
-            Game1.BloodManager.AddBlood(Position, 0);
+            Game1.BloodManager.AddBlood(Position, MathF.Atan2(direction.Y, direction.X));
+            
             health -= damage;
             if (health <= 0)
             {

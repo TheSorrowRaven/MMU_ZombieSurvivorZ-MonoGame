@@ -308,21 +308,21 @@ namespace ZombieSurvivorZ
             }
             else
             {
-                HitCollider(collider);
+                HitCollider(collider, direction);
             }
             end = Position + direction * hitDistance;
             Game1.FiringLines.CreateFiringLine(new(start, end), FiringLineFlashTime);
         }
-        private void HitCollider(Collider cl)
+        private void HitCollider(Collider cl, Vector2 direction)
         {
             if (cl.Go is Zombie zombie)
             {
-                HitZombie(zombie);
+                HitZombie(zombie, direction);
             }
         }
-        private void HitZombie(Zombie zombie)
+        private void HitZombie(Zombie zombie, Vector2 direction)
         {
-            zombie.DealDamage(Damage);
+            zombie.DealDamage(Damage, direction);
         }
 
         //Doesn't change state, is only visual

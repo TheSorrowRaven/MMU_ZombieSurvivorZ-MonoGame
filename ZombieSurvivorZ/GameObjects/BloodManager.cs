@@ -13,9 +13,15 @@ namespace ZombieSurvivorZ
     public class BloodManager : SpriteObject
     {
 
+        public override World World => World.floor;
+
         private const int maxBlood = 100;
 
         private Texture2D bloodTexture;
+
+        private Rectangle rect = new(0, 0, 128, 128);
+        private Vector2 origin = new(64, 64);
+        private Vector2 scale = new(0.4f, 0.4f);
 
         private readonly (Vector2, float)[] bloodArr = new (Vector2, float)[maxBlood];
         private int bloodIndex = 0;
@@ -33,7 +39,7 @@ namespace ZombieSurvivorZ
 
         public void AddBlood(Vector2 pos, float rotation)
         {
-            bloodArr[bloodIndex] = (pos, rotation);
+            bloodArr[bloodIndex] = (pos, rotation + (45 * MathF.PI / 180));
 
             bloodIndex++;
             bloodCount++;
@@ -46,11 +52,10 @@ namespace ZombieSurvivorZ
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-
             for (int i = 0; i < bloodCount; i++)
             {
                 var blood = bloodArr[i];
-                spriteBatch.Draw(bloodTexture, blood.Item1, new(0, 0, 128, 128), Color.White, blood.Item2, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
+                spriteBatch.Draw(bloodTexture, blood.Item1, rect, Color.White, blood.Item2, origin, scale, SpriteEffects.None, 0);
             }
         }
 

@@ -20,6 +20,7 @@ namespace ZombieSurvivorZ
             public bool IsOpen = false;
             public bool Rotated = false;
             public float ClosingScale = 0;
+            public float ZombieDestroyCooldown = 0;
 
             public Door(Collision.BoxStaticCollider CL, bool Rotated)
             {
@@ -29,9 +30,9 @@ namespace ZombieSurvivorZ
 
         }
 
+        private const int ZombieDestroyCooldown = 1;
+
         public readonly Dictionary<Vector2Int, Door> Doors = new();
-        public readonly List<Vector2Int> OpenDoors = new();
-        public readonly List<Vector2Int> ClosedDoors = new();
 
         private readonly Texture2D tilesetTexture;
         private readonly Rectangle closedDoorRectangleHorizontal;
@@ -40,6 +41,7 @@ namespace ZombieSurvivorZ
         private readonly Rectangle openDoorRectangleVertical;
 
         private readonly List<Vector2Int> ExpandingDoors = new();
+        private readonly List<Vector2Int> CooldownDoors = new();
 
         private const int OpenDoorCost = 0;
         private const int ClosedDoorCost = 1000;  //Base cost
@@ -62,7 +64,6 @@ namespace ZombieSurvivorZ
             Collision.BoxStaticCollider box = new(this, TileSize.X, TileSize.Y, topLeftTile.X, topLeftTile.Y);
             Vector2Int doorCell = new(x, y);
             Doors.Add(doorCell, new(box, tile.IsFlippedHorizontally));
-            ClosedDoors.Add(doorCell);
         }
 
         public override void Update()
@@ -96,6 +97,21 @@ namespace ZombieSurvivorZ
                     tileTopLeft.Y -= size.Y / 2;
                 }
                 door.CL.Set(size.X, size.Y, tileTopLeft.X, tileTopLeft.Y);
+            }
+
+
+            for (int i = 0; i < CooldownDoors.Count; i++)
+            {
+                Vector2Int doorCell = CooldownDoors[i];
+                Door door = Doors[doorCell];
+
+                door.ZombieDestroyCooldown -= Time.deltaTime;
+                if (door.ZombieDestroyCooldown < 0)
+                {
+                    door.ZombieDestroyCooldown = 0;
+                    CooldownDoors.RemoveAt(i);
+                    i--;
+                }
             }
 
         }
@@ -196,9 +212,6 @@ namespace ZombieSurvivorZ
 
             ExpandingDoors.Remove(doorCell);
 
-            OpenDoors.Add(doorCell);
-            ClosedDoors.Remove(doorCell);
-
             MapManager.TileGraph.UpdateNodeCost(doorCell, OpenDoorCost);
         }
 
@@ -210,11 +223,17 @@ namespace ZombieSurvivorZ
                 return;
             }
 
+            if (door.ZombieDestroyCooldown > 0)
+            {
+                return;
+            }
+
             if (MapManager.ZombieSpawnLayer.ZombieIsBlockingDoorClosing(doorCell))
             {
                 //TODO cannot close door! zombie is blocking
                 return;
             }
+
 
             door.ClosingScale = 0;
             door.IsOpen = false;
@@ -222,43 +241,73 @@ namespace ZombieSurvivorZ
             //door.CL.Set(TileSize.X, TileSize.Y, topLeftTile.X, topLeftTile.Y);
             ExpandingDoors.Add(doorCell);
 
-            ClosedDoors.Add(doorCell);
-            OpenDoors.Remove(doorCell);
-
             MapManager.TileGraph.UpdateNodeCost(doorCell, GetCostFromDoor(doorCell)); //TODO add base cost with barricade weight
+        }
+
+
+        public void DealDamage(Vector2Int doorCell, int damage)
+        {
+
+
+            //if (door.health <= 0)
+            {
+                OpenDoor(doorCell);
+                ZombieAttackCooldownDoor(doorCell);
+            }
+        }
+
+        private void ZombieAttackCooldownDoor(Vector2Int doorCell)
+        {
+            Door door = Doors[doorCell];
+            door.ZombieDestroyCooldown = ZombieDestroyCooldown;
+
+            CooldownDoors.Add(doorCell);
+
         }
 
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            for (int i = 0; i < OpenDoors.Count; i++)
+            foreach (var item in Doors)
             {
-                Vector2 doorPos = LocalToTileTopLeftPosition(OpenDoors[i]);
+                DrawDoor(spriteBatch, item.Key);
+            }
 
-                if (Doors[OpenDoors[i]].Rotated)
+        }
+
+        private void DrawDoor(SpriteBatch spriteBatch, Vector2Int doorCell)
+        {
+            Vector2 doorPos = LocalToTileTopLeftPosition(doorCell);
+            Door door = Doors[doorCell];
+            Rectangle rect;
+            if (door.IsOpen)
+            {
+                if (door.Rotated)
                 {
-                    spriteBatch.Draw(tilesetTexture, doorPos, openDoorRectangleHorizontal, Color.White);
+                    rect = openDoorRectangleHorizontal;
                 }
                 else
                 {
-                    spriteBatch.Draw(tilesetTexture, doorPos, openDoorRectangleVertical, Color.White);
+                    rect = openDoorRectangleVertical;
                 }
-
             }
-            for (int i = 0; i < ClosedDoors.Count; i++)
+            else
             {
-                Vector2 doorPos = LocalToTileTopLeftPosition(ClosedDoors[i]);
-
-                if (Doors[ClosedDoors[i]].Rotated)
+                if (door.Rotated)
                 {
-                    spriteBatch.Draw(tilesetTexture, doorPos, closedDoorRectangleVertical, Color.White);
+                    rect = closedDoorRectangleVertical;
                 }
                 else
                 {
-                    spriteBatch.Draw(tilesetTexture, doorPos, closedDoorRectangleHorizontal, Color.White);
+                    rect = closedDoorRectangleHorizontal;
                 }
             }
-
+            Color color = Color.White;
+            if (door.ZombieDestroyCooldown > 0)
+            {
+                color = new(0.3f, 0.3f, 0.3f);
+            }
+            spriteBatch.Draw(tilesetTexture, doorPos, rect, color);
         }
 
     }
