@@ -46,8 +46,7 @@ namespace ZombieSurvivorZ
         {
             Zombies.Add(new()
             {
-                Position = position,
-                Scale = new(0.25f, 0.25f)
+                Position = position
             });
         }
 

@@ -30,6 +30,7 @@ namespace ZombieSurvivorZ
         private const float AttackDealDamageTime = AnimSpeed * 5;
 
         private const float MovementSpeed = 100;
+        private const float KnockbackOnHit = 16;
         private const int MaxHealth = 20;
 
         private const int Damage = 5;
@@ -108,8 +109,9 @@ namespace ZombieSurvivorZ
 
         public void DealDamage(int damage, Vector2 direction)
         {
-            Game1.BloodManager.AddBlood(Position, MathF.Atan2(direction.Y, direction.X));
+            Game1.BloodManager.AddZombieBlood(Position, MathF.Atan2(direction.Y, direction.X));
             health -= damage;
+            Position += direction * KnockbackOnHit;
             if (health <= 0)
             {
                 Die();
@@ -195,6 +197,11 @@ namespace ZombieSurvivorZ
             Vector2Int zombieCell = Game1.MapManager.PositionToLocal(Position);
             if (zombieCell != lastCellPos)
             {
+                if (!Game1.MapManager.CellIsWalkable(zombieCell))
+                {
+                    zombieCell = Game1.MapManager.Get0CostWalkableSurroundingTile(zombieCell);
+                    Position = Game1.MapManager.LocalToTileCenterPosition(zombieCell);
+                }
                 lastCellPos = zombieCell;
             }
 
@@ -380,7 +387,7 @@ namespace ZombieSurvivorZ
                 direction /= distance;  //Normalize
                 Heading = direction;
 
-                if (distance > 100)
+                if (distance > 91)
                 {
                     CalculatePathToPlayer();
                     return;

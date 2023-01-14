@@ -14,26 +14,24 @@ namespace ZombieSurvivorZ
     {
 
         public UIBorder border;
-        public UIButton button;
         public UIText title;
         public readonly List<WeaponUpgradeUI> weaponUpgradeUIs = new();
 
-        private int YWeaponUpgradesOffset = 200;
+        private int YWeaponUpgradesOffset = 60;
         private int YWeaponUpgradesSpacing = 10;
 
         public UpgradeWindowUI() : base(null, new(200, 100), new(300, 500))
         {
-            Alpha = 0.4f;
-            Color = Color.Red;
+            Alpha = 0.8f;
+            Color = Color.Black;
+
             border = new(this, Vector2.Zero, Size);
-            button = UIButton.CreateWithText(this, new(50, 50), new(100, 50), "Purchase");
-            button.OnClick += () =>
-            {
-                Console.WriteLine("Button Click");
-                //this.SetActive(false);
-            };
+            border.Color = Color.Gray;
+
             title = new(this, new(0, 0), new(200, 50));
-            title.Text = "Hello World";
+            title.Align = new(0.5f, 0.5f);
+            title.Text = "Weapon Purchase";
+            title.Color = Color.White;
 
         }
 
@@ -52,7 +50,6 @@ namespace ZombieSurvivorZ
         {
             base.SetActive(active);
             border.SetActive(active);
-            button.SetActive(active);
             title.SetActive(active);
             for (int i = 0; i < weaponUpgradeUIs.Count; i++)
             {

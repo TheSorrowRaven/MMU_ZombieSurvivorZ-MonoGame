@@ -106,6 +106,10 @@ namespace ZombieSurvivorZ
         {
             base.Update();
 
+            if (!Active)
+            {
+                return;
+            }
             if (!Clickable)
             {
                 return;
