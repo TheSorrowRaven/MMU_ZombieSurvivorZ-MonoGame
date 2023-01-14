@@ -33,6 +33,8 @@ namespace ZombieSurvivorZ
 
         public static FiringLines FiringLines { get; private set; }
 
+        public static BloodManager BloodManager { get; private set; }
+
         public static UpgradeWindowUI UpgradeWindowUI { get; private set; }
         public static HUDDisplayUI HUDDisplayUI { get; private set; }
         public static bool UISuppressClick { get; set; } = false;
@@ -71,39 +73,10 @@ namespace ZombieSurvivorZ
             SpriteBatch = new SpriteBatch(GraphicsDevice);
             Font.Load();
 
-            MapManager = new();
+
             Player = new();
-
-
-
-            //var c = new Crate()
-            //{
-            //    Position = new(200, 100)
-            //};
-
-            //c = new Crate()
-            //{
-            //    Position = new(-100, -100)
-            //};
-            //new Crate()
-            //{
-            //    Position = new(0, 0)
-            //};
-            //for (int x = 0; x < 32; x++)
-            //{
-            //    for (int y = 0; y < 32; y++)
-            //    {
-            //        new Crate()
-            //        {
-            //            Position = new(100 + x * 32, 100 + y * 32)
-            //        };
-            //    }
-            //}
-            var z = new Zombie()
-            {
-                Position = new(32, 32),
-                Scale = new(0.25f, 0.25f)
-            };
+            MapManager = new();
+            BloodManager = new();
 
             FiringLines = new();
             UpgradeWindowUI = new();
@@ -134,9 +107,6 @@ namespace ZombieSurvivorZ
             Time.frameCount++;
 
             Input.Update(gameTime);
-
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
 
             UISuppressClick = false;
             //Objects Update

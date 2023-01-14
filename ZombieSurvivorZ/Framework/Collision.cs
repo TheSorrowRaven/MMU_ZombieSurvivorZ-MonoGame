@@ -66,6 +66,35 @@ namespace ZombieSurvivorZ
             }
         }
 
+        public static bool RaycastAll(Vector2 position, Vector2 direction, GameObject[] ignoreObjects, out Collider collider, out float hitDistance)
+        {
+            collider = null;
+            if (!RaycastAll(position, direction, out List<(Collider, float)> intersections))
+            {
+                hitDistance = float.NaN;
+                return false;
+            }
+            hitDistance = float.MaxValue;
+            bool hit = false;
+            foreach (var item in intersections)
+            {
+                if (ignoreObjects != null)
+                {
+                    if (ignoreObjects.Contains(item.Item1.Go))
+                    {
+                        continue;
+                    }
+                }
+                if (item.Item2 < hitDistance)
+                {
+                    collider = item.Item1;
+                    hitDistance = item.Item2;
+                    hit = true;
+                }
+            }
+            return hit;
+        }
+
         public static bool Raycast(Vector2 position, Vector2 direction, GameObject[] ignoreObjects, out Collider collider, out float hitDistance)
         {
             collider = null;
@@ -78,9 +107,12 @@ namespace ZombieSurvivorZ
             bool hit = false;
             foreach (var item in intersections)
             {
-                if (ignoreObjects.Contains(item.Item1.Go))
+                if (ignoreObjects != null)
                 {
-                    continue;
+                    if (ignoreObjects.Contains(item.Item1.Go))
+                    {
+                        continue;
+                    }
                 }
                 if (item.Item2 < hitDistance)
                 {
@@ -96,6 +128,14 @@ namespace ZombieSurvivorZ
             intersections = new();
             RaycastSet(position, direction, DynamicColliders, intersections);
             RaycastSet(position, direction, StaticColliders, intersections);
+            return intersections.Count > 0;
+        }
+        public static bool RaycastAll(Vector2 position, Vector2 direction, out List<(Collider, float)> intersections)
+        {
+            intersections = new();
+            RaycastSet(position, direction, DynamicColliders, intersections);
+            RaycastSet(position, direction, StaticColliders, intersections);
+            RaycastSet(position, direction, RaycastIgnoredStaticColliders, intersections);
             return intersections.Count > 0;
         }
 

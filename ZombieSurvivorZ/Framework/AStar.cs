@@ -97,8 +97,18 @@ namespace ZombieSurvivorZ
 
         public static void Compute(TileGraph graph, Vector2Int start, Vector2Int goal, Stack<Vector2Int> path)
         {
+
             records.Clear();
             pQueue.Clear();
+
+            if (!graph.Connections.ContainsKey(start))
+            {
+                return;
+            }
+            if (!graph.Connections.ContainsKey(goal))
+            {
+                return;
+            }
 
             NodeRecord startRecord = new(start, null, 0);
 

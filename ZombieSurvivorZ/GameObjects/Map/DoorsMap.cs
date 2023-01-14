@@ -9,6 +9,7 @@ using MonoGame.Extended.ViewportAdapters;
 using MonoGame.Extended.Tiled;
 using MonoGame.Extended.Tiled.Renderers;
 using System.Collections.Generic;
+using MonoGame.Extended.Collections;
 
 namespace ZombieSurvivorZ
 {
@@ -27,11 +28,17 @@ namespace ZombieSurvivorZ
             public readonly Collision.BoxStaticCollider CL;
             public bool IsOpen = false;
             public bool Rotated = false;
-            public bool barricaded = false;
-            public float barricadingCount = 0f;
-            public float barricadeTime = 2f;
-            public BarricadeState barricadeLevel = BarricadeState.Base;
             public float ClosingScale = 0;
+            public float ZombieDestroyCooldown = 0;
+
+            public int BarricadeHealth;
+
+            public const int BarricadeLevelMaxHealth = 25;
+            public const int BarricadeMaxLevel = 3;
+
+            //public float barricadingCount = 0f;
+            //public float barricadeTime = 2f;
+            //public BarricadeState barricadeLevel = BarricadeState.Base;
 
             public Door(Collision.BoxStaticCollider CL, bool Rotated)
             {
@@ -39,44 +46,89 @@ namespace ZombieSurvivorZ
                 this.Rotated = Rotated;
             }
 
+            public int GetBarricadeLevel()
+            {
+                if (BarricadeHealth <= 0)
+                {
+                    return 0;
+                }
+                return (BarricadeHealth - 1) / BarricadeLevelMaxHealth + 1;
+            }
+
             public void Barricade()
             {
-                TryBarricade();
-            }
-
-            private void TryBarricade()
-            {
-                if (barricadeLevel == BarricadeState.Level3)
+                int mod = BarricadeHealth % BarricadeLevelMaxHealth;
+                int currentLevel = GetBarricadeLevel();
+                if (mod == 0)
                 {
-                    return;
+                    if (currentLevel < 3)
+                    {
+                        BarricadeHealth += BarricadeLevelMaxHealth;
+                    }
                 }
-
-                barricadingCount += (float)Time.gameTime.ElapsedGameTime.TotalSeconds;
-                Console.WriteLine(barricadingCount);
-
-                if (barricadingCount > barricadeTime)
+                else
                 {
-                    ResetBarricading();
-                    barricadeLevel += 1;
-                    Console.WriteLine("barricade level: " + barricadeLevel);
+                    BarricadeHealth = currentLevel * BarricadeLevelMaxHealth;
                 }
             }
 
-            public void ResetBarricading()
+            public bool CanBarricade()
             {
-                barricadingCount = 0f;
+                if (ZombieDestroyCooldown > 0)
+                {
+                    return false;
+                }
+                int mod = BarricadeHealth % BarricadeLevelMaxHealth;
+                if (mod == 0)
+                {
+                    return GetBarricadeLevel() < 3;
+                }
+                return true;
             }
+
+            public bool TryBarricade()
+            {
+                if (CanBarricade())
+                {
+                    Barricade();
+                    return true;
+                }
+                return false;
+            }
+
+            //private void TryBarricade1()
+            //{
+            //    if (barricadeLevel == BarricadeState.Level3)
+            //    {
+            //        return;
+            //    }
+
+            //    barricadingCount += (float)Time.gameTime.ElapsedGameTime.TotalSeconds;
+            //    Console.WriteLine(barricadingCount);
+
+            //    if (barricadingCount > barricadeTime)
+            //    {
+            //        ResetBarricading();
+            //        barricadeLevel += 1;
+            //        Console.WriteLine("barricade level: " + barricadeLevel);
+            //    }
+            //}
+
+            //public void ResetBarricading()
+            //{
+            //    barricadingCount = 0f;
+            //}
         }
 
         public readonly Dictionary<Vector2Int, Door> Doors = new();
-        public readonly List<Vector2Int> OpenDoors = new();
-        public readonly List<Vector2Int> ClosedDoors = new();
 
         private readonly Texture2D tilesetTexture;
-        private readonly Rectangle closedDoorRectangleHorizontal;
+
         private readonly Rectangle closedDoorRectangleVertical;
-        private readonly Rectangle openDoorRectangleHorizontal;
+        private readonly Rectangle closedDoorRectangleHorizontal;
         private readonly Rectangle openDoorRectangleVertical;
+        private readonly Rectangle openDoorRectangleHorizontal;
+
         private readonly Rectangle Level1BarricadeHorizontal;
         private readonly Rectangle Level1BarricadeVertical;
         private readonly Rectangle Level2BarricadeHorizontal;
@@ -85,19 +137,24 @@ namespace ZombieSurvivorZ
         private readonly Rectangle Level3BarricadeVertical;
         
         private readonly List<Vector2Int> ExpandingDoors = new();
+        private readonly List<Vector2Int> CooldownDoors = new();
 
         private const int OpenDoorCost = 0;
-        private const int ClosedDoorCost = 1000;  //Base cost
+        private const int ClosedDoorCost = 10;  //Base cost
+        private const int ZombieDestroyCooldown = 1;
 
-        private const float ClosingDoorSpeed = 0.1f;
+        private const float ClosingDoorSpeed = 0.5f;
 
         public DoorsMap(TiledMapTileLayer layer) : base(layer)
         {
             tilesetTexture = Game1.GetTexture("tileset_temp");
+
             closedDoorRectangleHorizontal = new(256, 128, 64, 64);
             closedDoorRectangleVertical = new(320, 128, 64, 64);
-            openDoorRectangleHorizontal = new(192, 128, 64, 64);
-            openDoorRectangleVertical = new(0, 192, 64, 64);
+            openDoorRectangleVertical = new(192, 128, 64, 64);
+            openDoorRectangleHorizontal = new(0, 192, 64, 64);
+
+
             Level1BarricadeHorizontal = new(0, 256, 64, 64);
             Level1BarricadeVertical = new(64, 256, 64, 64);
             Level2BarricadeHorizontal = new(128, 256, 64, 64);
@@ -113,7 +170,6 @@ namespace ZombieSurvivorZ
             Collision.BoxStaticCollider box = new(this, TileSize.X, TileSize.Y, topLeftTile.X, topLeftTile.Y);
             Vector2Int doorCell = new(x, y);
             Doors.Add(doorCell, new(box, tile.IsFlippedHorizontally));
-            ClosedDoors.Add(doorCell);
         }
 
         public override void Update()
@@ -133,18 +189,62 @@ namespace ZombieSurvivorZ
                     i--;
                 }
 
-                Vector2 topLeftTile = LocalToTileTopLeftPosition(doorCell.X, doorCell.Y);
-                Vector2 size = TileSize * door.ClosingScale;
-                door.CL.Set(size.X, size.Y, topLeftTile.X, topLeftTile.Y);
+                Vector2 tileCenter = MapManager.LocalToTileCenterPosition(doorCell);
+                Vector2 size = TileSize;
+                Vector2 tileTopLeft = tileCenter;
+                if (door.Rotated)
+                {
+                    size.X *= door.ClosingScale;
+                    tileTopLeft.X -= size.X / 2;
+                }
+                else
+                {
+                    size.Y *= door.ClosingScale;
+                    tileTopLeft.Y -= size.Y / 2;
+                }
+                door.CL.Set(size.X, size.Y, tileTopLeft.X, tileTopLeft.Y);
             }
 
+
+            for (int i = 0; i < CooldownDoors.Count; i++)
+            {
+                Vector2Int doorCell = CooldownDoors[i];
+                Door door = Doors[doorCell];
+
+                door.ZombieDestroyCooldown -= Time.deltaTime;
+                if (door.ZombieDestroyCooldown < 0)
+                {
+                    door.ZombieDestroyCooldown = 0;
+                    CooldownDoors.RemoveAt(i);
+                    i--;
+                }
+            }
+
+        }
+
+        public bool TryGetDoor(Vector2Int doorCell, out Door door)
+        {
+            return Doors.TryGetValue(doorCell, out door);
+        }
+
+        public bool TryGetClosedDoor(Vector2Int doorCell, out Door door)
+        {
+            if (!Doors.TryGetValue(doorCell, out door))
+            {
+                return false;
+            }
+            if (door.IsOpen)
+            {
+                return false;
+            }
+            return true;
         }
 
         public float GetCostFromDoor(Vector2Int doorCell)
         {
             if (!Doors.TryGetValue(doorCell, out Door door))
             {
-                return ClosedDoorCost; //Base cost since nothing is barricaded yet
+                return ClosedDoorCost;  //Returns before Doors is initialized
             }
             return GetCostFromDoor(door);
         }
@@ -156,7 +256,7 @@ namespace ZombieSurvivorZ
             }
             else
             {
-                return ClosedDoorCost; //TODO add base cost with barricade weight
+                return ClosedDoorCost + door.BarricadeHealth * 2;
             }
         }
 
@@ -203,125 +303,129 @@ namespace ZombieSurvivorZ
             {
                 OpenDoor(doorCell);
             }
-            door.IsOpen = !door.IsOpen;
-
         }
 
         public void OpenDoor(Vector2Int doorCell)
         {
-            ExpandingDoors.Remove(doorCell);
-
             Door door = Doors[doorCell];
-            door.CL.Set(0, 0, 0, 0);
+            if (door.IsOpen)
+            {
+                return;
+            }
 
-            OpenDoors.Add(doorCell);
-            ClosedDoors.Remove(doorCell);
+            door.CL.Set(0, 0, 0, 0);
+            door.IsOpen = true;
+
+            ExpandingDoors.Remove(doorCell);
 
             MapManager.TileGraph.UpdateNodeCost(doorCell, OpenDoorCost);
         }
 
         public void CloseDoor(Vector2Int doorCell)
         {
-            ExpandingDoors.Add(doorCell);
-
             Door door = Doors[doorCell];
+            if (!door.IsOpen)
+            {
+                return;
+            }
+
+            if (door.ZombieDestroyCooldown > 0)
+            {
+                return;
+            }
+
+            if (MapManager.ZombieSpawnLayer.ZombieIsBlockingDoorClosing(doorCell))
+            {
+                //TODO cannot close door! zombie is blocking
+                return;
+            }
+
+
             door.ClosingScale = 0;
+            door.IsOpen = false;
             //Vector2 topLeftTile = LocalToTileTopLeftPosition(doorCell.X, doorCell.Y);
             //door.CL.Set(TileSize.X, TileSize.Y, topLeftTile.X, topLeftTile.Y);
-
-            ClosedDoors.Add(doorCell);
-            OpenDoors.Remove(doorCell);
+            ExpandingDoors.Add(doorCell);
 
             MapManager.TileGraph.UpdateNodeCost(doorCell, GetCostFromDoor(doorCell)); //TODO add base cost with barricade weight
         }
 
 
-        public override void Draw(SpriteBatch spriteBatch)
+        public void DealDamage(Vector2Int doorCell, int damage)
         {
-            for (int i = 0; i < OpenDoors.Count; i++)
+            Door door = Doors[doorCell];
+            if (door.BarricadeHealth == 0)
             {
-                Vector2 doorPos = LocalToTileTopLeftPosition(OpenDoors[i]);
-
-                if (Doors[OpenDoors[i]].Rotated)
-                {
-                    switch (Doors[OpenDoors[i]].barricadeLevel)
-                    {
-                        case Door.BarricadeState.Base:
-                            break;
-                        case Door.BarricadeState.Level1:
-                            spriteBatch.Draw(tilesetTexture, doorPos, Level1BarricadeHorizontal, Color.White);
-                            break;
-                        case Door.BarricadeState.Level2:
-                            spriteBatch.Draw(tilesetTexture, doorPos, Level2BarricadeHorizontal, Color.White);
-                            break;
-                        case Door.BarricadeState.Level3:
-                            spriteBatch.Draw(tilesetTexture, doorPos, Level3BarricadeHorizontal, Color.White);
-                            break;
-                    }
-                    spriteBatch.Draw(tilesetTexture, doorPos, openDoorRectangleHorizontal, Color.White);
-                }
-                else
-                {
-                    switch (Doors[OpenDoors[i]].barricadeLevel)
-                    {
-                        case Door.BarricadeState.Base:
-                            break;
-                        case Door.BarricadeState.Level1:
-                            spriteBatch.Draw(tilesetTexture, doorPos, Level1BarricadeVertical, Color.White);
-                            break;
-                        case Door.BarricadeState.Level2:
-                            spriteBatch.Draw(tilesetTexture, doorPos, Level2BarricadeVertical, Color.White);
-                            break;
-                        case Door.BarricadeState.Level3:
-                            spriteBatch.Draw(tilesetTexture, doorPos, Level3BarricadeVertical, Color.White);
-                            break;
-                    }
-                    spriteBatch.Draw(tilesetTexture, doorPos, openDoorRectangleVertical, Color.White);
-                }
-
+                OpenDoor(doorCell);
             }
-            for (int i = 0; i < ClosedDoors.Count; i++)
+            else
             {
-                Vector2 doorPos = LocalToTileTopLeftPosition(ClosedDoors[i]);
+                door.BarricadeHealth = Math.Max(0, door.BarricadeHealth - damage);
+            }
+            ZombieAttackCooldownDoor(doorCell);
+        }
 
-                if (Doors[ClosedDoors[i]].Rotated)
-                {
-                    switch (Doors[ClosedDoors[i]].barricadeLevel)
-                    {
-                        case Door.BarricadeState.Base:
-                            break;
-                        case Door.BarricadeState.Level1:
-                            spriteBatch.Draw(tilesetTexture, doorPos, Level1BarricadeVertical, Color.White);
-                            break;
-                        case Door.BarricadeState.Level2:
-                            spriteBatch.Draw(tilesetTexture, doorPos, Level2BarricadeVertical, Color.White);
-                            break;
-                        case Door.BarricadeState.Level3:
-                            spriteBatch.Draw(tilesetTexture, doorPos, Level3BarricadeVertical, Color.White);
-                            break;
-                    }
-                    spriteBatch.Draw(tilesetTexture, doorPos, closedDoorRectangleVertical, Color.White);
-                }
-                else
-                {
-                    switch (Doors[ClosedDoors[i]].barricadeLevel)
-                    {
-                        case Door.BarricadeState.Base:
-                            break;
-                        case Door.BarricadeState.Level1:
-                            spriteBatch.Draw(tilesetTexture, doorPos, Level1BarricadeHorizontal, Color.White);
-                            break;
-                        case Door.BarricadeState.Level2:
-                            spriteBatch.Draw(tilesetTexture, doorPos, Level2BarricadeHorizontal, Color.White);
-                            break;
-                        case Door.BarricadeState.Level3:
-                            spriteBatch.Draw(tilesetTexture, doorPos, Level3BarricadeHorizontal, Color.White);
-                            break;
-                    }
-                    spriteBatch.Draw(tilesetTexture, doorPos, closedDoorRectangleHorizontal, Color.White);
-                }
+        private void ZombieAttackCooldownDoor(Vector2Int doorCell)
+        {
+            Door door = Doors[doorCell];
+            door.ZombieDestroyCooldown = ZombieDestroyCooldown;
+
+            if (!CooldownDoors.Contains(doorCell))
+            {
+                CooldownDoors.Add(doorCell);
             }
 
         }
+
+
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            foreach (var item in Doors)
+            {
+                DrawDoor(spriteBatch, item.Key);
+            }
+
+        }
+
+        private void DrawDoor(SpriteBatch spriteBatch, Vector2Int doorCell)
+        {
+            Vector2 doorPos = LocalToTileTopLeftPosition(doorCell);
+            Door door = Doors[doorCell];
+            Rectangle rect;
+            if (door.IsOpen)
+            {
+                rect = door.Rotated ? openDoorRectangleVertical : openDoorRectangleHorizontal;
+            }
+            else
+            {
+                rect = door.Rotated ? closedDoorRectangleVertical : closedDoorRectangleHorizontal;
+            }
+            Color color = Color.White;
+            if (door.ZombieDestroyCooldown > 0)
+            {
+                color = new(0.3f, 0.3f, 0.3f);
+            }
+            spriteBatch.Draw(tilesetTexture, doorPos, rect, color);
+
+
+
+            if (!door.IsOpen && door.GetBarricadeLevel() > 0)
+            {
+                DrawDoorBarricade(spriteBatch, doorPos, door);
+            }
+        }
+
+        private void DrawDoorBarricade(SpriteBatch spriteBatch, Vector2 doorPos, Door door)
+        {
+            Rectangle rect = door.GetBarricadeLevel() switch
+            {
+                1 => door.Rotated ? Level1BarricadeVertical : Level1BarricadeHorizontal,
+                2 => door.Rotated ? Level2BarricadeVertical : Level2BarricadeHorizontal,
+                3 => door.Rotated ? Level3BarricadeVertical : Level3BarricadeHorizontal,
+                _ => new(),
+            };
+            spriteBatch.Draw(tilesetTexture, doorPos, rect, Color.White);
+        }
+
     }
 }

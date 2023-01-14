@@ -15,8 +15,11 @@ namespace ZombieSurvivorZ
 
         private const float BaseColliderSize = 25;
 
-        private float movementSpeed = 300;
-        private bool sameKeyHolstersWeapon = true;
+        private const float MovementSpeed = 300;
+        private const bool SameKeyHolstersWeapon = true;
+        private const int MaterialGainPerZombie = 25;
+
+        private const int MaxHealth = 100;
 
         private Reticle reticle;
         private Weapon weapon;
@@ -27,6 +30,8 @@ namespace ZombieSurvivorZ
         private readonly Dictionary<int, Weapon> keyNumToWeapon = new();
         private int keyNumCount = 1;
         public int Materials { get; private set; }
+
+        private int health;
 
 
         private Vector2Int lastCellPos;
@@ -44,6 +49,10 @@ namespace ZombieSurvivorZ
 
         public float ColliderSize => Scale.X * BaseColliderSize;
 
+        private float barricadeTimeCount;
+        public const float BarricadeTime = 2f;
+        public const int BarricadeMaterialCost = 5;
+
 
         public override Vector2 Position
         {
@@ -58,6 +67,7 @@ namespace ZombieSurvivorZ
         public Player()
         {
             CL = new CircleDynamicCollider(this, BaseColliderSize);
+            health = MaxHealth;
         }
 
         public override void Initialize()
@@ -108,9 +118,24 @@ namespace ZombieSurvivorZ
         private void TransformUpdate()
         {
             Vector2 movement = Input.ConstructAxis2(Keys.S, Keys.W, Keys.D, Keys.A);
-            Position += movement * (movementSpeed * Time.deltaTime);
+            Position += movement * (MovementSpeed * Time.deltaTime);
             Heading = Game1.Camera.ScreenToWorld(reticle.Position) - Position;
+        }
 
+        public void DealDamage(int damage, Vector2 direction)
+        {
+            Game1.BloodManager.AddBlood(Position, MathF.Atan2(direction.Y, direction.X));
+            
+            health -= damage;
+            if (health <= 0)
+            {
+                Die();
+            }
+        }
+
+        private void Die()
+        {
+            Console.WriteLine("PLAYER DIED!!");
         }
 
         #region Materials
@@ -124,6 +149,10 @@ namespace ZombieSurvivorZ
         {
             Materials -= materials;
             Game1.HUDDisplayUI.MaterialsDisplayUI.UpdateMaterials(Materials);
+        }
+        public void ZombieKilledAddMaterials()
+        {
+            AddMaterials(MaterialGainPerZombie);
         }
         public bool TryRemoveMaterials(int materials)
         {
@@ -199,7 +228,7 @@ namespace ZombieSurvivorZ
         {
             Weapon previousWeapon = this.weapon;
             previousWeapon?.HolsterWeapon();
-            if (sameKeyHolstersWeapon)
+            if (SameKeyHolstersWeapon)
             {
                 if (weapon == this.weapon)
                 {
@@ -255,21 +284,6 @@ namespace ZombieSurvivorZ
         private void InteractionUpdate()
         {
             Vector2Int playerCell = Game1.MapManager.PositionToLocal(Position);
-            TileGraph.TileData tileData = Game1.MapManager.GetTileData((ushort)playerCell.X, (ushort)playerCell.Y);
-            if (!tileData.walkable || tileData.cost != 0)
-            {
-                Vector2Int targetCell = Game1.MapManager.GetNearestSideTile(playerCell, Position, true);
-                if (!Game1.MapManager.CellIs0CostWalkable(targetCell))
-                {
-                    playerCell = Game1.MapManager.GetNearestSideTile(playerCell, Position, false);
-                    //Game1.MapManager.CellIs0CostWalkable(playerCell);
-                }
-                else
-                {
-                    playerCell = targetCell;
-                }
-                Position = Game1.MapManager.LocalToTileCenterPosition(playerCell);
-            }
             if (playerCell != lastCellPos)
             {
                 //Checks
@@ -289,29 +303,52 @@ namespace ZombieSurvivorZ
         {
             if (!DoorSelected)
             {
+                Game1.HUDDisplayUI.DoorHealthDisplayUI.SetActive(false);
                 return;
             }
             if (Input.IsRMouseFirstDown())
             {
                 Game1.MapManager.DoorsLayer.ToggleDoor(SelectingDoor);
             }
+            Game1.HUDDisplayUI.DoorHealthDisplayUI.SetActive(true);
+            Vector2 doorPos = Game1.MapManager.LocalToTileTopLeftPosition(SelectingDoor);
+            Game1.HUDDisplayUI.DoorHealthDisplayUI.SetDoor(Game1.MapManager.DoorsLayer.Doors[SelectingDoor], doorPos);
         }
 
         private void BarricadeUpdate()
         {
             if (!DoorSelected)
             {
-                if (SelectingDoor != new Vector2Int(0,0))
-                {
-                    // to stop barricading when the player stops selecting the door
-                    Game1.MapManager.DoorsLayer.Doors[SelectingDoor].ResetBarricading();
-                }
+                barricadeTimeCount = 0;
+                //if (SelectingDoor != new Vector2Int(0,0))
+                //{
+                //    // to stop barricading when the player stops selecting the door
+                //    Game1.MapManager.DoorsLayer.Doors[SelectingDoor].ResetBarricading();
+                //}
                 return;
             }
             if (Input.IsKeyDown(Keys.Space))
             {
-                //BarricadeDoor(SelectingDoor);
-                Game1.MapManager.DoorsLayer.Doors[SelectingDoor].Barricade();
+                barricadeTimeCount += Time.deltaTime;
+                Console.WriteLine(barricadeTimeCount);
+                if (Game1.MapManager.DoorsLayer.Doors[SelectingDoor].CanBarricade())
+                {
+                    //TODO show you're barricading
+                    //
+                }
+                if (barricadeTimeCount > BarricadeTime)
+                {
+                    if (Game1.MapManager.DoorsLayer.Doors[SelectingDoor].TryBarricade())
+                    {
+                        Console.WriteLine($"Successfully barricaded, Level: {Game1.MapManager.DoorsLayer.Doors[SelectingDoor].GetBarricadeLevel()}, Health: {Game1.MapManager.DoorsLayer.Doors[SelectingDoor].BarricadeHealth}");
+                        TryRemoveMaterials(BarricadeMaterialCost);
+                    }
+                    barricadeTimeCount = 0;
+                }
+            }
+            else
+            {
+                barricadeTimeCount = 0;
             }
         }
 
@@ -409,14 +446,14 @@ namespace ZombieSurvivorZ
             {
                 Vector2 pos = Game1.MapManager.LocalToTileTopLeftPosition(SelectingDoor);
                 spriteBatch.Draw(UsePromptTexture, new Rectangle((int)pos.X + 16, (int)pos.Y - 32, 32, 32), Color.White);
-                //spriteBatch.DrawRectangle(new RectangleF(Game1.MapManager.LocalToTileTopLeftPosition(SelectingDoor), Game1.MapManager.TileSize), Color.Blue, 3);
+                spriteBatch.DrawRectangle(new RectangleF(Game1.MapManager.LocalToTileTopLeftPosition(SelectingDoor), Game1.MapManager.TileSize), Color.Blue, 3);
                 spriteBatch.Draw(BarricadePromptTexture, new Rectangle((int)pos.X, (int)pos.Y + 48, 64, 64), Color.White);
             }
             if (CraftingSelected)
             {
                 Vector2 pos = Game1.MapManager.LocalToTileTopLeftPosition(SelectingCrafting);
                 spriteBatch.Draw(UsePromptTexture, new Rectangle((int)pos.X + 16, (int)pos.Y - 32, 32, 32), Color.White);
-                //spriteBatch.DrawRectangle(new RectangleF(Game1.MapManager.LocalToTileTopLeftPosition(SelectingCrafting), Game1.MapManager.TileSize), Color.Red, 3);
+                spriteBatch.DrawRectangle(new RectangleF(Game1.MapManager.LocalToTileTopLeftPosition(SelectingCrafting), Game1.MapManager.TileSize), Color.Yellow, 3);
             }
         }
 
