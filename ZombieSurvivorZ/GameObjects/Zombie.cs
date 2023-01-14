@@ -20,7 +20,7 @@ namespace ZombieSurvivorZ
             Die
         }
 
-        private const float BaseColliderSize = 24;
+        private const float StuckInPlaceTime = 2f;
 
         private const float AnimSpeed = 0.1f;
 
@@ -29,17 +29,18 @@ namespace ZombieSurvivorZ
         private const float AttackTime = AnimSpeed * 9;
         private const float AttackDealDamageTime = AnimSpeed * 5;
 
-        private const float MovementSpeed = 100;
         private const float KnockbackOnHit = 16;
-        private const int MaxHealth = 20;
 
-        private const int Damage = 5;
+        public virtual int MaxHealth => 20;
+        public virtual int Damage => 5;
+        public virtual float MovementSpeed => 200;
+        public virtual float ScaleF => 0.25f;
+        public virtual float ColliderSize => 24;
 
-
-
+        private float movementSpeed;
         private int health;
 
-        private static float ClosestDistanceToPlayer => Game1.Player.ColliderSize + BaseColliderSize;
+        private float ClosestDistanceToPlayer => Game1.Player.ColliderSize + ColliderSize;
 
         private readonly Texture2D[] ChasingAnim;
         private readonly Texture2D[] AttackingAnim;
@@ -70,11 +71,18 @@ namespace ZombieSurvivorZ
         private float attackTimeCount = 0;
         private bool dealtDamageThisAttack;
 
+        private Vector2 lastPos;
+        private float stuckInPlaceTimeCount = 0;
+        private int stuckTotal = 0;
+
         public Zombie()
         {
+            movementSpeed = MovementSpeed;
+
+            Scale = new(ScaleF, ScaleF);
+            CL = new CircleDynamicCollider(this, ColliderSize);
+
             health = MaxHealth;
-            Scale = new(0.25f, 0.25f);
-            CL = new CircleDynamicCollider(this, BaseColliderSize);
             IgnoredObjects[0] = this;
 
             ChasingAnim = new Texture2D[17];
@@ -89,11 +97,6 @@ namespace ZombieSurvivorZ
             Texture = ChasingAnim[0];   //Safe
         }
 
-        ~Zombie()
-        {
-            Console.WriteLine("Zombie released from memory");
-        }
-
         private static void PopulateAnim(Texture2D[] anim, string name)
         {
             for (int i = 0; i < anim.Length; i++)
@@ -104,7 +107,6 @@ namespace ZombieSurvivorZ
 
         public override void Initialize()
         {
-
         }
 
         public void DealDamage(int damage, Vector2 direction)
@@ -205,6 +207,32 @@ namespace ZombieSurvivorZ
                 lastCellPos = zombieCell;
             }
 
+            if (lastPos == Position)
+            {
+                stuckInPlaceTimeCount += Time.deltaTime;
+                if (stuckInPlaceTimeCount > StuckInPlaceTime)
+                {
+                    if (stuckTotal > 5)
+                    {
+                        Die();
+                        Console.WriteLine("Killed one zombie for being stuck for over 5 times!");
+                    }
+                    zombieCell = Game1.MapManager.PositionToLocal(Position);
+                    Position = Game1.MapManager.LocalToTileCenterPosition(zombieCell);
+
+                    CalculatePathToPlayer();
+                    stuckTotal++;
+                    movementSpeed = MovementSpeed * 10;
+                    stuckInPlaceTimeCount = 0;
+                }
+            }
+            else
+            {
+                lastPos = Position;
+                stuckInPlaceTimeCount = 0;
+                movementSpeed = MovementSpeed;
+            }
+
             switch (CurrentState)
             {
                 case State.Chase:
@@ -253,7 +281,6 @@ namespace ZombieSurvivorZ
                 if (Game1.MapManager.DoorsLayer.TryGetClosedDoor(doorCell, out _))
                 {
                     attackDirection = (Game1.MapManager.LocalToTileCenterPosition(doorCell) - Position).NormalizedCopy();
-                    Console.WriteLine("Attack Door");
                     ChangeState(State.Attack);
                     return;
                 }
@@ -271,13 +298,12 @@ namespace ZombieSurvivorZ
                 if (distance < attackDistance)
                 {
                     attackDirection = directionToPlayer;
-                    Console.WriteLine("Attack Player");
                     ChangeState(State.Attack);
                     return;
                 }
 
                 CheckNextTargetIsDoor();
-                Position += MovementSpeed * Time.deltaTime * directionToPlayer;
+                Position += movementSpeed * Time.deltaTime * directionToPlayer;
                 Heading = directionToPlayer;
                 wasSeeingPlayer = true;
             }
@@ -323,11 +349,6 @@ namespace ZombieSurvivorZ
                     {
                         HitDoor(door);
                     }
-                    else
-                    {
-                        //Impossible?
-                        Console.WriteLine("HuH/?");
-                    }
                 }
             }
 
@@ -335,12 +356,12 @@ namespace ZombieSurvivorZ
             {
                 if (collider.Go == Game1.Player)
                 {
-                    float requiredDistance = AttackDistance + AttackDistanceCompensation + BaseColliderSize;
+                    float requiredDistance = AttackDistance + AttackDistanceCompensation + ColliderSize;
                     if (hitDistance < requiredDistance)
                     {
                         HitPlayer(attackDirection);
                     }
-                    Console.WriteLine($"{hitDistance < requiredDistance}, Distance: {hitDistance}, Required: {requiredDistance}");
+                    //Console.WriteLine($"{hitDistance < requiredDistance}, Distance: {hitDistance}, Required: {requiredDistance}");
                 }
             }
 
@@ -393,7 +414,7 @@ namespace ZombieSurvivorZ
                     return;
                 }
 
-                float move = MovementSpeed * Time.deltaTime;
+                float move = movementSpeed * Time.deltaTime;
                 if (distance < move)
                 {
                     SetNextTargetPos();
@@ -431,7 +452,7 @@ namespace ZombieSurvivorZ
 
         private void CheckNextTargetIsDoor()
         {
-            Vector2 checkPos = Position + Heading * (BaseColliderSize + 16);
+            Vector2 checkPos = Position + Heading * (ColliderSize + 16);
             Vector2Int checkCell = Game1.MapManager.PositionToLocal(checkPos);
             nextTargetIsDoor = Game1.MapManager.DoorsLayer.TryGetDoor(checkCell, out _);
             if (nextTargetIsDoor)
@@ -450,10 +471,10 @@ namespace ZombieSurvivorZ
             base.Draw(spriteBatch);
 
 
-            if (Game1.CollisionDebugging && CL != null)
-            {
-                spriteBatch.DrawCircle((CircleF)CL.Bounds, 20, Color.Red);
-            }
+            //if (Game1.CollisionDebugging && CL != null)
+            //{
+            //    spriteBatch.DrawCircle((CircleF)CL.Bounds, 20, Color.Red);
+            //}
 
             if (Time.frameCount == 0)
             {

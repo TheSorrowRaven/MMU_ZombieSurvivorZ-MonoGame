@@ -13,16 +13,24 @@ namespace ZombieSurvivorZ
     {
 
         private readonly UIBorderedBox[] Boxes = new UIBorderedBox[3];
+        private readonly UIBorderedBox BarricadeProgress;
 
         private bool doorSet = false;
         private Vector2 targetPos;
         private DoorsMap.Door targetDoor;
+
+        private bool barricading = false;
+        private float barricadeProgress;
 
         public DoorHealthDisplayUI(UIBase parent, Vector2 pos, Vector2 size) : base(parent, pos, size)
         {
             Boxes[0] = new(this, new(0, 0), new(20, 20));
             Boxes[1] = new(this, new(0, 0), new(20, 20));
             Boxes[2] = new(this, new(0, 0), new(20, 20));
+
+            BarricadeProgress = new(this, new(1, -6), new(62, 6));
+            BarricadeProgress.Box.Color = Color.Blue;
+            BarricadeProgress.Color = Color.Black;
 
             for (int i = 0; i < Boxes.Length; i++)
             {
@@ -83,6 +91,20 @@ namespace ZombieSurvivorZ
             {
                 Boxes[i].SetActive(false);
             }
+
+
+            if (barricading)
+            {
+                BarricadeProgress.SetActive(true);
+                BarricadeProgress.Box.Size = new(62 * barricadeProgress, 6);
+                barricading = false;
+            }
+            else
+            {
+                BarricadeProgress.SetActive(false);
+            }
+
+
         }
 
         public void SetDoor(DoorsMap.Door door, Vector2 doorPos)
@@ -90,6 +112,12 @@ namespace ZombieSurvivorZ
             targetDoor = door;
             targetPos = doorPos;
             doorSet = true;
+        }
+
+        public void SetBarricadeStatus(float progress, float max)
+        {
+            barricading = true;
+            barricadeProgress = progress / max;
         }
 
         public override void SetActive(bool active)
@@ -103,6 +131,14 @@ namespace ZombieSurvivorZ
             for (int i = 0; i < Boxes.Length; i++)
             {
                 Boxes[i].SetActive(active);
+            }
+            if (active)
+            {
+                BarricadeProgress.SetActive(barricading);
+            }
+            else
+            {
+                BarricadeProgress.SetActive(false);
             }
         }
 

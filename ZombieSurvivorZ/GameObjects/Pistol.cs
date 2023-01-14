@@ -19,8 +19,8 @@ namespace ZombieSurvivorZ
             FireTime = 0.2f;
             MuzzleFlashTime = 0.05f;
             FiringLineFlashTime = 0.05f;
-            ReloadTime = 2.2f;
-            SwitchTime = 0.3f;
+            ReloadTime = 1.0f;
+            SwitchTime = 0.2f;
 
             Damage = 5;
             ClipSize = 9;
@@ -28,13 +28,13 @@ namespace ZombieSurvivorZ
             FiringLineStartOffset = 20;
 
             AmmoInClip = 9;
-            AmmoReserve = 14;
+            AmmoReserve = 45;
 
             RecoilSpreadIncrease = 5.0f;
             RecoilSpreadDecrease = 50.0f;
             RecoilMaxSpread = 25f;
             RecoilTime = 0.3f;
-            RecoilAimFactor = 0.5f;
+            RecoilAimFactor = 0.2f;
 
             Levels = new Level[]
             {

@@ -106,14 +106,23 @@ namespace ZombieSurvivorZ
 
                         if (Math.Abs(x * y) == 1) //Is Diagonal
                         {
-                            if (!getTileDataFunc((ushort)(current.X + x), (ushort)(current.Y)).walkable)
+                            if (tileCost != 0)
                             {
-                                //No connection, Don't set weight
                                 continue;
                             }
-                            if (!getTileDataFunc((ushort)(current.X), (ushort)(current.Y + y)).walkable)
+
+                            var td = getTileDataFunc((ushort)(xN), (ushort)(current.Y));
+                            if (!td.walkable || td.cost != 0)
                             {
                                 //No connection, Don't set weight
+                                //Console.WriteLine("Skip");
+                                continue;
+                            }
+                            td = getTileDataFunc((ushort)(current.X), (ushort)(yN));
+                            if (!td.walkable || td.cost != 0)
+                            {
+                                //No connection, Don't set weight
+                                //Console.WriteLine("Skip");
                                 continue;
                             }
                         }

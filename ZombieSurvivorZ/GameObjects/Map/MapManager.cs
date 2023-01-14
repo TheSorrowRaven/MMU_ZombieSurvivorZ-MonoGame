@@ -74,6 +74,10 @@ namespace ZombieSurvivorZ
         }
         public Vector2Int PositionToLocal(Vector2 pos)
         {
+            if (float.IsNaN(pos.X) || float.IsNaN(pos.Y))
+            {
+                return new(0, 0);
+            }
             Vector2 position = Position;
             return new Vector2Int(Convert.ToInt32(MathF.Floor((pos.X - position.X) / Map.TileWidth)), Convert.ToInt32(MathF.Floor((pos.Y - position.Y) / Map.TileHeight)));
         }
