@@ -195,6 +195,10 @@ namespace ZombieSurvivorZ
             {
                 FiringLineFlashTime = level.FiringLineFlashTime.Value;
             }
+            if (level.Damage != null)
+            {
+                Damage = level.Damage.Value;
+            }
             if (level.ClipSize != null)
             {
                 ClipSize = level.ClipSize.Value;
@@ -259,14 +263,14 @@ namespace ZombieSurvivorZ
             if (WeaponState == State.Switching)
             {
                 //Switching
-                Console.WriteLine("IsSwitching!");
+                //Console.WriteLine("IsSwitching!");
                 return;
             }
 
             if (WeaponState == State.Reloading)
             {
                 //Reloading
-                Console.WriteLine("IsReloading!");
+                //Console.WriteLine("IsReloading!");
                 return;
             }
 
@@ -285,17 +289,23 @@ namespace ZombieSurvivorZ
                 return;
             }
 
-            Fire();
+            TriggerFire();
         }
 
-        protected virtual void Fire()
+        protected virtual void TriggerFire()
         {
-            FireRaycast(recoilSpread);
+            Fire();
+
             AmmoInClip--;
             fireTimeCount = FireTime;
 
             MuzzleFlash();
             Recoil();
+        }
+
+        protected virtual void Fire()
+        {
+            FireRaycast(recoilSpread);
         }
 
         protected virtual void FireRaycast(float recoil)
@@ -374,7 +384,7 @@ namespace ZombieSurvivorZ
                 //No more ammo to reload
                 return;
             }
-            Console.WriteLine("RELOAD!");
+            //Console.WriteLine("RELOAD!");
             WeaponState = State.Reloading;
             reloadTimeCount = ReloadTime;
         }

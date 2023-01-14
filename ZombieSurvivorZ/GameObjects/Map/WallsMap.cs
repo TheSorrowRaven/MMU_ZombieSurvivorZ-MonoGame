@@ -28,6 +28,12 @@ namespace ZombieSurvivorZ
 
         public override bool IsTileWalkable(ushort x, ushort y, out float cost)
         {
+            if (x >= 50 || y >= 50)
+            {
+                //TODO
+                cost = 0;
+                return false;
+            }
             TiledMapTile tile = Layer.GetTile(x, y);
             cost = 0;
             return tile.GlobalIdentifier == 0;

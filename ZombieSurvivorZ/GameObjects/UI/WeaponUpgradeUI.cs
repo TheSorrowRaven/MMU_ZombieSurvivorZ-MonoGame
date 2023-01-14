@@ -34,7 +34,6 @@ namespace ZombieSurvivorZ
 
         public WeaponUpgradeUI(UIBase parent, Vector2 pos, Weapon weapon, int order) : base(parent, pos, Size)
         {
-            Alpha = 1f;
             Color = new(0.2f, 0.2f, 0.2f);
 
             //UIBorder border = new(this, new(0, 0), Size);
@@ -93,8 +92,7 @@ namespace ZombieSurvivorZ
                 }
                 iconTextureName = "icon_upgrade";
 
-                AmmoPurchaseMaterials.Text = weapon.MaterialsToPurchaseAmmo.ToString();
-                AmmoPurchase.SetActive(true);
+                AmmoPurchase.SetClickable(true);
 
                 WeaponPurchase.ClearOnClick();
                 WeaponPurchase.OnClick += WeaponUpgrade_OnClick;
@@ -103,17 +101,19 @@ namespace ZombieSurvivorZ
             {
                 purchaseUpgradeMaterials = weapon.MaterialsToPurchase.ToString();
                 iconTextureName = "icon_purchase";
-                AmmoPurchase.SetActive(false);
+
+                AmmoPurchase.SetClickable(false);
 
                 WeaponPurchase.ClearOnClick();
                 WeaponPurchase.OnClick += WeaponPurchase_OnClick;
             }
+
             WeaponPurchaseTexture.Texture = Game1.GetTexture(iconTextureName);
             WeaponPurchaseMaterials.Text = purchaseUpgradeMaterials;
 
-
             AmmoPurchase.ClearOnClick();
             AmmoPurchase.OnClick += AmmoPurchase_OnClick;
+            AmmoPurchaseMaterials.Text = weapon.MaterialsToPurchaseAmmo.ToString();
         }
 
         private void WeaponPurchase_OnClick()

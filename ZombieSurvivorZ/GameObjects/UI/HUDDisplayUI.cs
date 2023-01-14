@@ -18,15 +18,15 @@ namespace ZombieSurvivorZ
         public readonly AmmoDisplayUI AmmoDisplayUI;
 
         public readonly DoorHealthDisplayUI DoorHealthDisplayUI;
+        public readonly PlayerHealthDisplayUI PlayerHealthDisplayUI;
+
+        public readonly TimerDisplayUI TimerDisplayUI;
 
         public HUDDisplayUI() : base(null, new(0, 0), new(Game1.ScreenSize.X, Game1.ScreenSize.Y))
         {
             Vector2 size = new(200, 100);
             BottomRightContainer = new(this, new(Game1.ScreenSize.X - size.X, Game1.ScreenSize.Y - size.Y), size);
-            //BottomRightContainer.Active = false;
-            //Improve this?
-            BottomRightContainer.Color = Color.White;
-            BottomRightContainer.Alpha = 0.1f;
+            BottomRightContainer.SetActive(false);
 
             Vector2 lSize = new(70, 2);
             BottomRightLineSeparator = new(BottomRightContainer, (size / 2) - (lSize / 2), lSize);
@@ -37,6 +37,9 @@ namespace ZombieSurvivorZ
 
             DoorHealthDisplayUI = new(this, new(0, 0), new(64, 20));
             DoorHealthDisplayUI.SetActive(false);
+
+            PlayerHealthDisplayUI = new(this, new(20, Game1.ScreenSize.Y - 60), new(250, 40));
+            TimerDisplayUI = new(this, new(Game1.ScreenSize.X / 2 - 200, 8), new(400, 64));
         }
 
         public override void SetActive(bool active)
@@ -46,6 +49,9 @@ namespace ZombieSurvivorZ
             BottomRightLineSeparator.SetActive(active);
             MaterialsDisplayUI.SetActive(active);
             AmmoDisplayUI.SetActive(active);
+            DoorHealthDisplayUI.SetActive(active);
+            PlayerHealthDisplayUI.SetActive(active);
+            TimerDisplayUI.SetActive(active);
         }
 
         public override void Draw(SpriteBatch spriteBatch)

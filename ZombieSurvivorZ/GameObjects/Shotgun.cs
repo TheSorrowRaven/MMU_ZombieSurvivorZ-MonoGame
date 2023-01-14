@@ -7,34 +7,46 @@ using System.Threading.Tasks;
 
 namespace ZombieSurvivorZ
 {
-    public class Rifle : Weapon
+    public class Shotgun : Weapon
     {
-        public Rifle()
+
+        public const int Pellets = 8;
+        public const float baseSpread = 16;
+
+        public Shotgun()
         {
-            WeaponName = "Rifle";
+            WeaponName = "Shotgun";
             WeaponUITexture = Game1.GetTexture("pistol_texture");
-            MaterialsToPurchase = 1000;
-            MaterialsToPurchaseAmmo = 20;
+            MaterialsToPurchase = 2500;
+            MaterialsToPurchaseAmmo = 40;
 
-            FireTime = 0.1f;
-            MuzzleFlashTime = 0.1f;
-            FiringLineFlashTime = 0.05f;
+            FireTime = 0.6f;
+            MuzzleFlashTime = 0.2f;
+            FiringLineFlashTime = 0.1f;
             ReloadTime = 1.5f;
-            SwitchTime = 0.5f;
+            SwitchTime = 0.8f;
 
-            Damage = 5;
-            ClipSize = 25;
-            CanAutoFire = true;
+            Damage = 10;
+            ClipSize = 8;
+            CanAutoFire = false;
             FiringLineStartOffset = 40;
 
-            AmmoInClip = 20;
-            AmmoReserve = 75;
+            AmmoInClip = 8;
+            AmmoReserve = 32;
 
-            RecoilSpreadIncrease = 10.0f;
-            RecoilSpreadDecrease = 60.0f;
-            RecoilMaxSpread = 35.0f;
-            RecoilTime = 0.3f;
-            RecoilAimFactor = 0.2f;
+            RecoilSpreadIncrease = 20.0f;
+            RecoilSpreadDecrease = 75.0f;
+            RecoilMaxSpread = 40.0f;
+            RecoilTime = 0.4f;
+            RecoilAimFactor = 0.4f;
+        }
+
+        protected override void Fire()
+        {
+            for (int i = 0; i < Pellets; i++)
+            {
+                FireRaycast(baseSpread);
+            }
         }
 
         public override void Initialize()

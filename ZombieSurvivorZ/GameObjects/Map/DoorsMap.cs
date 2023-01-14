@@ -17,14 +17,6 @@ namespace ZombieSurvivorZ
     {
         public class Door
         {
-            public enum BarricadeState
-            {
-                Base,
-                Level1,
-                Level2,
-                Level3
-            }
-
             public readonly Collision.BoxStaticCollider CL;
             public bool IsOpen = false;
             public bool Rotated = false;
@@ -33,12 +25,9 @@ namespace ZombieSurvivorZ
 
             public int BarricadeHealth;
 
-            public const int BarricadeLevelMaxHealth = 25;
+            public const int BarricadeLevelMaxHealth = 50;
             public const int BarricadeMaxLevel = 3;
 
-            //public float barricadingCount = 0f;
-            //public float barricadeTime = 2f;
-            //public BarricadeState barricadeLevel = BarricadeState.Base;
 
             public Door(Collision.BoxStaticCollider CL, bool Rotated)
             {
@@ -96,28 +85,6 @@ namespace ZombieSurvivorZ
                 return false;
             }
 
-            //private void TryBarricade1()
-            //{
-            //    if (barricadeLevel == BarricadeState.Level3)
-            //    {
-            //        return;
-            //    }
-
-            //    barricadingCount += (float)Time.gameTime.ElapsedGameTime.TotalSeconds;
-            //    Console.WriteLine(barricadingCount);
-
-            //    if (barricadingCount > barricadeTime)
-            //    {
-            //        ResetBarricading();
-            //        barricadeLevel += 1;
-            //        Console.WriteLine("barricade level: " + barricadeLevel);
-            //    }
-            //}
-
-            //public void ResetBarricading()
-            //{
-            //    barricadingCount = 0f;
-            //}
         }
 
         public readonly Dictionary<Vector2Int, Door> Doors = new();
@@ -140,7 +107,8 @@ namespace ZombieSurvivorZ
         private readonly List<Vector2Int> CooldownDoors = new();
 
         private const int OpenDoorCost = 0;
-        private const int ClosedDoorCost = 10;  //Base cost
+        private const int ClosedDoorCost = 2;  //Base cost
+        private const float BarricadeCostMultiplier = 0.1f;
         private const int ZombieDestroyCooldown = 1;
 
         private const float ClosingDoorSpeed = 0.5f;
@@ -256,7 +224,7 @@ namespace ZombieSurvivorZ
             }
             else
             {
-                return ClosedDoorCost + door.BarricadeHealth * 2;
+                return ClosedDoorCost + door.BarricadeHealth * BarricadeCostMultiplier;
             }
         }
 
@@ -347,9 +315,18 @@ namespace ZombieSurvivorZ
             //door.CL.Set(TileSize.X, TileSize.Y, topLeftTile.X, topLeftTile.Y);
             ExpandingDoors.Add(doorCell);
 
-            MapManager.TileGraph.UpdateNodeCost(doorCell, GetCostFromDoor(doorCell)); //TODO add base cost with barricade weight
+            MapManager.TileGraph.UpdateNodeCost(doorCell, GetCostFromDoor(doorCell));
         }
 
+        public bool TryBarricadeDoor(Vector2Int doorCell)
+        {
+            Door door = Doors[doorCell];
+            bool barricaded = door.TryBarricade();
+
+            MapManager.TileGraph.UpdateNodeCost(doorCell, GetCostFromDoor(doorCell));
+
+            return barricaded;
+        }
 
         public void DealDamage(Vector2Int doorCell, int damage)
         {
@@ -361,6 +338,7 @@ namespace ZombieSurvivorZ
             else
             {
                 door.BarricadeHealth = Math.Max(0, door.BarricadeHealth - damage);
+                MapManager.TileGraph.UpdateNodeCost(doorCell, GetCostFromDoor(doorCell));
             }
             ZombieAttackCooldownDoor(doorCell);
         }
