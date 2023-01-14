@@ -20,6 +20,7 @@ namespace ZombieSurvivorZ
         private const int MaterialGainPerZombie = 25;
 
         private const int MaxHealth = 100;
+        private const float KnockbackOnHit = 12;
 
         private Reticle reticle;
         private Weapon weapon;
@@ -89,6 +90,9 @@ namespace ZombieSurvivorZ
             DebugGun debugGun = CreateWeapon(new DebugGun());
             OwnWeapon(debugGun);
 
+            Rifle rifle = CreateWeapon(new Rifle());
+            //OwnWeapon(rifle);
+
             AddWeaponsToWeaponUpgradeUI();
 
             reticle = new();
@@ -124,8 +128,9 @@ namespace ZombieSurvivorZ
 
         public void DealDamage(int damage, Vector2 direction)
         {
-            Game1.BloodManager.AddBlood(Position, MathF.Atan2(direction.Y, direction.X));
-            
+            Game1.BloodManager.AddHumanBlood(Position, MathF.Atan2(direction.Y, direction.X));
+            Position += direction * KnockbackOnHit;
+
             health -= damage;
             if (health <= 0)
             {

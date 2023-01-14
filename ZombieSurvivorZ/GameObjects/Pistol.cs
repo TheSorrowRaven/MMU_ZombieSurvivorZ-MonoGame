@@ -34,6 +34,7 @@ namespace ZombieSurvivorZ
             RecoilSpreadDecrease = 50.0f;
             RecoilMaxSpread = 25f;
             RecoilTime = 0.3f;
+            RecoilAimFactor = 0.5f;
 
             Levels = new Level[]
             {

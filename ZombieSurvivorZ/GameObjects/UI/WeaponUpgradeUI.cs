@@ -14,6 +14,8 @@ namespace ZombieSurvivorZ
     {
 
         public readonly UITexture WeaponTexture;
+        public readonly UIBox WeaponTextureBackground;
+
         public readonly UIText WeaponNumber;
         public readonly UIText WeaponName;
 
@@ -32,30 +34,38 @@ namespace ZombieSurvivorZ
 
         public WeaponUpgradeUI(UIBase parent, Vector2 pos, Weapon weapon, int order) : base(parent, pos, Size)
         {
-            Alpha = 0.4f;
-            Color = Color.LightSlateGray;
+            Alpha = 1f;
+            Color = new(0.2f, 0.2f, 0.2f);
 
             //UIBorder border = new(this, new(0, 0), Size);
             //border.Color = Color.DarkSlateGray;
 
             //80,100 size before purchase & ammo
+            WeaponTextureBackground = new(this, new(16, 8), new(64, 64));
+            WeaponTextureBackground.Color = Color.DarkGray;
             WeaponTexture = new(this, new(16, 8), new(64, 64), Game1.GetTexture("pistol_texture"));
 
-            WeaponNumber = new(this, new(12, 4), new(16, 16));
+            WeaponNumber = new(this, new(14, 8), new(16, 16));
             WeaponNumber.Text = order.ToString();
+            WeaponNumber.Color = Color.Black;
 
             WeaponName = new(WeaponTexture, new(0, WeaponTexture.Size.Y), new(WeaponTexture.Size.X, 20));
             WeaponName.Align = new(0.5f, 0f);
+            WeaponName.Color = Color.AntiqueWhite;
 
             WeaponPurchase = UIButton.Create(this, new(88, 10), new(104, 80));
+            WeaponPurchase.fill.Color = Color.LightGray;
             WeaponPurchaseMaterials = new(WeaponPurchase, new(5, 16), new(48, 48));
             WeaponPurchaseMaterials.Text = "500";
+            WeaponPurchaseMaterials.Color = Color.Black;
             WeaponPurchaseTexture = new(WeaponPurchase, new(51, 16), new(48, 48), Game1.GetTexture("icon_purchase"));
 
             AmmoPurchase = UIButton.Create(this, new(192, 29), new(75, 42));
+            AmmoPurchase.fill.Color = Color.LightGray;
             AmmoPurchaseTexture = new(AmmoPurchase, new(5, 5), new(32, 32), Game1.GetTexture("icon_ammo"));
             AmmoPurchaseMaterials = new(AmmoPurchase, new(37, 5), new(32, 32));
             AmmoPurchaseMaterials.Text = "50";
+            AmmoPurchaseMaterials.Color = Color.Black;
 
             SetStatsFromWeapon(weapon);
         }
@@ -154,6 +164,7 @@ namespace ZombieSurvivorZ
         {
             base.SetActive(active);
             WeaponTexture.SetActive(active);
+            WeaponTextureBackground.SetActive(active);
             WeaponNumber.SetActive(active);
             WeaponName.SetActive(active);
             AmmoPurchase.SetActive(active);

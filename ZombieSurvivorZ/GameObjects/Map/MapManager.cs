@@ -129,28 +129,27 @@ namespace ZombieSurvivorZ
             {
                 return new(tile.X, tile.Y + (position.Y < center.Y ? -1 : 1));
             }
-
         }
 
-        //public Vector2Int Get0CostWalkableSurroundingTile(Vector2Int center)
-        //{
-        //    for (int y = -1; y <= 1; y++)
-        //    {
-        //        for (int x = -1; x <= 1; x++)
-        //        {
-        //            if (x == 0 && y == 0)
-        //            {
-        //                continue;
-        //            }
-        //            Vector2Int cell = new(center.X + x, center.Y + y);
-        //            if (CellIs0CostWalkable(cell))
-        //            {
-        //                return cell;
-        //            }
-        //        }
-        //    }
-        //    return center;
-        //}
+        public Vector2Int Get0CostWalkableSurroundingTile(Vector2Int center)
+        {
+            for (int y = -1; y <= 1; y++)
+            {
+                for (int x = -1; x <= 1; x++)
+                {
+                    if (x == 0 && y == 0)
+                    {
+                        continue;
+                    }
+                    Vector2Int cell = new(center.X + x, center.Y + y);
+                    if (CellIs0CostWalkable(cell))
+                    {
+                        return cell;
+                    }
+                }
+            }
+            return center;
+        }
         //public Vector2Int Get0CostWalkableSideTile(Vector2Int center)
         //{
         //    for (int y = -1; y <= 1; y++)
@@ -178,6 +177,11 @@ namespace ZombieSurvivorZ
         {
             TileGraph.TileData tileData = GetTileData((ushort)cell.X, (ushort)cell.Y);
             return tileData.walkable && tileData.cost == 0;
+        }
+        public bool CellIsWalkable(Vector2Int cell)
+        {
+            TileGraph.TileData tileData = GetTileData((ushort)cell.X, (ushort)cell.Y);
+            return tileData.walkable;
         }
 
         public override void Update()

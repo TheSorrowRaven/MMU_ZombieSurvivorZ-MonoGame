@@ -88,6 +88,7 @@ namespace ZombieSurvivorZ
         public float RecoilSpreadIncrease { get; protected set; }
         public float RecoilSpreadDecrease { get; protected set; }
         public float RecoilMaxSpread { get; protected set; }
+        public float RecoilAimFactor { get; protected set; }
 
         //Ammo
         public int AmmoReserve { get; protected set; }
@@ -289,7 +290,7 @@ namespace ZombieSurvivorZ
 
         protected virtual void Fire()
         {
-            FireRaycast();
+            FireRaycast(recoilSpread);
             AmmoInClip--;
             fireTimeCount = FireTime;
 
@@ -297,12 +298,15 @@ namespace ZombieSurvivorZ
             Recoil();
         }
 
-        protected virtual void FireRaycast()
+        protected virtual void FireRaycast(float recoil)
         {
-            Vector2 direction = Heading;
-            Vector2 start = Position + direction * FiringLineStartOffset * Scale.X;
+            Vector2 originalDirection = Heading;
+            float rotation = ((MathF.Atan2(Heading.Y, Heading.X) * (180 / MathF.PI)) + (Random.Shared.NextSingle(-recoil, recoil) * RecoilAimFactor)) * MathF.PI / 180;
+            Vector2 direction = new(MathF.Cos(rotation), MathF.Sin(rotation));
+            Vector2 start = Position + originalDirection * FiringLineStartOffset * Scale.X;
             Vector2 end;
-            if (!Collision.Raycast(Position, direction, IgnoreObjects, out Collision.Collider collider, out float hitDistance))
+
+            if (!Raycast(Position, direction, IgnoreObjects, out Collider collider, out float hitDistance))
             {
                 hitDistance = 1000;
             }
