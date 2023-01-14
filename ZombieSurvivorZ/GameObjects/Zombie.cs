@@ -82,7 +82,15 @@ namespace ZombieSurvivorZ
             AttackingAnim = new Texture2D[9];
             PopulateAnim(AttackingAnim, "Zombie/skeleton-attack_");
 
+            EnterChaseState(false);
+            CurrentState = State.Chase;
+
             Texture = ChasingAnim[0];   //Safe
+        }
+
+        ~Zombie()
+        {
+            Console.WriteLine("Zombie released from memory");
         }
 
         private static void PopulateAnim(Texture2D[] anim, string name)
@@ -113,6 +121,8 @@ namespace ZombieSurvivorZ
             CL.DestroyCollider();
             CL = null;
             ChangeState(State.Die);
+            Game1.MapManager.ZombieSpawnLayer.ZombieDied(this);
+            Destroy();
         }
 
         private void CalculatePathToPlayer()
@@ -202,11 +212,15 @@ namespace ZombieSurvivorZ
             UpdateAnim();
         }
 
-        private void EnterChaseState()
+        private void EnterChaseState(bool updatePath = true)
         {
             SetAnim(ChasingAnim);
             animRepeat = true;
-            CalculatePathToPlayer();
+
+            if (updatePath)
+            {
+                CalculatePathToPlayer();
+            }
         }
 
         private void EnterAttackState()
@@ -255,6 +269,7 @@ namespace ZombieSurvivorZ
                     return;
                 }
 
+                CheckNextTargetIsDoor();
                 Position += MovementSpeed * Time.deltaTime * directionToPlayer;
                 Heading = directionToPlayer;
                 wasSeeingPlayer = true;
@@ -331,13 +346,7 @@ namespace ZombieSurvivorZ
                 //No damage when it's open
                 return;
             }
-
-            //TODO EUWERN
-            //door.health??
-            //if (door.health <= 0)
-            {
-                Game1.MapManager.DoorsLayer.DealDamage(doorCell, Damage);
-            }
+            Game1.MapManager.DoorsLayer.DealDamage(doorCell, Damage);
         }
 
         private void HitPlayer(Vector2 direction)
@@ -370,6 +379,12 @@ namespace ZombieSurvivorZ
                 }
                 direction /= distance;  //Normalize
                 Heading = direction;
+
+                if (distance > 100)
+                {
+                    CalculatePathToPlayer();
+                    return;
+                }
 
                 float move = MovementSpeed * Time.deltaTime;
                 if (distance < move)
@@ -405,6 +420,17 @@ namespace ZombieSurvivorZ
                 return;
             }
             hasNextTargetPos = false;
+        }
+
+        private void CheckNextTargetIsDoor()
+        {
+            Vector2 checkPos = Position + Heading * (BaseColliderSize + 16);
+            Vector2Int checkCell = Game1.MapManager.PositionToLocal(checkPos);
+            nextTargetIsDoor = Game1.MapManager.DoorsLayer.TryGetDoor(checkCell, out _);
+            if (nextTargetIsDoor)
+            {
+                doorCell = checkCell;
+            }
         }
 
         public override void OnCollision(DynamicCollider current, Collider other, Vector2 penetrationVector)

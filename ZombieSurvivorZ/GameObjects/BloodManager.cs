@@ -42,7 +42,7 @@ namespace ZombieSurvivorZ
             bloodArr[bloodIndex] = (pos, rotation + (45 * MathF.PI / 180));
 
             bloodIndex++;
-            bloodCount++;
+            bloodCount = Math.Min(bloodCount + 1, maxBlood);
             if (bloodIndex >= maxBlood)
             {
                 bloodIndex = 0;

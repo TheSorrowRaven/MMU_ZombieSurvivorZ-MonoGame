@@ -108,9 +108,6 @@ namespace ZombieSurvivorZ
 
             Input.Update(gameTime);
 
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
-
             UISuppressClick = false;
             //Objects Update
             World.UI.Update(gameTime);

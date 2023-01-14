@@ -16,12 +16,37 @@ namespace ZombieSurvivorZ
     {
 
         public readonly List<Zombie> Zombies = new();
+        public readonly List<Vector2Int> SpawnPoints = new();
 
         public ZombieSpawnMap(TiledMapTileLayer layer) : base(layer)
         {
+            SpawnZombie(new(32, 32));
+        }
+
+        public override void Update()
+        {
+            base.Update();
+
+            if (Time.frameCount % 30 == 0)
+            {
+                Vector2Int spawnPoint = SpawnPoints[Random.Shared.Next(SpawnPoints.Count)];
+                Vector2 position = MapManager.LocalToTileCenterPosition(spawnPoint);
+                SpawnZombie(position);
+                Console.WriteLine(Zombies.Count);
+            }
+
+        }
+
+        public void ZombieDied(Zombie zombie)
+        {
+            Zombies.Remove(zombie);
+        }
+
+        public void SpawnZombie(Vector2 position)
+        {
             Zombies.Add(new()
             {
-                Position = new(32, 32),
+                Position = position,
                 Scale = new(0.25f, 0.25f)
             });
         }
@@ -37,6 +62,14 @@ namespace ZombieSurvivorZ
                 }
             }
             return false;
+        }
+
+
+        protected override void InitializeTile(int x, int y, TiledMapTile tile)
+        {
+            base.InitializeTile(x, y, tile);
+
+            SpawnPoints.Add(new(x, y));
         }
 
         public override bool IsTileWalkable(ushort x, ushort y, out float cost)
