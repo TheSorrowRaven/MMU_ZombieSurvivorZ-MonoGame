@@ -17,6 +17,8 @@ namespace ZombieSurvivorZ
         public readonly MaterialsDisplayUI MaterialsDisplayUI;
         public readonly AmmoDisplayUI AmmoDisplayUI;
 
+        public readonly DoorHealthDisplayUI DoorHealthDisplayUI;
+
         public HUDDisplayUI() : base(null, new(0, 0), new(Game1.ScreenSize.X, Game1.ScreenSize.Y))
         {
             Vector2 size = new(200, 100);
@@ -32,6 +34,9 @@ namespace ZombieSurvivorZ
 
             AmmoDisplayUI = new(BottomRightContainer, new(0, 0), new(200, 50));
             MaterialsDisplayUI = new(BottomRightContainer, new(0, 50), new(200, 50));
+
+            DoorHealthDisplayUI = new(this, new(0, 0), new(64, 20));
+            DoorHealthDisplayUI.SetActive(false);
         }
 
         public override void SetActive(bool active)
