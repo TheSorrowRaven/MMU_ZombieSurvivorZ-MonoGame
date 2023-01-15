@@ -27,7 +27,7 @@ namespace ZombieSurvivorZ
             CanAutoFire = true;
             FiringLineStartOffset = 40;
 
-            AmmoInClip = 20;
+            AmmoInClip = 25;
             AmmoReserve = 75;
 
             RecoilSpreadIncrease = 10.0f;
@@ -35,19 +35,33 @@ namespace ZombieSurvivorZ
             RecoilMaxSpread = 35.0f;
             RecoilTime = 0.3f;
             RecoilAimFactor = 0.2f;
+
+            Levels = new Level[]
+            {
+                new Level
+                {
+                    UpgradeCost = 100,
+                    ClipSize = 30,
+                },
+                new Level
+                {
+                    UpgradeCost = 150,
+                    Damage = 8,
+                }
+            };
         }
 
         public override void Initialize()
         {
-            PlayerBodyTextureHolding = Game1.GetTexture("Player/player_body_holdingpistol");
-            PlayerBodyTextureMuzzleFlashing = Game1.GetTexture("Player/player_body_recoilingpistol");
+            PlayerBodyTextureHolding = Game1.GetTexture("Player/player_body_holdingrifle");
+            PlayerBodyTextureMuzzleFlashing = Game1.GetTexture("Player/player_body_recoilingrifle");
             PlayerBodyTextureReloading = Game1.GetTexture("Player/player_body_reloadingpistol");
 
-            WeaponTexture = Game1.GetTexture("Player/player_pistol");
-            WeaponMuzzleFlashingTexture = Game1.GetTexture("Player/player_recoilingpistol");
-            WeaponReloadTexture = Game1.GetTexture("Player/player_reloadingpistol");
+            WeaponTexture = Game1.GetTexture("Player/player_rifle");
+            WeaponMuzzleFlashingTexture = Game1.GetTexture("Player/player_recoilingrifle");
+            WeaponReloadTexture = Game1.GetTexture("Player/player_reloadingrifle");
 
-            WeaponFlashTexture = Game1.GetTexture("Player/player_pistolflash");
+            WeaponFlashTexture = Game1.GetTexture("Player/player_rifleflash");
 
             Texture = WeaponTexture;
 

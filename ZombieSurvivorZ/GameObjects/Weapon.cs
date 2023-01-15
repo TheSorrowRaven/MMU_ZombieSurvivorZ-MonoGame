@@ -219,7 +219,7 @@ namespace ZombieSurvivorZ
             {
                 RecoilMaxSpread = level.RecoilMaxSpread.Value;
             }
-
+            AmmoInClip = ClipSize;
         }
 
 
