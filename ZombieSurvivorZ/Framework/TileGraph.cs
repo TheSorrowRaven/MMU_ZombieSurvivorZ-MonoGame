@@ -16,6 +16,7 @@ namespace ZombieSurvivorZ
 
         public HashSet<Vector2Int> Nodes;
         public Dictionary<Vector2Int, float[]> Connections;
+        //public HashSet<Vector2Int> ZombieCells = new();
 
         private const float Sqr2 = 1.41421356237f;
         private static readonly float[] Cost = { Sqr2, 1, Sqr2, 1, 1, Sqr2, 1, Sqr2 };
@@ -47,11 +48,25 @@ namespace ZombieSurvivorZ
                     {
                         continue;
                     }
+                    //if (weights[i] == 0)
+                    //{
+                    //    continue;
+                    //}
                     weights[i] = Cost[i] + cost;
 
                 }
             }
         }
+
+        //public void AddZombieCell(Vector2Int cell)
+        //{
+        //    ZombieCells.Add(cell);
+        //}
+        //public void RemoveZombieCell(Vector2Int cell)
+        //{
+        //    ZombieCells.Remove(cell);
+        //}
+
 
         public void BFSConstructGraph(Func<ushort, ushort, TileData> getTileDataFunc, int xStart, int yStart)
         {
@@ -106,20 +121,20 @@ namespace ZombieSurvivorZ
 
                         if (Math.Abs(x * y) == 1) //Is Diagonal
                         {
-                            if (tileCost != 0)
-                            {
-                                continue;
-                            }
+                            //if (tileCost != 0)
+                            //{
+                            //    continue;
+                            //}
 
                             var td = getTileDataFunc((ushort)(xN), (ushort)(current.Y));
-                            if (!td.walkable || td.cost != 0)
+                            if (!td.walkable/* || td.cost != 0*/)
                             {
                                 //No connection, Don't set weight
                                 //Console.WriteLine("Skip");
                                 continue;
                             }
                             td = getTileDataFunc((ushort)(current.X), (ushort)(yN));
-                            if (!td.walkable || td.cost != 0)
+                            if (!td.walkable/* || td.cost != 0*/)
                             {
                                 //No connection, Don't set weight
                                 //Console.WriteLine("Skip");

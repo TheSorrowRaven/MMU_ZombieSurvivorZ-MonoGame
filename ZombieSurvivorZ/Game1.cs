@@ -37,6 +37,7 @@ namespace ZombieSurvivorZ
 
         public static UpgradeWindowUI UpgradeWindowUI { get; private set; }
         public static HUDDisplayUI HUDDisplayUI { get; private set; }
+        public static ScoreDisplayUI ScoreDisplayUI { get; private set; }
         public static bool UISuppressClick { get; set; } = false;
 
 
@@ -81,6 +82,7 @@ namespace ZombieSurvivorZ
             FiringLines = new();
             UpgradeWindowUI = new();
             HUDDisplayUI = new();
+            ScoreDisplayUI = new();
         }
 
         public static Texture2D GetTexture(string name)

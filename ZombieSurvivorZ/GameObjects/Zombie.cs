@@ -20,6 +20,8 @@ namespace ZombieSurvivorZ
             Die
         }
 
+        public const float InCellCost = 10;
+
         private const float StuckInPlaceTime = 2f;
 
         private const float AnimSpeed = 0.1f;
@@ -127,6 +129,8 @@ namespace ZombieSurvivorZ
             ChangeState(State.Die);
             Game1.MapManager.ZombieSpawnLayer.ZombieDied(this);
             Destroy();
+
+            //Game1.MapManager.TileGraph.RemoveZombieCell(CellPosition);
         }
 
         private void CalculatePathToPlayer()
@@ -201,13 +205,16 @@ namespace ZombieSurvivorZ
             {
                 if (!Game1.MapManager.CellIsWalkable(zombieCell))
                 {
-                    zombieCell = Game1.MapManager.Get0CostWalkableSurroundingTile(zombieCell);
-                    Position = Game1.MapManager.LocalToTileCenterPosition(zombieCell);
+                    Position = Game1.MapManager.ZombieSpawnLayer.GetRandomSpawnPosition();
+                    zombieCell = Game1.MapManager.PositionToLocal(Position);
                 }
+                //Game1.MapManager.TileGraph.RemoveZombieCell(lastCellPos);
+                //Game1.MapManager.TileGraph.AddZombieCell(zombieCell);
+
                 lastCellPos = zombieCell;
             }
 
-            if (lastPos == Position)
+            if (lastPos == Position && CurrentState == State.Chase)
             {
                 stuckInPlaceTimeCount += Time.deltaTime;
                 if (stuckInPlaceTimeCount > StuckInPlaceTime)
@@ -220,6 +227,12 @@ namespace ZombieSurvivorZ
                     zombieCell = Game1.MapManager.PositionToLocal(Position);
                     Position = Game1.MapManager.LocalToTileCenterPosition(zombieCell);
 
+                    if (Game1.MapManager.DoorsLayer.SurroundingAreDoors(zombieCell, out Vector2Int door))
+                    {
+                        nextTargetIsDoor = true;
+                        doorCell = door;
+                    }
+
                     CalculatePathToPlayer();
                     stuckTotal++;
                     movementSpeed = MovementSpeed * 10;
@@ -230,7 +243,12 @@ namespace ZombieSurvivorZ
             {
                 lastPos = Position;
                 stuckInPlaceTimeCount = 0;
+                stuckTotal = 0;
                 movementSpeed = MovementSpeed;
+            }
+            if (float.IsNaN(Position.X) || float.IsNaN(Position.Y))
+            {
+                Position = Game1.MapManager.ZombieSpawnLayer.GetRandomSpawnPosition();
             }
 
             switch (CurrentState)
@@ -339,6 +357,10 @@ namespace ZombieSurvivorZ
         private void TryDealDamage()
         {
 
+            if (!nextTargetIsDoor)
+            {
+                CheckNextTargetIsDoor();
+            }
             if (nextTargetIsDoor)
             {
                 Vector2Int doorDistance = CellPosition - doorCell;
