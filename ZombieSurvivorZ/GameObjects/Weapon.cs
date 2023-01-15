@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
@@ -117,6 +118,10 @@ namespace ZombieSurvivorZ
 
         private readonly GameObject[] IgnoreObjects = new GameObject[1];
         private WeaponUpgradeUI WeaponUpgradeUIRef;
+
+        // Sound effects
+        public SoundEffect WeaponFireSE { get; protected set; }
+        public SoundEffect WeaponReloadSE { get; protected set; }
 
         public void SetWeaponUpgradeUI(WeaponUpgradeUI weaponUpgradeUIRef)
         {
@@ -295,6 +300,7 @@ namespace ZombieSurvivorZ
         protected virtual void TriggerFire()
         {
             Fire();
+            WeaponFireSE.Play();
 
             AmmoInClip--;
             fireTimeCount = FireTime;
@@ -385,6 +391,10 @@ namespace ZombieSurvivorZ
                 return;
             }
             //Console.WriteLine("RELOAD!");
+            if (WeaponState != State.Reloading)
+            {
+                WeaponReloadSE.Play();
+            }
             WeaponState = State.Reloading;
             reloadTimeCount = ReloadTime;
         }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
@@ -56,10 +57,15 @@ namespace ZombieSurvivorZ
         public const int BarricadeMaterialCost = 5;
         private float barricadeTimeCount;
 
-
         public bool hasDied = false;
         public float timeSurvived = 0;
 
+        public static AudioListener PlayerListener { get; set; }
+        private SoundEffect PlayerTakeDamageSE { get; set; }
+        private SoundEffect PlayerDeathSE { get; set; }
+        private SoundEffect DoorOpenSE { get; set; }
+        private SoundEffect DoorCloseSE { get; set; }
+        private SoundEffect DoorBarricadingSE { get; set; }
 
         public override Vector2 Position
         {
@@ -84,6 +90,14 @@ namespace ZombieSurvivorZ
 
             UsePromptTexture = Game1.GetTexture("Keys/toggle_door");
             BarricadePromptTexture = Game1.GetTexture("Keys/barricade");
+
+            PlayerTakeDamageSE = Game1.GetSoundEffect("Audio/zombie_attackdoor");
+            PlayerDeathSE = Game1.GetSoundEffect("Audio/zombie_attackdoor");
+            DoorOpenSE = Game1.GetSoundEffect("Audio/door_open");
+            DoorCloseSE = Game1.GetSoundEffect("Audio/door_close");
+            DoorBarricadingSE = Game1.GetSoundEffect("Audio/zombie_attackdoor");
+
+            PlayerListener = new AudioListener();
 
             RotationOffset = 90 * MathF.PI / 180;
             Position = new(0, 0);
@@ -145,6 +159,7 @@ namespace ZombieSurvivorZ
             }
             Position += movement * (MovementSpeed * Time.deltaTime);
             Heading = Game1.Camera.ScreenToWorld(reticle.Position) - Position;
+            PlayerListener.Position = new(Position / 125, 0);
         }
 
         private float gracePeriodHealTime = 1f;
@@ -355,7 +370,14 @@ namespace ZombieSurvivorZ
             }
             if (Input.IsRMouseFirstDown())
             {
-                Game1.MapManager.DoorsLayer.ToggleDoor(SelectingDoor);
+                if (Game1.MapManager.DoorsLayer.ToggleDoor(SelectingDoor))
+                {
+                    DoorOpenSE.Play();
+                }
+                else
+                {
+                    DoorCloseSE.Play();
+                }
             }
             Game1.HUDDisplayUI.DoorHealthDisplayUI.SetActive(true);
             Vector2 doorPos = Game1.MapManager.LocalToTileTopLeftPosition(SelectingDoor);

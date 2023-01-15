@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
@@ -77,6 +78,14 @@ namespace ZombieSurvivorZ
         private float stuckInPlaceTimeCount = 0;
         private int stuckTotal = 0;
 
+        private SoundEffect ZombieTakeDamageSE { get; set; }
+        private SoundEffect ZombieAttackDoorSE { get; set; }
+        private SoundEffect ZombieAttackPlayerSE { get; set; }
+        public AudioEmitter ZombieEmitter { get; set; }
+        SoundEffectInstance takeDamageInstance;
+        SoundEffectInstance attackDoorInstance;
+        SoundEffectInstance attackPlayerInstance;
+
         public Zombie()
         {
             movementSpeed = MovementSpeed;
@@ -97,6 +106,10 @@ namespace ZombieSurvivorZ
             CurrentState = State.Chase;
 
             Texture = ChasingAnim[0];   //Safe
+
+            ZombieTakeDamageSE = Game1.GetSoundEffect("Audio/zombie_attackdoor");
+            ZombieAttackPlayerSE = Game1.GetSoundEffect("Audio/zombie_attackdoor");
+            ZombieAttackDoorSE = Game1.GetSoundEffect("Audio/zombie_attackdoor");
         }
 
         private static void PopulateAnim(Texture2D[] anim, string name)
@@ -109,6 +122,11 @@ namespace ZombieSurvivorZ
 
         public override void Initialize()
         {
+            ZombieEmitter = new AudioEmitter();
+            ZombieEmitter.DopplerScale = 5.0f;
+            takeDamageInstance = ZombieTakeDamageSE.CreateInstance();
+            attackDoorInstance = ZombieAttackDoorSE.CreateInstance();
+            attackPlayerInstance = ZombieAttackPlayerSE.CreateInstance();
         }
 
         public void DealDamage(int damage, Vector2 direction)
@@ -263,6 +281,12 @@ namespace ZombieSurvivorZ
                     break;
             }
             UpdateAnim();
+
+            ZombieEmitter.Position = new(Position / 125, 0);
+
+            takeDamageInstance.Apply3D(Player.PlayerListener, ZombieEmitter);
+            attackDoorInstance.Apply3D(Player.PlayerListener, ZombieEmitter);
+            attackPlayerInstance.Apply3D(Player.PlayerListener, ZombieEmitter);
         }
 
         private void EnterChaseState(bool updatePath = true)
@@ -396,6 +420,7 @@ namespace ZombieSurvivorZ
                 //No damage when it's open
                 return;
             }
+            attackDoorInstance.Play();
             Game1.MapManager.DoorsLayer.DealDamage(doorCell, Damage);
         }
 

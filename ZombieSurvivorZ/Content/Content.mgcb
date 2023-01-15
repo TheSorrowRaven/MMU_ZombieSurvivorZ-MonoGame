@@ -16,6 +16,60 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin Audio/debug.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/debug.mp3
+
+#begin Audio/door_close.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/door_close.mp3
+
+#begin Audio/door_open.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/door_open.mp3
+
+#begin Audio/pistol.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/pistol.mp3
+
+#begin Audio/reload.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/reload.mp3
+
+#begin Audio/rifle.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/rifle.mp3
+
+#begin Audio/shotgun.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/shotgun.mp3
+
+#begin Audio/zombie_attackdoor.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/zombie_attackdoor.mp3
+
+#begin Audio/zombie_door2.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/zombie_door2.mp3
+
 #begin bloodsplat_zombie.png
 /importer:TextureImporter
 /processor:TextureProcessor

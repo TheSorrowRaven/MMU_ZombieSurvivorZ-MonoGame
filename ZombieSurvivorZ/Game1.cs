@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
@@ -17,6 +18,7 @@ namespace ZombieSurvivorZ
         public static readonly Game1 Current = new();
 
         private static readonly Dictionary<string, Texture2D> TextureBank = new();
+        private static readonly Dictionary<string, SoundEffect> SoundEffects = new();
         public static GameWindow Screen { get; private set; }
         public static Vector2 ScreenCenter => new(Screen.ClientBounds.Width / 2, Screen.ClientBounds.Height / 2);
         public static Vector2 ScreenSize => Screen.ClientBounds.Size.ToVector2();
@@ -56,6 +58,7 @@ namespace ZombieSurvivorZ
             Graphics.PreferredBackBufferHeight = 720;
             Graphics.ApplyChanges();
 
+            SoundEffect.MasterVolume = 0.4f;
 
             Camera = new();
             Collision.Initialize();
@@ -93,6 +96,17 @@ namespace ZombieSurvivorZ
                 TextureBank.Add(name, texture);
             }
             return texture;
+        }
+
+        public static SoundEffect GetSoundEffect(string name)
+        {
+            if (!SoundEffects.TryGetValue(name, out SoundEffect soundeffect))
+            {
+                soundeffect = Current.Content.Load<SoundEffect>(name);
+                SoundEffects.Add(name, soundeffect);
+            }
+
+            return soundeffect;
         }
 
         public static T GetContent<T>(string name)
