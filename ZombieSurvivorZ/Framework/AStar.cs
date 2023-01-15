@@ -137,7 +137,7 @@ namespace ZombieSurvivorZ
                         i++;
                         if (costs[i] == 0) continue;
 
-                        float newCost = curRecord.costSoFar + costs[i];
+                        float newCost = curRecord.costSoFar + costs[i]/* + (graph.ZombieCells.Contains(currentTile) ? Zombie.InCellCost : 0)*/;
 
                         Vector2Int neighbourTile = new(currentTile.X + x, currentTile.Y + y);
 

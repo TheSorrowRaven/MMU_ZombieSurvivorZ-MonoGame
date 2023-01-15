@@ -15,45 +15,16 @@ namespace ZombieSurvivorZ
     public class ZombieSpawnMap : BaseMap
     {
 
-        public class Wave
-        {
-            public bool isGrace;
-            public int zombies;
-            public float period;
-
-        }
-
         private const int minZombies = 1;
+
+        private const float gracePeriod = 20f;
+        private const int zombiesIncrease = 10;
+        private const float zombiesSpawnTime = 10f;
 
         public readonly List<Zombie> Zombies = new();
         public readonly List<Vector2Int> SpawnPoints = new();
-        public readonly Wave[] waves = new Wave[]
-        {
-            new Wave()
-            {
-                //prep
-                isGrace = true,
-                period = 20f,
-            },
-            new Wave()
-            {
-                zombies = 6,
-                period = 20f
-            },
-            new Wave()
-            {
-                isGrace = true,
-                period = 10f,
-            },
-            new Wave()
-            {
-                zombies = 100,
-                period = 30f
-            },
-        };
 
-        private int waveIndex;
-        private Wave currentWave;
+        private int waveCount;
 
         public bool allZombiesKilled = false;
         private bool isGrace;
@@ -62,6 +33,8 @@ namespace ZombieSurvivorZ
 
         private float zombieSpawnCooldown;
         private float zombieSpawnCooldownCount;
+
+        public int zombiesKilled = 0;
 
         public ZombieSpawnMap(TiledMapTileLayer layer) : base(layer)
         {
@@ -73,7 +46,6 @@ namespace ZombieSurvivorZ
         {
             base.Initialize();
 
-            waveIndex = -1;
             NextWave();
         }
 
@@ -85,7 +57,7 @@ namespace ZombieSurvivorZ
 
             if (isGrace)
             {
-
+                Game1.Player.IsGracePeriodUpdate();
             }
             else
             {
@@ -144,17 +116,20 @@ namespace ZombieSurvivorZ
 
         private void NextWave()
         {
-            waveIndex++;
-            if (waveIndex >= waves.Length)
+            if (waveCount % 2 == 0)
             {
-                //TODO repeat?
-                waveIndex = 0;
+                isGrace = true;
+                waveTimerCount = gracePeriod;
+                waveZombiesToSpawn = 0;
             }
-            currentWave = waves[waveIndex];
+            else
+            {
+                isGrace = false;
+                waveTimerCount = zombiesSpawnTime;
+                waveZombiesToSpawn = ((waveCount + 1) / 2) * zombiesIncrease;
+            }
+            waveCount++;
 
-            waveZombiesToSpawn = currentWave.zombies;
-            waveTimerCount = currentWave.period;
-            isGrace = currentWave.isGrace;
             allZombiesKilled = waveZombiesToSpawn > 0;
 
             zombieSpawnCooldown = waveTimerCount / waveZombiesToSpawn;
@@ -175,6 +150,7 @@ namespace ZombieSurvivorZ
         public void ZombieDied(Zombie zombie)
         {
             Zombies.Remove(zombie);
+            zombiesKilled++;
         }
 
         private void SpawnRandomZombie()
@@ -182,6 +158,13 @@ namespace ZombieSurvivorZ
             Vector2Int spawnPoint = SpawnPoints[Random.Shared.Next(SpawnPoints.Count)];
             Vector2 position = MapManager.LocalToTileCenterPosition(spawnPoint);
             SpawnZombie(position);
+        }
+
+        public Vector2 GetRandomSpawnPosition()
+        {
+            Vector2Int spawnPoint = SpawnPoints[Random.Shared.Next(SpawnPoints.Count)];
+            Vector2 position = MapManager.LocalToTileCenterPosition(spawnPoint);
+            return position;
         }
 
         public void SpawnZombie(Vector2 position)

@@ -57,6 +57,10 @@ namespace ZombieSurvivorZ
         private float barricadeTimeCount;
 
 
+        public bool hasDied = false;
+        public float timeSurvived = 0;
+
+
         public override Vector2 Position
         {
             get => base.Position;
@@ -115,6 +119,12 @@ namespace ZombieSurvivorZ
 
         public override void Update()
         {
+            if (hasDied)
+            {
+                return;
+            }
+            timeSurvived += Time.deltaTime;
+
             TransformUpdate();
             WeaponOperationUpdate();
             WeaponUpdate();
@@ -137,6 +147,21 @@ namespace ZombieSurvivorZ
             Heading = Game1.Camera.ScreenToWorld(reticle.Position) - Position;
         }
 
+        private float gracePeriodHealTime = 1f;
+        private float gracePeriodHealTimeCount;
+        private int gracePeriodHeal = 1;
+
+        public void IsGracePeriodUpdate()
+        {
+            gracePeriodHealTimeCount -= Time.deltaTime;
+            if (gracePeriodHealTimeCount < 0)
+            {
+                health = Math.Min(MaxHealth, health + gracePeriodHeal);
+                gracePeriodHealTimeCount = gracePeriodHealTime;
+                Game1.HUDDisplayUI.PlayerHealthDisplayUI.HealthUpdated(health, MaxHealth);
+            }
+        }
+
         public void DealDamage(int damage, Vector2 direction)
         {
             Game1.BloodManager.AddHumanBlood(Position, MathF.Atan2(direction.Y, direction.X));
@@ -154,6 +179,10 @@ namespace ZombieSurvivorZ
         private void Die()
         {
             Console.WriteLine("PLAYER DIED!!");
+            hasDied = true;
+            Active = false;
+            Destroy();
+            Game1.ScoreDisplayUI.PlayerDied(Game1.MapManager.ZombieSpawnLayer.zombiesKilled, new(0, 0, 0, 0, (int)(timeSurvived * 1000)));
         }
 
         #region Materials
@@ -452,12 +481,22 @@ namespace ZombieSurvivorZ
 
         public override void OnCollision(DynamicCollider current, Collider other, Vector2 penetrationVector)
         {
+            if (hasDied)
+            {
+                return;
+            }
             base.OnCollision(current, other, penetrationVector);
             OnCollision_PushBack(current, other, penetrationVector);
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
+            if (hasDied)
+            {
+                return;
+            }
+
+
             Texture2D bodyTexture;
             if (weapon != null)
             {
