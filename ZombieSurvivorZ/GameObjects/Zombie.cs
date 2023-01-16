@@ -57,6 +57,7 @@ namespace ZombieSurvivorZ
         private readonly Stack<Vector2Int> Path = new();
         private bool hasNextTargetPos = false;
         private Vector2 nextTargetPos = new(float.MinValue, float.MinValue);
+        private Vector2Int nextTargetCell = new(0, 0);
 
         private bool nextTargetIsDoor;
         private Vector2Int doorCell;
@@ -77,6 +78,7 @@ namespace ZombieSurvivorZ
         private Vector2 lastPos;
         private float stuckInPlaceTimeCount = 0;
         private int stuckTotal = 0;
+        private float pushBackStrength = Random.Shared.NextSingle(0.1f, 3f);
 
         private SoundEffect ZombieTakeDamageSE { get; set; }
         private SoundEffect ZombieAttackDoorSE { get; set; }
@@ -226,15 +228,23 @@ namespace ZombieSurvivorZ
             Vector2Int zombieCell = Game1.MapManager.PositionToLocal(Position);
             if (zombieCell != lastCellPos)
             {
-                if (!Game1.MapManager.CellIsWalkable(zombieCell))
+                if (!Game1.MapManager.CellIs0CostWalkable(zombieCell))
                 {
-                    Position = Game1.MapManager.ZombieSpawnLayer.GetRandomSpawnPosition();
-                    zombieCell = Game1.MapManager.PositionToLocal(Position);
+                    Position = Game1.MapManager.LocalToTileCenterPosition(lastCellPos);
                 }
+                else
+                {
+                    lastCellPos = zombieCell;
+                }
+                //if (!Game1.MapManager.CellIsWalkable(zombieCell))
+                //{
+                //    Position = Game1.MapManager.ZombieSpawnLayer.GetRandomSpawnPosition();
+                //    zombieCell = Game1.MapManager.PositionToLocal(Position);
+                //}
                 //Game1.MapManager.TileGraph.RemoveZombieCell(lastCellPos);
                 //Game1.MapManager.TileGraph.AddZombieCell(zombieCell);
 
-                lastCellPos = zombieCell;
+                //lastCellPos = zombieCell;
             }
 
             if (lastPos == Position && CurrentState == State.Chase)
@@ -272,6 +282,7 @@ namespace ZombieSurvivorZ
             if (float.IsNaN(Position.X) || float.IsNaN(Position.Y))
             {
                 Position = Game1.MapManager.ZombieSpawnLayer.GetRandomSpawnPosition();
+                Console.WriteLine("NaN position! Resetting it to spawn");
             }
 
             switch (CurrentState)
@@ -462,7 +473,12 @@ namespace ZombieSurvivorZ
                 direction /= distance;  //Normalize
                 Heading = direction;
 
-                if (distance > 91)
+
+                if (CellPosition == nextTargetCell)
+                {
+                    SetNextTargetPos();
+                }
+                else if (distance > 150)
                 {
                     CalculatePathToPlayer();
                     return;
@@ -497,6 +513,7 @@ namespace ZombieSurvivorZ
                 {
                     doorCell = cell;
                 }
+                nextTargetCell = cell;
                 nextTargetPos = Game1.MapManager.LocalToTileCenterPosition(cell);
                 hasNextTargetPos = true;
                 return;
@@ -517,7 +534,7 @@ namespace ZombieSurvivorZ
 
         public override void OnCollision(DynamicCollider current, Collider other, Vector2 penetrationVector)
         {
-            OnCollision_PushBack(current, other, penetrationVector);
+            OnCollision_PushBack(current, other, penetrationVector * pushBackStrength);
         }
 
         public override void Draw(SpriteBatch spriteBatch)

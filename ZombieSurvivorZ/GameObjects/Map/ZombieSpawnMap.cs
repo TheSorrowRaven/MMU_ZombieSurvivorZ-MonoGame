@@ -38,7 +38,7 @@ namespace ZombieSurvivorZ
 
         public ZombieSpawnMap(TiledMapTileLayer layer) : base(layer)
         {
-            SpawnZombie(new(32, 32));
+            //SpawnZombie(new(32, 32));
 
         }
 
