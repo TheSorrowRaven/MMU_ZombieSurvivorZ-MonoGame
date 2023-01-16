@@ -10,7 +10,7 @@ namespace ZombieSurvivorZ
     public class Shotgun : Weapon
     {
 
-        public const int Pellets = 8;
+        public const int Pellets = 4;
         public const float baseSpread = 16;
 
         public Shotgun()
