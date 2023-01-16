@@ -50,6 +50,9 @@ namespace ZombieSurvivorZ
 
             WeaponFireSE = Game1.GetSoundEffect("Audio/debug");
             WeaponReloadSE = Game1.GetSoundEffect("Audio/debug");
+            WeaponNoAmmoSE = Game1.GetSoundEffect("Audio/debug");
+
+            weaponReloadInstance = WeaponFireSE.CreateInstance();
 
             Texture = WeaponTexture;
 

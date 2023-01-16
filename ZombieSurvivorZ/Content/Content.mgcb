@@ -16,6 +16,24 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin Audio/barricading.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/barricading.mp3
+
+#begin Audio/buy_notenough.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/buy_notenough.mp3
+
+#begin Audio/buy.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/buy.mp3
+
 #begin Audio/debug.mp3
 /importer:Mp3Importer
 /processor:SoundEffectProcessor
@@ -34,11 +52,41 @@
 /processorParam:Quality=Best
 /build:Audio/door_open.mp3
 
+#begin Audio/noammo.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/noammo.mp3
+
+#begin Audio/pistol.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Audio/pistol.mp3
+
 #begin Audio/pistol.mp3
 /importer:Mp3Importer
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Audio/pistol.mp3
+
+#begin Audio/player_death.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/player_death.mp3
+
+#begin Audio/player_takedamage.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/player_takedamage.mp3
+
+#begin Audio/reload_mag.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/reload_mag.mp3
 
 #begin Audio/reload.mp3
 /importer:Mp3Importer
@@ -52,11 +100,23 @@
 /processorParam:Quality=Best
 /build:Audio/rifle.mp3
 
+#begin Audio/roundstart.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/roundstart.mp3
+
 #begin Audio/shotgun.mp3
 /importer:Mp3Importer
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Audio/shotgun.mp3
+
+#begin Audio/zombie_attack.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/zombie_attack.mp3
 
 #begin Audio/zombie_attackdoor.mp3
 /importer:Mp3Importer
@@ -64,11 +124,17 @@
 /processorParam:Quality=Best
 /build:Audio/zombie_attackdoor.mp3
 
-#begin Audio/zombie_door2.mp3
+#begin Audio/zombie_attackplayer.mp3
 /importer:Mp3Importer
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
-/build:Audio/zombie_door2.mp3
+/build:Audio/zombie_attackplayer.mp3
+
+#begin Audio/zombie_takedamage.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/zombie_takedamage.mp3
 
 #begin bloodsplat_zombie.png
 /importer:TextureImporter

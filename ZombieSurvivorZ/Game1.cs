@@ -58,7 +58,7 @@ namespace ZombieSurvivorZ
             Graphics.PreferredBackBufferHeight = 720;
             Graphics.ApplyChanges();
 
-            SoundEffect.MasterVolume = 0.4f;
+            SoundEffect.MasterVolume = 1.0f;
 
             Camera = new();
             Collision.Initialize();

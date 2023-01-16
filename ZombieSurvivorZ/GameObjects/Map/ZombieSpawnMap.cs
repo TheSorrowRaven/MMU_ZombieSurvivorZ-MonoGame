@@ -116,6 +116,7 @@ namespace ZombieSurvivorZ
 
         private void NextWave()
         {
+            Game1.Player.RoundStartSE.Play();
             if (waveCount % 2 == 0)
             {
                 isGrace = true;
