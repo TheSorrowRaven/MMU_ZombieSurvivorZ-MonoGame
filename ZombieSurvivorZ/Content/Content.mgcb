@@ -60,12 +60,6 @@
 
 #begin Audio/pistol.mp3
 /importer:Mp3Importer
-/processor:SongProcessor
-/processorParam:Quality=Best
-/build:Audio/pistol.mp3
-
-#begin Audio/pistol.mp3
-/importer:Mp3Importer
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Audio/pistol.mp3
