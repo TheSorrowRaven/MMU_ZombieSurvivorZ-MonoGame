@@ -9,35 +9,67 @@ namespace ZombieSurvivorZ
 {
     public class Shotgun : Weapon
     {
-
         public Shotgun()
         {
             WeaponName = "Shotgun";
-            WeaponUITexture = Game1.GetTexture("pistol_texture");
-            MaterialsToPurchase = 2500;
-            MaterialsToPurchaseAmmo = 40;
+            WeaponUITexture = Game1.GetTexture("shotgun_texture");
+            MaterialsToPurchase = 300;
+            MaterialsToPurchaseAmmo = 50;
 
             FireTime = 0.6f;
             MuzzleFlashTime = 0.2f;
             FiringLineFlashTime = 0.1f;
-            ReloadTime = 1.5f;
+            ReloadTime = 1.2f;
             SwitchTime = 0.8f;
 
             Damage = 10;
-            ClipSize = 8;
+            ClipSize = 6;
             Pellets = 3;
-            BaseSpread = 16;
+            BaseSpread = 20;
             CanAutoFire = false;
             FiringLineStartOffset = 40;
 
-            AmmoInClip = 8;
-            AmmoReserve = 32;
+            AmmoInClip = 6;
+            AmmoReserve = 24;
 
             RecoilSpreadIncrease = 40.0f;
             RecoilSpreadDecrease = 65.0f;
-            RecoilMaxSpread = 60.0f;
+            RecoilMaxSpread = 65.0f;
             RecoilTime = 0.4f;
             RecoilAimFactor = 0.4f;
+
+            Levels = new Level[]
+            {
+                new Level
+                {
+                    UpgradeCost = 250,
+                    BaseSpread = 18,
+                    Pellets = 4
+                },
+                new Level
+                {
+                    UpgradeCost = 350,
+                    Pellets = 5
+                },
+                new Level
+                {
+                    UpgradeCost = 400,
+                    BaseSpread = 14,
+                    Pellets = 6
+                },
+                new Level()
+                {
+                    UpgradeCost = 500,
+                    BaseSpread = 12,
+                    Pellets = 7
+                },
+                new Level()
+                {
+                    UpgradeCost = 800,
+                    BaseSpread = 10,
+                    Pellets = 8
+                }
+            };
         }
 
         public override void Initialize()

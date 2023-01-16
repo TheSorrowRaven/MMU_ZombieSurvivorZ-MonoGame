@@ -43,13 +43,36 @@ namespace ZombieSurvivorZ
                 new Level
                 {
                     UpgradeCost = 100,
+                    ClipSize = 10,
+                    ReloadTime = 0.9f,
+                },
+                new Level
+                {
+                    UpgradeCost = 125,
+                    ClipSize = 11,
+                    ReloadTime = 0.8f,
+                    FireTime = 0.175f,
+                },
+                new Level
+                {
+                    UpgradeCost = 200,
                     ClipSize = 12,
+                    ReloadTime = 0.7f,
+                    Damage = 7,
                 },
                 new Level
                 {
                     UpgradeCost = 150,
+                    ClipSize = 13,
+                    ReloadTime = 0.6f,
+                    FireTime = 0.15f,
+                },
+                new Level
+                {
+                    UpgradeCost = 175,
+                    ClipSize = 14,
                     ReloadTime = 0.5f,
-                }
+                },
             };
         }
 

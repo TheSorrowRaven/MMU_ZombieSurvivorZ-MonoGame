@@ -12,9 +12,9 @@ namespace ZombieSurvivorZ
         public Rifle()
         {
             WeaponName = "Rifle";
-            WeaponUITexture = Game1.GetTexture("pistol_texture");
-            MaterialsToPurchase = 1000;
-            MaterialsToPurchaseAmmo = 20;
+            WeaponUITexture = Game1.GetTexture("rifle_texture");
+            MaterialsToPurchase = 500;
+            MaterialsToPurchaseAmmo = 50;
 
             FireTime = 0.1f;
             MuzzleFlashTime = 0.1f;
@@ -22,7 +22,7 @@ namespace ZombieSurvivorZ
             ReloadTime = 1.5f;
             SwitchTime = 0.5f;
 
-            Damage = 5;
+            Damage = 8;
             ClipSize = 25;
             Pellets = 1;
             BaseSpread = 0;
@@ -42,14 +42,30 @@ namespace ZombieSurvivorZ
             {
                 new Level
                 {
-                    UpgradeCost = 100,
+                    UpgradeCost = 400,
                     ClipSize = 30,
                 },
                 new Level
                 {
-                    UpgradeCost = 150,
-                    Damage = 8,
-                }
+                    UpgradeCost = 500,
+                    ClipSize = 35,
+                },
+                new Level
+                {
+                    UpgradeCost = 750,
+                    ClipSize = 40,
+                },
+                new Level
+                {
+                    UpgradeCost = 750,
+                    ClipSize = 45,
+                },
+                new Level
+                {
+                    UpgradeCost = 1000,
+                    ClipSize = 50,
+                    Damage = 10,
+                },
             };
         }
 
@@ -74,6 +90,11 @@ namespace ZombieSurvivorZ
             weaponReloadInstance = WeaponReloadSE.CreateInstance();
 
             base.Initialize();
+        }
+
+        public override void AmmoPurchased()
+        {
+            AmmoReserve += ClipSize;
         }
     }
 }

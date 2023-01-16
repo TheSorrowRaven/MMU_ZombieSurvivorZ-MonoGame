@@ -18,7 +18,7 @@ namespace ZombieSurvivorZ
 
         private const float MovementSpeed = 300;
         private const bool SameKeyHolstersWeapon = true;
-        private const int MaterialGainPerZombie = 25;
+        private const int MaterialGainPerZombie = 12;
 
         private const int MaxHealth = 100;
         private const float KnockbackOnHit = 12;
@@ -53,8 +53,8 @@ namespace ZombieSurvivorZ
 
         public float ColliderSize => Scale.X * BaseColliderSize;
 
-        public const float BarricadeTime = 0.75f;
-        public const int BarricadeMaterialCost = 5;
+        public const float BarricadeTime = 0.6f;
+        public const int BarricadeMaterialCost = 25;
         private float barricadeTimeCount;
 
         public bool hasDied = false;

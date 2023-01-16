@@ -26,7 +26,7 @@ namespace ZombieSurvivorZ
 
             public int BarricadeHealth;
 
-            public const int BarricadeLevelMaxHealth = 50;
+            public const int BarricadeLevelMaxHealth = 60;
             public const int BarricadeMaxLevel = 3;
 
             public Door(Collision.BoxStaticCollider CL, bool Rotated)
@@ -128,7 +128,7 @@ namespace ZombieSurvivorZ
             Level2BarricadeHorizontal = new(128, 256, 64, 64);
             Level2BarricadeVertical = new(192, 256, 64, 64);
             Level3BarricadeHorizontal = new(256, 256, 64, 64);
-            Level3BarricadeVertical = new(312, 256, 64, 64);
+            Level3BarricadeVertical = new(320, 256, 64, 64);
         }
 
         protected override void InitializeTile(int x, int y, TiledMapTile tile)

@@ -170,7 +170,7 @@ namespace ZombieSurvivorZ
 
         public virtual void AmmoPurchased()
         {
-            AmmoReserve += ClipSize;
+            AmmoReserve += ClipSize * 2;
         }
         public virtual void UpgradeLevel()
         {
