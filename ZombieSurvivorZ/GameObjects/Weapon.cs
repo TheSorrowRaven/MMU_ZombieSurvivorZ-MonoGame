@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
@@ -117,6 +118,12 @@ namespace ZombieSurvivorZ
 
         private readonly GameObject[] IgnoreObjects = new GameObject[1];
         private WeaponUpgradeUI WeaponUpgradeUIRef;
+
+        // Sound effects
+        public SoundEffect WeaponFireSE { get; protected set; }
+        public SoundEffect WeaponReloadSE { get; protected set; }
+        public SoundEffect WeaponNoAmmoSE { get; protected set; }
+        public SoundEffectInstance weaponReloadInstance;
 
         public void SetWeaponUpgradeUI(WeaponUpgradeUI weaponUpgradeUIRef)
         {
@@ -285,6 +292,7 @@ namespace ZombieSurvivorZ
             if (AmmoInClip == 0)
             {
                 //No ammo, try to reload
+                WeaponNoAmmoSE.Play();
                 Reload();
                 return;
             }
@@ -295,6 +303,7 @@ namespace ZombieSurvivorZ
         protected virtual void TriggerFire()
         {
             Fire();
+            WeaponFireSE.Play();
 
             AmmoInClip--;
             fireTimeCount = FireTime;
@@ -385,12 +394,23 @@ namespace ZombieSurvivorZ
                 return;
             }
             //Console.WriteLine("RELOAD!");
+            if (WeaponState != State.Reloading)
+            {
+                //WeaponReloadSE.Play();
+                ReloadSFX();
+            }
             WeaponState = State.Reloading;
             reloadTimeCount = ReloadTime;
         }
 
+        public virtual void ReloadSFX()
+        {
+            WeaponReloadSE.Play();
+        }
+
         protected virtual void FinishReload()
         {
+            weaponReloadInstance.Stop();
             WeaponState = State.Ready;
             int initialAmmoInClip = AmmoInClip;
             int requiredAmmo = ClipSize - initialAmmoInClip;

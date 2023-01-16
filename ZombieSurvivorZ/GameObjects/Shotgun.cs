@@ -61,9 +61,21 @@ namespace ZombieSurvivorZ
 
             WeaponFlashTexture = Game1.GetTexture("Player/player_shotgunflash");
 
+            WeaponFireSE = Game1.GetSoundEffect("Audio/shotgun");
+            WeaponReloadSE = Game1.GetSoundEffect("Audio/reload");
+            WeaponNoAmmoSE = Game1.GetSoundEffect("Audio/noammo");
+
+            weaponReloadInstance = WeaponReloadSE.CreateInstance();
+
             Texture = WeaponTexture;
 
             base.Initialize();
+        }
+
+        public override void ReloadSFX()
+        {
+            weaponReloadInstance.IsLooped = true;
+            weaponReloadInstance.Play();
         }
     }
 }

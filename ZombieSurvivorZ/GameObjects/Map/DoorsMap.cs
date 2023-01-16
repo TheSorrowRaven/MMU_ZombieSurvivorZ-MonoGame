@@ -10,6 +10,7 @@ using MonoGame.Extended.Tiled;
 using MonoGame.Extended.Tiled.Renderers;
 using System.Collections.Generic;
 using MonoGame.Extended.Collections;
+using Microsoft.Xna.Framework.Audio;
 
 namespace ZombieSurvivorZ
 {
@@ -27,7 +28,6 @@ namespace ZombieSurvivorZ
 
             public const int BarricadeLevelMaxHealth = 50;
             public const int BarricadeMaxLevel = 3;
-
 
             public Door(Collision.BoxStaticCollider CL, bool Rotated)
             {
@@ -260,16 +260,18 @@ namespace ZombieSurvivorZ
             return false;
         }
 
-        public void ToggleDoor(Vector2Int doorCell)
+        public bool ToggleDoor(Vector2Int doorCell)
         {
             Door door = Doors[doorCell];
             if (door.IsOpen)
             {
                 CloseDoor(doorCell);
+                return false;
             }
             else
             {
                 OpenDoor(doorCell);
+                return true;
             }
         }
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
@@ -56,10 +57,21 @@ namespace ZombieSurvivorZ
         public const int BarricadeMaterialCost = 5;
         private float barricadeTimeCount;
 
-
         public bool hasDied = false;
         public float timeSurvived = 0;
 
+        public static AudioListener PlayerListener { get; set; }
+        private SoundEffect PlayerTakeDamageSE { get; set; }
+        private SoundEffect PlayerDeathSE { get; set; }
+        private SoundEffect PlayerSwitchWeaponSE { get; set; }
+        private SoundEffect DoorOpenSE { get; set; }
+        private SoundEffect DoorCloseSE { get; set; }
+        private SoundEffect DoorBarricadingSE { get; set; }
+        public SoundEffect RoundStartSE { get; set; }
+        public SoundEffect UIBuySE { get; set; }
+        public SoundEffect UINotEnoughSE { get; set; }
+        private bool BarricadeEnoughSEPlayed = false;
+        private SoundEffectInstance doorBarricadingInstance;
 
         public override Vector2 Position
         {
@@ -84,6 +96,20 @@ namespace ZombieSurvivorZ
 
             UsePromptTexture = Game1.GetTexture("Keys/toggle_door");
             BarricadePromptTexture = Game1.GetTexture("Keys/barricade");
+
+            PlayerTakeDamageSE = Game1.GetSoundEffect("Audio/player_takedamage");
+            PlayerDeathSE = Game1.GetSoundEffect("Audio/player_death");
+            PlayerSwitchWeaponSE = Game1.GetSoundEffect("Audio/reload");
+            DoorOpenSE = Game1.GetSoundEffect("Audio/door_open");
+            DoorCloseSE = Game1.GetSoundEffect("Audio/door_close");
+            DoorBarricadingSE = Game1.GetSoundEffect("Audio/barricading");
+            RoundStartSE = Game1.GetSoundEffect("Audio/roundstart");
+            UIBuySE = Game1.GetSoundEffect("Audio/buy");
+            UINotEnoughSE = Game1.GetSoundEffect("Audio/buy_notenough");
+
+            PlayerListener = new AudioListener();
+
+            doorBarricadingInstance = DoorBarricadingSE.CreateInstance();
 
             RotationOffset = 90 * MathF.PI / 180;
             Position = new(0, 0);
@@ -145,6 +171,7 @@ namespace ZombieSurvivorZ
             }
             Position += movement * (MovementSpeed * Time.deltaTime);
             Heading = Game1.Camera.ScreenToWorld(reticle.Position) - Position;
+            PlayerListener.Position = new(Position / 125, 0);
         }
 
         private float gracePeriodHealTime = 1f;
@@ -173,11 +200,13 @@ namespace ZombieSurvivorZ
                 health = 0;
                 Die();
             }
+            PlayerTakeDamageSE.Play();
             Game1.HUDDisplayUI.PlayerHealthDisplayUI.HealthUpdated(health, MaxHealth);
         }
 
         private void Die()
         {
+            PlayerDeathSE.Play();
             Console.WriteLine("PLAYER DIED!!");
             hasDied = true;
             Active = false;
@@ -273,6 +302,7 @@ namespace ZombieSurvivorZ
 
         private void SwitchToWeapon(Weapon weapon)
         {
+            PlayerSwitchWeaponSE.Play();
             Weapon previousWeapon = this.weapon;
             previousWeapon?.HolsterWeapon();
             if (SameKeyHolstersWeapon)
@@ -355,7 +385,14 @@ namespace ZombieSurvivorZ
             }
             if (Input.IsRMouseFirstDown())
             {
-                Game1.MapManager.DoorsLayer.ToggleDoor(SelectingDoor);
+                if (Game1.MapManager.DoorsLayer.ToggleDoor(SelectingDoor))
+                {
+                    DoorOpenSE.Play();
+                }
+                else
+                {
+                    DoorCloseSE.Play();
+                }
             }
             Game1.HUDDisplayUI.DoorHealthDisplayUI.SetActive(true);
             Vector2 doorPos = Game1.MapManager.LocalToTileTopLeftPosition(SelectingDoor);
@@ -376,13 +413,17 @@ namespace ZombieSurvivorZ
             }
             if (Input.IsKeyDown(Keys.Space))
             {
-
                 if (Materials >= BarricadeMaterialCost)
                 {
+                    
                     barricadeTimeCount += Time.deltaTime;
                     //Console.WriteLine(barricadeTimeCount);
                     if (Game1.MapManager.DoorsLayer.Doors[SelectingDoor].CanBarricade())
                     {
+                        if (doorBarricadingInstance.State != SoundState.Playing)
+                        {
+                            doorBarricadingInstance.Play();
+                        }
                         Game1.HUDDisplayUI.DoorHealthDisplayUI.SetBarricadeStatus(barricadeTimeCount, BarricadeTime);
                     }
                     if (barricadeTimeCount > BarricadeTime)
@@ -396,6 +437,11 @@ namespace ZombieSurvivorZ
                 }
                 else
                 {
+                    if (!BarricadeEnoughSEPlayed)
+                    {
+                        UINotEnoughSE.Play();
+                        BarricadeEnoughSEPlayed = true;
+                    }
                     Game1.HUDDisplayUI.MaterialsDisplayUI.WarnInsufficientMaterials();
                 }
 
@@ -403,6 +449,8 @@ namespace ZombieSurvivorZ
             else
             {
                 barricadeTimeCount = 0;
+                BarricadeEnoughSEPlayed = false;
+                doorBarricadingInstance.Stop();
             }
         }
 

@@ -120,10 +120,12 @@ namespace ZombieSurvivorZ
         {
             if (Game1.Player.TryRemoveMaterials(weapon.MaterialsToPurchase))
             {
+                Game1.Player.UIBuySE.Play();
                 Game1.Player.OwnWeapon(weapon);
                 return;
             }
             //NOT ENOUGH
+            Game1.Player.UINotEnoughSE.Play();
             Game1.HUDDisplayUI.MaterialsDisplayUI.WarnInsufficientMaterials();
         }
         private void WeaponUpgrade_OnClick()
@@ -136,21 +138,25 @@ namespace ZombieSurvivorZ
             }
             if (Game1.Player.TryRemoveMaterials(cost.Value))
             {
+                Game1.Player.UIBuySE.Play();
                 weapon.UpgradeLevel();
                 weapon.UpdateWeaponUpgradeUI();
                 return;
             }
             //NOT ENOUGH
+            Game1.Player.UINotEnoughSE.Play();
             Game1.HUDDisplayUI.MaterialsDisplayUI.WarnInsufficientMaterials();
         }
         private void AmmoPurchase_OnClick()
         {
             if (Game1.Player.TryRemoveMaterials(weapon.MaterialsToPurchaseAmmo))
             {
+                Game1.Player.UIBuySE.Play();
                 weapon.AmmoPurchased();
                 return;
             }
             //NOT ENOUGH
+            Game1.Player.UINotEnoughSE.Play();
             Game1.HUDDisplayUI.MaterialsDisplayUI.WarnInsufficientMaterials();
         }
 

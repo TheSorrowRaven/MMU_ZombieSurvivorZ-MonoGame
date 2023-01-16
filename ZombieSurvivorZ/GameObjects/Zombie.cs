@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
@@ -77,6 +78,16 @@ namespace ZombieSurvivorZ
         private float stuckInPlaceTimeCount = 0;
         private int stuckTotal = 0;
 
+        private SoundEffect ZombieTakeDamageSE { get; set; }
+        private SoundEffect ZombieAttackDoorSE { get; set; }
+        private SoundEffect ZombieAttackPlayerSE { get; set; }
+        private SoundEffect ZombieAttackSE { get; set; }
+        public AudioEmitter ZombieEmitter { get; set; }
+        SoundEffectInstance takeDamageInstance;
+        SoundEffectInstance attackDoorInstance;
+        SoundEffectInstance attackPlayerInstance;
+        SoundEffectInstance attackInstance;
+
         public Zombie()
         {
             movementSpeed = MovementSpeed;
@@ -97,6 +108,11 @@ namespace ZombieSurvivorZ
             CurrentState = State.Chase;
 
             Texture = ChasingAnim[0];   //Safe
+
+            ZombieTakeDamageSE = Game1.GetSoundEffect("Audio/zombie_takedamage");
+            ZombieAttackPlayerSE = Game1.GetSoundEffect("Audio/zombie_attackplayer");
+            ZombieAttackDoorSE = Game1.GetSoundEffect("Audio/zombie_attackdoor");
+            ZombieAttackSE = Game1.GetSoundEffect("Audio/zombie_attack");
         }
 
         private static void PopulateAnim(Texture2D[] anim, string name)
@@ -109,6 +125,12 @@ namespace ZombieSurvivorZ
 
         public override void Initialize()
         {
+            ZombieEmitter = new AudioEmitter();
+            ZombieEmitter.DopplerScale = 2.0f;
+            takeDamageInstance = ZombieTakeDamageSE.CreateInstance();
+            attackDoorInstance = ZombieAttackDoorSE.CreateInstance();
+            attackPlayerInstance = ZombieAttackPlayerSE.CreateInstance();
+            attackInstance = ZombieAttackSE.CreateInstance();
         }
 
         public void DealDamage(int damage, Vector2 direction)
@@ -124,6 +146,7 @@ namespace ZombieSurvivorZ
 
         private void Die()
         {
+            takeDamageInstance.Play();
             CL.DestroyCollider();
             CL = null;
             ChangeState(State.Die);
@@ -263,6 +286,13 @@ namespace ZombieSurvivorZ
                     break;
             }
             UpdateAnim();
+
+            ZombieEmitter.Position = new(Position / 125, 0);
+
+            takeDamageInstance.Apply3D(Player.PlayerListener, ZombieEmitter);
+            attackDoorInstance.Apply3D(Player.PlayerListener, ZombieEmitter);
+            attackPlayerInstance.Apply3D(Player.PlayerListener, ZombieEmitter);
+            attackInstance.Apply3D(Player.PlayerListener, ZombieEmitter);
         }
 
         private void EnterChaseState(bool updatePath = true)
@@ -345,6 +375,7 @@ namespace ZombieSurvivorZ
             {
                 dealtDamageThisAttack = true;
                 TryDealDamage();
+                attackInstance.Play();
             }
 
             if (attackTimeCount > AttackTime)
@@ -356,7 +387,6 @@ namespace ZombieSurvivorZ
 
         private void TryDealDamage()
         {
-
             if (!nextTargetIsDoor)
             {
                 CheckNextTargetIsDoor();
@@ -381,6 +411,7 @@ namespace ZombieSurvivorZ
                     float requiredDistance = AttackDistance + AttackDistanceCompensation + ColliderSize;
                     if (hitDistance < requiredDistance)
                     {
+                        attackPlayerInstance.Play();
                         HitPlayer(attackDirection);
                     }
                     //Console.WriteLine($"{hitDistance < requiredDistance}, Distance: {hitDistance}, Required: {requiredDistance}");
@@ -396,6 +427,7 @@ namespace ZombieSurvivorZ
                 //No damage when it's open
                 return;
             }
+            attackDoorInstance.Play();
             Game1.MapManager.DoorsLayer.DealDamage(doorCell, Damage);
         }
 

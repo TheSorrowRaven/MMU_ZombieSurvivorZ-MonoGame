@@ -28,7 +28,7 @@ namespace ZombieSurvivorZ
 
         public override bool IsTileWalkable(ushort x, ushort y, out float cost)
         {
-            if (x >= 50 || y >= 50)
+            if (x >= 52 || y >= 52)
             {
                 //TODO
                 cost = 0;
