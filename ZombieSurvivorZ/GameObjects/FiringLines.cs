@@ -47,7 +47,7 @@ namespace ZombieSurvivorZ
             for (int i = 0; i < firingLines.Count; i++)
             {
                 Line line = firingLines[i].Item1;
-                spriteBatch.DrawLine(line.start, line.end, Color.DarkGray);
+                spriteBatch.DrawLine(line.start, line.end, Color.Yellow);
             }
         }
 

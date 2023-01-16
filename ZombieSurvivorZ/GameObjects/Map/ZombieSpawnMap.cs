@@ -15,7 +15,7 @@ namespace ZombieSurvivorZ
     public class ZombieSpawnMap : BaseMap
     {
 
-        private const int minZombies = 1;
+        private const int minZombies = 0;
 
         private const float gracePeriod = 20f;
         private const int zombiesIncrease = 10;
