@@ -24,6 +24,8 @@ namespace ZombieSurvivorZ
 
             Damage = 15;
             ClipSize = 100;
+            Pellets = 1;
+            BaseSpread = 0;
             CanAutoFire = true;
             FiringLineStartOffset = 40;
 

@@ -33,6 +33,8 @@ namespace ZombieSurvivorZ
             public float? FiringLineFlashTime;
             public int? Damage;
             public int? ClipSize;
+            public int? Pellets;
+            public float? BaseSpread;
             public bool? CanAutoFire;
             public float? RecoilSpreadIncrease;
             public float? RecoilSpreadDecrease;
@@ -83,6 +85,8 @@ namespace ZombieSurvivorZ
 
         public int Damage { get; protected set; }
         public int ClipSize { get; protected set; }
+        public int Pellets { get; protected set; }
+        public float BaseSpread { get; protected set; }
         public bool CanAutoFire { get; protected set; }
         public float FiringLineStartOffset { get; protected set; }
 
@@ -90,7 +94,6 @@ namespace ZombieSurvivorZ
         public float RecoilSpreadDecrease { get; protected set; }
         public float RecoilMaxSpread { get; protected set; }
         public float RecoilAimFactor { get; protected set; }
-
         //Ammo
         public int AmmoReserve { get; protected set; }
         public int AmmoInClip { get; protected set; }
@@ -210,6 +213,14 @@ namespace ZombieSurvivorZ
             {
                 ClipSize = level.ClipSize.Value;
             }
+            if (level.Pellets != null)
+            {
+                Pellets = level.Pellets.Value;
+            }
+            if (level.BaseSpread != null)
+            {
+                BaseSpread = level.BaseSpread.Value;
+            }
             if (level.CanAutoFire != null)
             {
                 CanAutoFire = level.CanAutoFire.Value;
@@ -314,7 +325,10 @@ namespace ZombieSurvivorZ
 
         protected virtual void Fire()
         {
-            FireRaycast(recoilSpread);
+            for (int i = 0; i < Pellets; i++)
+            {
+                FireRaycast(BaseSpread + recoilSpread);
+            }
         }
 
         protected virtual void FireRaycast(float recoil)

@@ -10,9 +10,6 @@ namespace ZombieSurvivorZ
     public class Shotgun : Weapon
     {
 
-        public const int Pellets = 4;
-        public const float baseSpread = 16;
-
         public Shotgun()
         {
             WeaponName = "Shotgun";
@@ -28,6 +25,8 @@ namespace ZombieSurvivorZ
 
             Damage = 10;
             ClipSize = 8;
+            Pellets = 3;
+            BaseSpread = 16;
             CanAutoFire = false;
             FiringLineStartOffset = 40;
 
@@ -39,14 +38,6 @@ namespace ZombieSurvivorZ
             RecoilMaxSpread = 60.0f;
             RecoilTime = 0.4f;
             RecoilAimFactor = 0.4f;
-        }
-
-        protected override void Fire()
-        {
-            for (int i = 0; i < Pellets; i++)
-            {
-                FireRaycast(baseSpread);
-            }
         }
 
         public override void Initialize()
