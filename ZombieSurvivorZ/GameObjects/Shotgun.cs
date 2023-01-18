@@ -68,6 +68,15 @@ namespace ZombieSurvivorZ
                     UpgradeCost = 800,
                     BaseSpread = 10,
                     Pellets = 8
+                },
+                new Level()
+                {
+                    UpgradeCost = 7500,
+                    ClipSize = 10,
+                    Pellets = 10,
+                    FireTime = 0.4f,
+                    ReloadTime = 0.8f,
+                    RecoilMaxSpread = 50f,
                 }
             };
         }
