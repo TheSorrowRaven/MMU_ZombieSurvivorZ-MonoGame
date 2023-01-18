@@ -20,7 +20,7 @@ namespace ZombieSurvivorZ
         private int YWeaponUpgradesOffset = 60;
         private int YWeaponUpgradesSpacing = 10;
 
-        public UpgradeWindowUI() : base(null, new(200, 100), new(300, 500))
+        public UpgradeWindowUI() : base(null, new(Game1.ScreenSize.X / 2 - 350, Game1.ScreenSize.Y / 2 - 300), new(300, 500))
         {
             Alpha = 0.8f;
             Color = Color.Black;

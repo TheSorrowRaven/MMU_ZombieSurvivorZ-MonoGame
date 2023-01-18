@@ -54,8 +54,11 @@ namespace ZombieSurvivorZ
             Screen = Window;
             IsMouseVisible = false;
 
-            Graphics.PreferredBackBufferWidth = 1280;
-            Graphics.PreferredBackBufferHeight = 720;
+            //Graphics.PreferredBackBufferWidth = 1280;
+            //Graphics.PreferredBackBufferHeight = 720;
+            Graphics.PreferredBackBufferWidth = 1920;
+            Graphics.PreferredBackBufferHeight = 1080;
+            Graphics.IsFullScreen = true;
             Graphics.ApplyChanges();
 
             SoundEffect.MasterVolume = 0.6f;
@@ -123,6 +126,10 @@ namespace ZombieSurvivorZ
             Time.frameCount++;
 
             Input.Update(gameTime);
+            if (Input.IsKeyFirstDown(Keys.Escape))
+            {
+                Exit();
+            }
 
             UISuppressClick = false;
             //Objects Update
