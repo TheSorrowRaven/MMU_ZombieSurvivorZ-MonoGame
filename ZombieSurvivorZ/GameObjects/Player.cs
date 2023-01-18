@@ -119,9 +119,8 @@ namespace ZombieSurvivorZ
             Pistol pistol = CreateWeapon(new Pistol());
             OwnWeapon(pistol);
 
-            Rifle rifle = CreateWeapon(new Rifle());
-            //OwnWeapon(rifle);
             Shotgun shotgun = CreateWeapon(new Shotgun());
+            Rifle rifle = CreateWeapon(new Rifle());
 
             AddWeaponsToWeaponUpgradeUI();
 
