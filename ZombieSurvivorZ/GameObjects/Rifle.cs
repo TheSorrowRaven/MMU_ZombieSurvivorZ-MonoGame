@@ -66,6 +66,14 @@ namespace ZombieSurvivorZ
                     ClipSize = 50,
                     Damage = 10,
                 },
+                new Level
+                {
+                    UpgradeCost = 10000,
+                    ClipSize = 75,
+                    ReloadTime = 1.1f,
+                    FireTime = 0.075f,
+                    RecoilMaxSpread = 25f,
+                }
             };
         }
 

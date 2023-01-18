@@ -23,7 +23,7 @@ namespace ZombieSurvivorZ
 
         public const float InCellCost = 10;
 
-        private const float StuckInPlaceTime = 2f;
+        private const float StuckInPlaceTime = 1f;
 
         private const float AnimSpeed = 0.1f;
 
@@ -252,10 +252,10 @@ namespace ZombieSurvivorZ
                 stuckInPlaceTimeCount += Time.deltaTime;
                 if (stuckInPlaceTimeCount > StuckInPlaceTime)
                 {
-                    if (stuckTotal > 5)
+                    if (stuckTotal > 3)
                     {
                         Die();
-                        Console.WriteLine("Killed one zombie for being stuck for over 5 times!");
+                        Console.WriteLine("Killed one zombie for being stuck for over 3 times!");
                     }
                     zombieCell = Game1.MapManager.PositionToLocal(Position);
                     Position = Game1.MapManager.LocalToTileCenterPosition(zombieCell);
