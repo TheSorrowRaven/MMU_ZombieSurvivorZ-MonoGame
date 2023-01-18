@@ -283,7 +283,7 @@ namespace ZombieSurvivorZ
                 return;
             }
 
-            door.CL.Set(0, 0, 0, 0);
+            door.CL.Set(0, 0, 9999, 9999);
             door.IsOpen = true;
 
             ExpandingDoors.Remove(doorCell);
