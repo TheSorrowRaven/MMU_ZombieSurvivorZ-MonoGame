@@ -59,5 +59,17 @@ namespace ZombieSurvivorZ
 
         }
 
+        public override void Destroy()
+        {
+            base.Destroy();
+            BottomRightContainer.Destroy();
+            BottomRightLineSeparator.Destroy();
+            MaterialsDisplayUI.Destroy();
+            AmmoDisplayUI.Destroy();
+            DoorHealthDisplayUI.Destroy();
+            PlayerHealthDisplayUI.Destroy();
+            TimerDisplayUI.Destroy();
+        }
+
     }
 }

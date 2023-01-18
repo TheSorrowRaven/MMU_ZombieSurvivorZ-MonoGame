@@ -81,6 +81,7 @@ namespace ZombieSurvivorZ
                 }
                 else
                 {
+                    //wait for all zombies to be killed
                     waveTimerCount = 0;
                     if (!MinimumZombiesReachedToProgress())
                     {
@@ -211,6 +212,15 @@ namespace ZombieSurvivorZ
         {
             cost = 0;
             return true;
+        }
+
+        public override void Destroy()
+        {
+            base.Destroy();
+            for (int i = 0; i < Zombies.Count; i++)
+            {
+                Zombies[i].Destroy();
+            }
         }
 
     }

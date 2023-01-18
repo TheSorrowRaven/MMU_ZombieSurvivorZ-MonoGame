@@ -42,6 +42,9 @@ namespace ZombieSurvivorZ
         public static ScoreDisplayUI ScoreDisplayUI { get; private set; }
         public static bool UISuppressClick { get; set; } = false;
 
+        public static Menu MainMenu { get; private set; }
+
+        public bool GameStarted = false;
 
         private Game1()
         {
@@ -63,7 +66,6 @@ namespace ZombieSurvivorZ
 
             SoundEffect.MasterVolume = 0.6f;
 
-            Camera = new();
             Collision.Initialize();
 
             base.Initialize();
@@ -80,6 +82,50 @@ namespace ZombieSurvivorZ
             SpriteBatch = new SpriteBatch(GraphicsDevice);
             Font.Load();
 
+            ShowMainMenu();
+            //StartGame();
+        }
+
+        public void ShowMainMenu()
+        {
+            CleanGame();
+            MainMenu = new();
+            GameStarted = false;
+        }
+
+        public void CleanGame()
+        {
+            Player?.Destroy();
+            MapManager?.Destroy();
+            BloodManager?.Destroy();
+            FiringLines?.Destroy();
+            UpgradeWindowUI?.Destroy();
+            HUDDisplayUI?.Destroy();
+            ScoreDisplayUI?.Destroy();
+
+            Player = null;
+            MapManager = null;
+            BloodManager = null;
+            FiringLines = null;
+            UpgradeWindowUI = null;
+            HUDDisplayUI = null;
+            ScoreDisplayUI = null;
+            Camera = null;
+        }
+
+        public void StartGame()
+        {
+            if (GameStarted)
+            {
+                CleanGame();
+            }
+            else
+            {
+                MainMenu?.Destroy();
+                MainMenu = null;
+            }
+
+            Camera = new();
 
             Player = new();
             MapManager = new();
@@ -89,6 +135,8 @@ namespace ZombieSurvivorZ
             UpgradeWindowUI = new();
             HUDDisplayUI = new();
             ScoreDisplayUI = new();
+
+            GameStarted = true;
         }
 
         public static Texture2D GetTexture(string name)
@@ -141,7 +189,7 @@ namespace ZombieSurvivorZ
             Collision.Update(gameTime);
 
             //Camera Update
-            Camera.Update();
+            Camera?.Update();
 
             base.Update(gameTime);
         }
@@ -150,9 +198,15 @@ namespace ZombieSurvivorZ
         {
             GraphicsDevice.Clear(Color.Black);
 
-
-            Matrix transformMatrix = Camera.GetViewMatrix();
-            SpriteBatch.Begin(transformMatrix: transformMatrix, samplerState: SamplerState.AnisotropicWrap);
+            if (Camera != null)
+            {
+                Matrix transformMatrix = Camera.GetViewMatrix();
+                SpriteBatch.Begin(transformMatrix: transformMatrix, samplerState: SamplerState.AnisotropicWrap);
+            }
+            else
+            {
+                SpriteBatch.Begin();
+            }
             World.floor.Draw(SpriteBatch, gameTime);
             World.objects.Draw(SpriteBatch, gameTime);
             SpriteBatch.End();

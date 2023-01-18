@@ -16,6 +16,9 @@ namespace ZombieSurvivorZ
         public readonly UIText ZombiesScore;
         public readonly UIText TimeSurvived;
 
+        public readonly UIButton BackToMenu;
+        public readonly UIButton PlayAgain;
+
         public ScoreDisplayUI() : base(null, new(0, 0), new(Game1.ScreenSize.X, Game1.ScreenSize.Y))
         {
             Color = Color.Black;
@@ -32,6 +35,18 @@ namespace ZombieSurvivorZ
             TimeSurvived = new(this, new(Game1.ScreenSize.X / 2 - 200, Game1.ScreenSize.Y / 2 + 50), new(400, 50));
             TimeSurvived.Text = "Time Survived: ";
             TimeSurvived.Color = Color.AntiqueWhite;
+
+            PlayAgain = UIButton.CreateWithText(this, new(Game1.ScreenSize.X / 2 - 150, Game1.ScreenSize.Y / 2 + 200), new(100, 50), "PLAY AGAIN");
+            BackToMenu = UIButton.CreateWithText(this, new(Game1.ScreenSize.X / 2 + 50, Game1.ScreenSize.Y / 2 + 200), new(100, 50), "MAIN MENU");
+
+            PlayAgain.OnClick += () =>
+            {
+                Game1.Current.StartGame();
+            };
+            BackToMenu.OnClick += () =>
+            {
+                Game1.Current.ShowMainMenu();
+            };
 
             SetActive(false);
         }
@@ -58,7 +73,8 @@ namespace ZombieSurvivorZ
             DeathText.SetActive(active);
             ZombiesScore.SetActive(active);
             TimeSurvived.SetActive(active);
-
+            PlayAgain.SetActive(active);
+            BackToMenu.SetActive(active);
         }
 
         public override void Draw(SpriteBatch spriteBatch)
@@ -66,5 +82,14 @@ namespace ZombieSurvivorZ
             base.Draw(spriteBatch);
         }
 
+        public override void Destroy()
+        {
+            base.Destroy();
+            DeathText.Destroy();
+            ZombiesScore.Destroy();
+            TimeSurvived.Destroy();
+            PlayAgain.Destroy();
+            BackToMenu.Destroy();
+        }
     }
 }

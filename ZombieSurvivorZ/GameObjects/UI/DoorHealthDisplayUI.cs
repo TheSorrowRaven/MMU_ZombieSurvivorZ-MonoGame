@@ -147,5 +147,15 @@ namespace ZombieSurvivorZ
 
         }
 
+
+        public override void Destroy()
+        {
+            base.Destroy();
+            BarricadeProgress.Destroy();
+            for (int i = 0; i < Boxes.Length; i++)
+            {
+                Boxes[i].Destroy();
+            }
+        }
     }
 }

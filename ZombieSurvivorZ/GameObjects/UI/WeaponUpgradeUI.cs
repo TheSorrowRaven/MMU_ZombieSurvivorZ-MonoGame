@@ -191,5 +191,20 @@ namespace ZombieSurvivorZ
             base.Draw(spriteBatch);
         }
 
+        public override void Destroy()
+        {
+            base.Destroy();
+            WeaponTexture.Destroy();
+            WeaponTextureBackground.Destroy();
+            WeaponNumber.Destroy();
+            WeaponName.Destroy();
+            AmmoPurchase.Destroy();
+            AmmoPurchaseMaterials.Destroy();
+            AmmoPurchaseTexture.Destroy();
+            WeaponPurchase.Destroy();
+            WeaponPurchaseMaterials.Destroy();
+            WeaponPurchaseTexture.Destroy();
+        }
+
     }
 }

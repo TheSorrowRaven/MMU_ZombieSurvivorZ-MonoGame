@@ -83,5 +83,12 @@ namespace ZombieSurvivorZ
 
         }
 
+
+        public override void Destroy()
+        {
+            base.Destroy();
+            MaterialsText.Destroy();
+            WarningBox.Destroy();
+        }
     }
 }

@@ -75,5 +75,16 @@ namespace ZombieSurvivorZ
             base.Draw(spriteBatch);
         }
 
+        public override void Destroy()
+        {
+            base.Destroy();
+            border.Destroy();
+            title.Destroy();
+            for (int i = 0; i < weaponUpgradeUIs.Count; i++)
+            {
+                weaponUpgradeUIs[i].Destroy();
+            }
+        }
+
     }
 }

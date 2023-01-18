@@ -146,7 +146,7 @@ namespace ZombieSurvivorZ
                         continue;
                     }
                     Vector2Int cell = new(center.X + x, center.Y + y);
-                    if (CellIs0CostWalkable(cell))
+                    if (CellIs0CostAndWalkable(cell))
                     {
                         return cell;
                     }
@@ -177,7 +177,7 @@ namespace ZombieSurvivorZ
         //    }
         //    return center;
         //}
-        public bool CellIs0CostWalkable(Vector2Int cell)
+        public bool CellIs0CostAndWalkable(Vector2Int cell)
         {
             TileGraph.TileData tileData = GetTileData((ushort)cell.X, (ushort)cell.Y);
             return tileData.walkable && tileData.cost == 0;
@@ -195,6 +195,17 @@ namespace ZombieSurvivorZ
 
         public override void Draw(SpriteBatch spriteBatch)
         {
+        }
+
+        public override void Destroy()
+        {
+            base.Destroy();
+            FloorLayer.Destroy();
+            WallsLayer.Destroy();
+            WindowsLayer.Destroy();
+            DoorsLayer.Destroy();
+            ZombieSpawnLayer.Destroy();
+            CraftingLayer.Destroy();
         }
 
     }

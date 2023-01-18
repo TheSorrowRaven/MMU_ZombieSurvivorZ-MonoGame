@@ -32,6 +32,7 @@ namespace ZombieSurvivorZ
         {
             foreach (var collider in DynamicColliders)
             {
+                //Dynamic Colliders collision
                 foreach (var other in DynamicColliders)
                 {
                     if (collider == other)
@@ -45,6 +46,7 @@ namespace ZombieSurvivorZ
                     }
                 }
 
+                //Other colliders
                 foreach (var other in StaticColliders)
                 {
                     if (collider.Bounds.Intersects(other.Bounds))
@@ -66,6 +68,7 @@ namespace ZombieSurvivorZ
             }
         }
 
+        //Raycast all, including the raycast ignored colliders
         public static bool RaycastAll(Vector2 position, Vector2 direction, GameObject[] ignoreObjects, out Collider collider, out float hitDistance)
         {
             collider = null;
@@ -95,6 +98,7 @@ namespace ZombieSurvivorZ
             return hit;
         }
 
+        //Normal raycast, excluding the raycast ignored colliders
         public static bool Raycast(Vector2 position, Vector2 direction, GameObject[] ignoreObjects, out Collider collider, out float hitDistance)
         {
             collider = null;
@@ -139,6 +143,7 @@ namespace ZombieSurvivorZ
             return intersections.Count > 0;
         }
 
+        //Do raycast on a hashset
         private static void RaycastSet<T>(Vector2 position, Vector2 direction, HashSet<T> colliders, List<(Collider, float)> intersections) where T : Collider
         {
             Ray ray = new(new(position.X, position.Y, 0), new(direction.X, direction.Y, 0));
@@ -166,6 +171,8 @@ namespace ZombieSurvivorZ
                 }
             }
         }
+
+        #region Collider Objects
 
         public abstract class Collider
         {
@@ -359,9 +366,7 @@ namespace ZombieSurvivorZ
             }
         }
 
-
-
-
+        #endregion
 
         #region Penetration Vector (Monogame.Extended.Collisions)
 

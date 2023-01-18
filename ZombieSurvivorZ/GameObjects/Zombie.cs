@@ -90,6 +90,33 @@ namespace ZombieSurvivorZ
         SoundEffectInstance attackPlayerInstance;
         SoundEffectInstance attackInstance;
 
+
+        public override Vector2 Position
+        {
+            get => base.Position;
+            set
+            {
+                base.Position = value;
+                CheckZombieValidPos();
+            }
+        }
+
+        private void CheckZombieValidPos()
+        {
+            Vector2Int zombieCell = Game1.MapManager.PositionToLocal(Position);
+            if (zombieCell != lastCellPos)
+            {
+                if (!Game1.MapManager.CellIs0CostAndWalkable(zombieCell))
+                {
+                    Position = Game1.MapManager.LocalToTileCenterPosition(lastCellPos);
+                }
+                else
+                {
+                    lastCellPos = zombieCell;
+                }
+            }
+        }
+
         public Zombie()
         {
             movementSpeed = MovementSpeed;
@@ -225,30 +252,10 @@ namespace ZombieSurvivorZ
         {
             base.Update();
 
-            Vector2Int zombieCell = Game1.MapManager.PositionToLocal(Position);
-            if (zombieCell != lastCellPos)
-            {
-                if (!Game1.MapManager.CellIs0CostWalkable(zombieCell))
-                {
-                    Position = Game1.MapManager.LocalToTileCenterPosition(lastCellPos);
-                }
-                else
-                {
-                    lastCellPos = zombieCell;
-                }
-                //if (!Game1.MapManager.CellIsWalkable(zombieCell))
-                //{
-                //    Position = Game1.MapManager.ZombieSpawnLayer.GetRandomSpawnPosition();
-                //    zombieCell = Game1.MapManager.PositionToLocal(Position);
-                //}
-                //Game1.MapManager.TileGraph.RemoveZombieCell(lastCellPos);
-                //Game1.MapManager.TileGraph.AddZombieCell(zombieCell);
-
-                //lastCellPos = zombieCell;
-            }
 
             if (lastPos == Position && CurrentState == State.Chase)
             {
+                //Stuck Check
                 stuckInPlaceTimeCount += Time.deltaTime;
                 if (stuckInPlaceTimeCount > StuckInPlaceTime)
                 {
@@ -257,7 +264,7 @@ namespace ZombieSurvivorZ
                         Die();
                         Console.WriteLine("Killed one zombie for being stuck for over 3 times!");
                     }
-                    zombieCell = Game1.MapManager.PositionToLocal(Position);
+                    Vector2Int zombieCell = Game1.MapManager.PositionToLocal(Position);
                     Position = Game1.MapManager.LocalToTileCenterPosition(zombieCell);
 
                     if (Game1.MapManager.DoorsLayer.SurroundingAreDoors(zombieCell, out Vector2Int door))
@@ -352,7 +359,7 @@ namespace ZombieSurvivorZ
             bool seesPlayer = PlayerCheckUpdate(directionToPlayer);
             if (seesPlayer)
             {
-
+                //Direct line of sight without obstacles
                 float attackDistance = ClosestDistanceToPlayer + AttackDistance;
                 if (distance < attackDistance)
                 {
@@ -480,6 +487,7 @@ namespace ZombieSurvivorZ
                 }
                 else if (distance > 150)
                 {
+                    //Recalculate if pushed too far away from target
                     CalculatePathToPlayer();
                     return;
                 }
@@ -534,31 +542,12 @@ namespace ZombieSurvivorZ
 
         public override void OnCollision(DynamicCollider current, Collider other, Vector2 penetrationVector)
         {
-            OnCollision_PushBack(current, other, penetrationVector * pushBackStrength);
+            OnCollision_PushBack(current, other, penetrationVector);
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
             base.Draw(spriteBatch);
-
-
-            //if (Game1.CollisionDebugging && CL != null)
-            //{
-            //    spriteBatch.DrawCircle((CircleF)CL.Bounds, 20, Color.Red);
-            //}
-
-            if (Time.frameCount == 0)
-            {
-                return;
-            }
-
-            //Stack<Vector2Int> path = new(Path);
-            //Vector2Int firstPos = Game1.MapManager.PositionToLocal(Position);
-            //while (path.TryPop(out Vector2Int pos))
-            //{
-            //    spriteBatch.DrawLine(Game1.MapManager.LocalToTileCenterPosition(firstPos.X, firstPos.Y), Game1.MapManager.LocalToTileCenterPosition(pos.X, pos.Y), Color.Yellow, 2);
-            //    firstPos = pos;
-            //}
         }
 
     }

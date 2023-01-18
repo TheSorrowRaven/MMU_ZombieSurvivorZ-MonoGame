@@ -125,7 +125,7 @@ namespace ZombieSurvivorZ
 
         }
 
-        public void Destroy()
+        public virtual void Destroy()
         {
             Destroy(this);
         }

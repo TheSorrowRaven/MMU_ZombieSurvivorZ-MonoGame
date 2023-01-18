@@ -6,6 +6,7 @@ using MonoGame.Extended;
 using System;
 using System.Runtime.CompilerServices;
 using MonoGame.Extended.ViewportAdapters;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ZombieSurvivorZ
 {
@@ -53,5 +54,11 @@ namespace ZombieSurvivorZ
 
         }
 
+
+        public override void Destroy()
+        {
+            base.Destroy();
+            timer.Destroy();
+        }
     }
 }

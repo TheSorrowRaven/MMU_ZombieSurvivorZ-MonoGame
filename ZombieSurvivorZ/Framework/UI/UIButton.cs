@@ -174,5 +174,13 @@ namespace ZombieSurvivorZ
             base.Draw(spriteBatch);
         }
 
+        public override void Destroy()
+        {
+            base.Destroy();
+            border.Destroy();
+            fill.Destroy();
+            text?.Destroy();
+        }
+
     }
 }
