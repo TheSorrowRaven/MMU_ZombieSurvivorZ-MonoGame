@@ -1,6 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using MonoGame.Extended.Tiled;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace ZombieSurvivorZ

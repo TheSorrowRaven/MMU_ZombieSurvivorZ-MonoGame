@@ -1,12 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
 using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Security.AccessControl;
 using static ZombieSurvivorZ.Collision;
 
 namespace ZombieSurvivorZ
@@ -47,7 +43,7 @@ namespace ZombieSurvivorZ
         //Sub State
         public bool IsRecoiling { get; protected set; } = false;
         //Visual State
-        public bool IsMuzzleFlashing { get; protected set;} = false;
+        public bool IsMuzzleFlashing { get; protected set; } = false;
 
         //Ownership
         public bool IsOwned { get; set; } = false;
@@ -61,7 +57,8 @@ namespace ZombieSurvivorZ
         //Upgrades
         public int LevelNumber { get; protected set; } = -1;
         public Level[] Levels { get; protected set; } = Array.Empty<Level>();
-        public Level CurrentLevel {
+        public Level CurrentLevel
+        {
             get
             {
                 if (LevelNumber == -1)

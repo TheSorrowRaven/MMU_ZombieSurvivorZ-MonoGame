@@ -3,10 +3,8 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
-using MonoGame.Extended.Collisions;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using static ZombieSurvivorZ.Collision;
 
 namespace ZombieSurvivorZ
@@ -345,7 +343,7 @@ namespace ZombieSurvivorZ
             if (Input.IsLMouseFirstDown())
             {
                 weapon.SemiFire();
-                
+
             }
             else if (Input.IsLMouseDown())
             {
@@ -414,7 +412,7 @@ namespace ZombieSurvivorZ
             {
                 if (Materials >= BarricadeMaterialCost)
                 {
-                    
+
                     barricadeTimeCount += Time.deltaTime;
                     //Console.WriteLine(barricadeTimeCount);
                     if (Game1.MapManager.DoorsLayer.Doors[SelectingDoor].CanBarricade())

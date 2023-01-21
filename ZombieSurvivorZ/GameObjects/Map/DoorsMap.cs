@@ -1,16 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using MonoGame.Extended.Timers;
-using MonoGame.Extended;
-using System;
-using System.Runtime.CompilerServices;
-using MonoGame.Extended.ViewportAdapters;
 using MonoGame.Extended.Tiled;
-using MonoGame.Extended.Tiled.Renderers;
+using System;
 using System.Collections.Generic;
-using MonoGame.Extended.Collections;
-using Microsoft.Xna.Framework.Audio;
 
 namespace ZombieSurvivorZ
 {
@@ -102,7 +94,7 @@ namespace ZombieSurvivorZ
         private readonly Rectangle Level2BarricadeVertical;
         private readonly Rectangle Level3BarricadeHorizontal;
         private readonly Rectangle Level3BarricadeVertical;
-        
+
         private readonly List<Vector2Int> ExpandingDoors = new();
         private readonly List<Vector2Int> CooldownDoors = new();
 

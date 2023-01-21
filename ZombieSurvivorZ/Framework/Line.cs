@@ -1,9 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended.Collisions;
-using System;
-using System.Diagnostics.SymbolStore;
-using static ZombieSurvivorZ.Collision;
 
 namespace ZombieSurvivorZ
 {

@@ -1,14 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using MonoGame.Extended;
-using MonoGame.Extended.Collisions;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using static ZombieSurvivorZ.Collision;
-
-namespace ZombieSurvivorZ
+﻿namespace ZombieSurvivorZ
 {
     public class BabyZombie : Zombie
     {
