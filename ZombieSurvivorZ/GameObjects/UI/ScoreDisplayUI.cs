@@ -50,6 +50,7 @@ namespace ZombieSurvivorZ
         {
             ZombiesScore.Text = $"Zombies Killed: {zombiesKilled}";
             TimeSurvived.Text = $"Time Survived: {PadInt(timeSurvived.Minutes)} : {PadInt(timeSurvived.Seconds)}";
+            Game1.Current.SetCursorVisible(true);
             SetActive(true);
         }
 

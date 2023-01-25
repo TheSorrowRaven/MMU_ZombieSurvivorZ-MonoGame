@@ -578,5 +578,11 @@ namespace ZombieSurvivorZ
             }
         }
 
+        public override void Destroy()
+        {
+            base.Destroy();
+            reticle.Destroy();
+        }
+
     }
 }

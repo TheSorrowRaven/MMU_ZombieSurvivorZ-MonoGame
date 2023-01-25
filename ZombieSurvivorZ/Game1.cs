@@ -58,6 +58,7 @@ namespace ZombieSurvivorZ
             Graphics.PreferredBackBufferWidth = 1920;
             Graphics.PreferredBackBufferHeight = 1080;
             Graphics.IsFullScreen = true;
+            Graphics.HardwareModeSwitch = false;
             Graphics.ApplyChanges();
 
             SoundEffect.MasterVolume = 0.6f;
